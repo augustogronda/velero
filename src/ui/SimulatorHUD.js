@@ -1,18 +1,21 @@
 import * as THREE from 'three';
 import { COURSE_NOTES } from './CourseNotes.js';
 import { RIPA_SCENARIOS } from '../simulation/RipaEngine.js';
+import { WEATHER_PRESETS } from '../simulation/WeatherSystem.js';
 
 export class SimulatorHUD {
-  constructor(windSystem, boat, environment, otherVessel, ripaEngine, ialaSystem, engine = null) {
+  constructor(windSystem, boat, environment, otherVessel, ripaEngine, ialaSystem, anchorSystem, weatherSystem, engine = null) {
     this.wind = windSystem;
     this.boat = boat;
     this.env = environment;
     this.otherVessel = otherVessel;
     this.ripa = ripaEngine;
     this.iala = ialaSystem;
+    this.anchor = anchorSystem;
+    this.weather = weatherSystem;
     this.engine = engine;
 
-    this.currentMode = 'wind'; // 'wind', 'ripa', 'iala'
+    this.currentMode = 'wind'; // 'wind', 'ripa', 'iala', 'anchor', 'weather'
 
     this.initDOM();
     this.populateRipaNavigation();
@@ -21,7 +24,7 @@ export class SimulatorHUD {
   }
 
   initDOM() {
-    // 1. Barra superior
+    // 1. Barra superior con los 5 modos educativos oficiales PNA
     this.header = document.createElement('header');
     this.header.className = 'sim-header';
     this.header.innerHTML = `
@@ -30,12 +33,14 @@ export class SimulatorHUD {
         <h1>Simulador Náutico 3D</h1>
       </div>
       <div class="sim-mode-selector">
-        <button class="mode-tab active" data-mode="wind">🧭 Viento & Rumbos</button>
-        <button class="mode-tab" data-mode="ripa">⚖️ Ejercicios RIPA (Cruces)</button>
-        <button class="mode-tab" data-mode="iala">📍 Boyado IALA B</button>
+        <button class="mode-tab active" data-mode="wind">🧭 Viento</button>
+        <button class="mode-tab" data-mode="ripa">⚖️ RIPA</button>
+        <button class="mode-tab" data-mode="iala">📍 Boyado B</button>
+        <button class="mode-tab" data-mode="anchor">⚓ Fondeo</button>
+        <button class="mode-tab" data-mode="weather">⛈️ Meteorología</button>
       </div>
       <div class="sim-header-actions">
-        <button id="btn-night-toggle" class="sim-btn sim-btn-night" title="Alternar modo noche y luces reglamentarias de navegación">🌙 Modo Noche (RIPA)</button>
+        <button id="btn-night-toggle" class="sim-btn sim-btn-night" title="Alternar modo noche y luces reglamentarias de navegación">🌙 Modo Noche</button>
         <button id="btn-notes-toggle" class="sim-btn" title="Ver apuntes y glosario del curso">📖 Apuntes PNA</button>
         <a href="index.html" class="sim-btn sim-btn-link" title="Volver a la vista de partes y despiece 3D">⛵ Nomenclatura ➔</a>
       </div>
@@ -55,7 +60,6 @@ export class SimulatorHUD {
           <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
           <circle cx="100" cy="100" r="75" fill="none" stroke="rgba(56,189,248,0.15)" stroke-width="1" stroke-dasharray="2,4"/>
           
-          <!-- Graduación cardinal -->
           <text x="100" y="24" text-anchor="middle" class="c-cardinal north">N (0°)</text>
           <text x="182" y="104" text-anchor="middle" class="c-cardinal">E (90°)</text>
           <text x="100" y="186" text-anchor="middle" class="c-cardinal">S (180°)</text>
@@ -192,7 +196,94 @@ export class SimulatorHUD {
     `;
     document.body.appendChild(this.ialaCard);
 
-    // 6. Panel de Control Táctil Inferior (Timón, Viento y Escotas)
+    // 6. Tarjeta interactiva de Fondeo y Círculo de Borneo (Modo Fondeo)
+    this.anchorCard = document.createElement('div');
+    this.anchorCard.className = 'sim-anchor-card';
+    this.anchorCard.style.display = 'none';
+    this.anchorCard.innerHTML = `
+      <div class="anchor-header">
+        <span class="anchor-badge">⚓ MANIOBRA DE FONDEO Y BORNEO (PNA)</span>
+      </div>
+      <div class="anchor-status-banner success" id="anchor-status-banner">
+        🟢 FONDEO SEGURO Y REGLAMENTARIO (PNA)
+      </div>
+      <div class="anchor-scope-box">
+        <div>
+          <div class="scope-val" id="anchor-scope-val">6.0:1</div>
+          <div class="scope-desc">Relación de Filado (Scope)</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:1.1rem;font-weight:700;color:#38bdf8;" id="anchor-radius-val">29 m</div>
+          <div class="scope-desc">Radio de Borneo</div>
+        </div>
+      </div>
+      <div class="anchor-sliders-group">
+        <div class="anchor-slider-row">
+          <label>Profundidad (Sonda): <strong id="lbl-anchor-depth">4.0 m</strong></label>
+          <input type="range" id="slider-anchor-depth" min="2" max="10" step="0.5" value="4">
+        </div>
+        <div class="anchor-slider-row">
+          <label>Cadena/Cabo Filado: <strong id="lbl-anchor-rode">24 m</strong></label>
+          <input type="range" id="slider-anchor-rode" min="6" max="50" step="1" value="24">
+        </div>
+        <div class="anchor-slider-row">
+          <label>Dirección del Viento: <strong id="lbl-anchor-wind">90°</strong></label>
+          <input type="range" id="slider-anchor-wind" min="0" max="359" value="90">
+        </div>
+        <div class="anchor-slider-row">
+          <label>Corriente de Marea: <strong id="lbl-anchor-curr">120° (1.2 kts)</strong></label>
+          <input type="range" id="slider-anchor-curr" min="0" max="359" value="120">
+        </div>
+      </div>
+      <p class="anchor-advice" id="anchor-advice">
+        Catenaria óptima. La tracción horizontal clava las uñas Danforth profundamente en el fango.
+      </p>
+    `;
+    document.body.appendChild(this.anchorCard);
+
+    // 7. Tarjeta interactiva de Meteorología Rioplatense (Modo Meteorología)
+    this.weatherCard = document.createElement('div');
+    this.weatherCard.className = 'sim-weather-card';
+    this.weatherCard.style.display = 'none';
+    this.weatherCard.innerHTML = `
+      <div class="weather-header">
+        <span class="weather-badge">⛈️ METEOROLOGÍA RIOPLATENSE & RIZADO</span>
+      </div>
+      <div class="weather-presets-grid">
+        <button class="weather-btn" data-preset="sudestada">🌪️ Sudestada (SE 26 kts)</button>
+        <button class="weather-btn" data-preset="pampero">⚡ Pampero (SW 34 kts)</button>
+        <button class="weather-btn" data-preset="calma_norte">☀️ Calma Norte (Bochorno)</button>
+        <button class="weather-btn active" data-preset="virazon">🌊 Virazón Térmica (E 15 kts)</button>
+      </div>
+      <div class="weather-metrics-bar">
+        <div class="w-metric">
+          <span class="w-val" id="w-pressure">1014 hPa</span>
+          <span class="w-lbl">Barómetro</span>
+        </div>
+        <div class="w-metric">
+          <span class="w-val" id="w-temp">22°C</span>
+          <span class="w-lbl">Temperatura</span>
+        </div>
+        <div class="w-metric">
+          <span class="w-val" id="w-surge">Normal</span>
+          <span class="w-lbl">Nivel del Río</span>
+        </div>
+      </div>
+      <div class="reefing-section">
+        <div class="reefing-title">⚙️ Maniobra de Rizado (Mayor y Foque)</div>
+        <div class="reefing-btn-group">
+          <button class="reefing-btn active" data-reef="0">Todo el Paño</button>
+          <button class="reefing-btn" data-reef="1">1° Rizo (-30%)</button>
+          <button class="reefing-btn" data-reef="2">2° Rizo (-60%)</button>
+        </div>
+      </div>
+      <p class="weather-desc-box" id="weather-desc">
+        Brisa térmica regular de la tarde. Condiciones ideales con aparejo completo.
+      </p>
+    `;
+    document.body.appendChild(this.weatherCard);
+
+    // 8. Panel de Control Táctil Inferior (Timón, Viento y Escotas)
     this.controlsCard = document.createElement('div');
     this.controlsCard.className = 'sim-controls-panel';
     this.controlsCard.innerHTML = `
@@ -233,7 +324,7 @@ export class SimulatorHUD {
     `;
     document.body.appendChild(this.controlsCard);
 
-    // 7. Drawer de Apuntes
+    // 9. Drawer de Apuntes
     this.notesDrawer = document.createElement('aside');
     this.notesDrawer.className = 'sim-notes-drawer';
     this.notesDrawer.innerHTML = `
@@ -257,7 +348,6 @@ export class SimulatorHUD {
     select.innerHTML = '';
 
     list.forEach(scen => {
-      // Pill
       const pill = document.createElement('button');
       pill.className = 'ripa-pill';
       pill.setAttribute('data-key', scen.id);
@@ -265,7 +355,6 @@ export class SimulatorHUD {
       pill.textContent = scen.number;
       pillsContainer.appendChild(pill);
 
-      // Option in dropdown
       const opt = document.createElement('option');
       opt.value = scen.id;
       opt.textContent = `${scen.number}. ${scen.badge} — ${scen.title}`;
@@ -315,12 +404,12 @@ export class SimulatorHUD {
         this.env.setNightMode(night);
         this.boat.setNavigationLights(night, false);
         if (this.otherVessel) this.otherVessel.setNightLights(night);
-        btnNight.textContent = night ? '☀️ Modo Día' : '🌙 Modo Noche (RIPA)';
+        btnNight.textContent = night ? '☀️ Modo Día' : '🌙 Modo Noche';
         btnNight.classList.toggle('active', night);
       });
     }
 
-    // Sliders
+    // Sliders Viento y Barco
     const sliderHdg = document.getElementById('slider-hdg');
     const sliderWindDir = document.getElementById('slider-wind-dir');
     const sliderWindSpd = document.getElementById('slider-wind-spd');
@@ -333,14 +422,14 @@ export class SimulatorHUD {
     if (sliderMain) sliderMain.addEventListener('input', (e) => { this.wind.setSheetTrim(+e.target.value / 100, this.wind.jibSheetTrim); this.update(); });
     if (sliderJib) sliderJib.addEventListener('input', (e) => { this.wind.setSheetTrim(this.wind.mainSheetTrim, +e.target.value / 100); this.update(); });
 
-    // Presets
+    // Presets de rumbo
     const presetBtns = document.querySelectorAll('.btn-preset');
     presetBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         presetBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         const h = +btn.getAttribute('data-heading');
-        sliderHdg.value = h;
+        if (sliderHdg) sliderHdg.value = h;
         this.wind.setBoatHeading(h);
         this.applyAutoTrim();
         this.update();
@@ -362,7 +451,7 @@ export class SimulatorHUD {
     if (btnNotesToggle && this.notesDrawer) btnNotesToggle.addEventListener('click', () => this.notesDrawer.classList.toggle('open'));
     if (btnNotesClose && this.notesDrawer) btnNotesClose.addEventListener('click', () => this.notesDrawer.classList.remove('open'));
 
-    // RIPA scenario selector & navigation
+    // RIPA controls
     const selRipa = document.getElementById('select-ripa-scenario');
     if (selRipa) {
       selRipa.addEventListener('change', (e) => {
@@ -375,8 +464,7 @@ export class SimulatorHUD {
       pillsBar.addEventListener('click', (e) => {
         const pill = e.target.closest('.ripa-pill');
         if (pill) {
-          const key = pill.getAttribute('data-key');
-          this.loadRipaScenario(key);
+          this.loadRipaScenario(pill.getAttribute('data-key'));
         }
       });
     }
@@ -408,41 +496,114 @@ export class SimulatorHUD {
         this.loadRipaScenario(this.ripa.currentScenarioKey);
       });
     }
+
+    // Anchor sliders
+    const sDepth = document.getElementById('slider-anchor-depth');
+    const sRode = document.getElementById('slider-anchor-rode');
+    const sWind = document.getElementById('slider-anchor-wind');
+    const sCurr = document.getElementById('slider-anchor-curr');
+
+    if (sDepth) sDepth.addEventListener('input', (e) => {
+      this.anchor.setParameters(+e.target.value, this.anchor.rodeLength);
+      this.updateAnchorUI();
+    });
+    if (sRode) sRode.addEventListener('input', (e) => {
+      this.anchor.setParameters(this.anchor.depth, +e.target.value);
+      this.updateAnchorUI();
+    });
+    if (sWind) sWind.addEventListener('input', (e) => {
+      this.anchor.setEnvironmentForces(+e.target.value, this.anchor.currentDir, this.anchor.currentSpeed);
+      this.updateAnchorUI();
+    });
+    if (sCurr) sCurr.addEventListener('input', (e) => {
+      this.anchor.setEnvironmentForces(this.anchor.windDir, +e.target.value, this.anchor.currentSpeed);
+      this.updateAnchorUI();
+    });
+
+    // Weather buttons
+    const wBtns = document.querySelectorAll('.weather-btn');
+    wBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        wBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const pKey = btn.getAttribute('data-preset');
+        this.weather.setPreset(pKey);
+        this.updateWeatherUI();
+      });
+    });
+
+    // Reefing buttons
+    const rBtns = document.querySelectorAll('.reefing-btn');
+    rBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        rBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const rLevel = +btn.getAttribute('data-reef');
+        this.weather.setReefing(rLevel);
+        this.update();
+      });
+    });
   }
 
   setMode(mode) {
     this.currentMode = mode;
+
+    // Resetear visibilidades de tarjetas
+    this.compassWidget.style.display = 'none';
+    this.telemetryCard.style.display = 'none';
+    this.ripaCard.style.display = 'none';
+    this.ialaCard.style.display = 'none';
+    this.anchorCard.style.display = 'none';
+    this.weatherCard.style.display = 'none';
+    this.controlsCard.style.display = 'none';
+
+    // Desactivar sistemas especializados
+    this.otherVessel.setupScenario({ active: false });
+    this.iala.setActive(false);
+    this.anchor.setActive(false);
+
     if (mode === 'wind') {
       this.compassWidget.style.display = 'block';
       this.telemetryCard.style.display = 'flex';
-      this.ripaCard.style.display = 'none';
-      this.ialaCard.style.display = 'none';
       this.controlsCard.style.display = 'flex';
-      this.otherVessel.setupScenario({ active: false });
-      this.iala.setActive(false);
+      this.boat.group.position.set(0, 0, 0);
       this.env.setNightMode(false);
       this.boat.setNavigationLights(false, false);
-      const btnNight = document.getElementById('btn-night-toggle');
-      if (btnNight) {
-        btnNight.textContent = '🌙 Modo Noche (RIPA)';
-        btnNight.classList.remove('active');
+      if (this.engine) {
+        this.engine.camera.position.set(12, 7, 16);
+        this.engine.controls.target.set(0, 1.8, 0);
       }
     } else if (mode === 'ripa') {
-      this.compassWidget.style.display = 'none';
-      this.telemetryCard.style.display = 'none';
       this.ripaCard.style.display = 'flex';
-      this.ialaCard.style.display = 'none';
-      this.controlsCard.style.display = 'none';
-      this.iala.setActive(false);
       this.loadRipaScenario(this.ripa.currentScenarioKey);
     } else if (mode === 'iala') {
-      this.compassWidget.style.display = 'none';
-      this.telemetryCard.style.display = 'none';
-      this.ripaCard.style.display = 'none';
       this.ialaCard.style.display = 'flex';
       this.controlsCard.style.display = 'flex';
-      this.otherVessel.setupScenario({ active: false });
+      this.boat.group.position.set(0, 0, 0);
       this.iala.setActive(true);
+      if (this.engine) {
+        this.engine.camera.position.set(16, 12, 28);
+        this.engine.controls.target.set(0, 2, 8);
+      }
+    } else if (mode === 'anchor') {
+      this.anchorCard.style.display = 'flex';
+      this.anchor.setActive(true);
+      this.updateAnchorUI();
+      if (this.engine) {
+        this.engine.camera.position.set(18, 16, 26);
+        this.engine.controls.target.set(0, 0, 8);
+      }
+    } else if (mode === 'weather') {
+      this.weatherCard.style.display = 'flex';
+      this.telemetryCard.style.display = 'flex';
+      this.controlsCard.style.display = 'flex';
+      this.boat.group.position.set(0, 0, 0);
+      this.weather.setPreset(this.weather.currentPresetKey);
+      this.updateWeatherUI();
+      if (this.engine) {
+        this.engine.camera.position.set(12, 6, 16);
+        this.engine.controls.target.set(0, 1.5, 0);
+      }
     }
   }
 
@@ -450,7 +611,8 @@ export class SimulatorHUD {
     const scen = this.ripa.loadScenario(key);
     if (!scen) return;
 
-    // 1. Sincronizar encabezado, badge y selector
+    this.boat.group.position.set(0, 0, 0);
+
     const badge = document.getElementById('ripa-badge');
     const banner = document.getElementById('ripa-tactical-banner');
     const desc = document.getElementById('ripa-desc');
@@ -475,7 +637,6 @@ export class SimulatorHUD {
       feedback.style.display = 'none';
     }
 
-    // Sincronizar píldoras numeradas
     const list = this.ripa.getScenarioList();
     const pills = document.querySelectorAll('.ripa-pill');
     pills.forEach(p => {
@@ -491,7 +652,6 @@ export class SimulatorHUD {
       }
     });
 
-    // 2. Configurar el estado 3D exacto del escenario
     if (scen.wind) {
       this.wind.setTrueWind(scen.wind.directionDeg, scen.wind.speedKts);
     }
@@ -501,22 +661,19 @@ export class SimulatorHUD {
     }
     this.applyAutoTrim();
 
-    // Sincronizar iluminación día/noche
     const isNight = !!scen.nightMode;
     this.env.setNightMode(isNight);
     const btnNight = document.getElementById('btn-night-toggle');
     if (btnNight) {
-      btnNight.textContent = isNight ? '☀️ Modo Día' : '🌙 Modo Noche (RIPA)';
+      btnNight.textContent = isNight ? '☀️ Modo Día' : '🌙 Modo Noche';
       btnNight.classList.toggle('active', isNight);
     }
 
-    // Sincronizar cámara 3D si está disponible
     if (this.engine && scen.camera) {
       this.engine.camera.position.set(...scen.camera.position);
       this.engine.controls.target.set(...scen.camera.target);
     }
 
-    // 3. Renderizar opciones del cuestionario
     if (optionsGroup && scen.options) {
       optionsGroup.innerHTML = scen.options.map((opt, idx) => `
         <button class="ripa-opt-btn" data-idx="${idx}">${opt.text}</button>
@@ -550,6 +707,54 @@ export class SimulatorHUD {
         });
       });
     }
+
+    this.update();
+  }
+
+  updateAnchorUI() {
+    if (!this.anchor) return;
+    const status = this.anchor.getStatus();
+
+    const banner = document.getElementById('anchor-status-banner');
+    const scopeVal = document.getElementById('anchor-scope-val');
+    const radiusVal = document.getElementById('anchor-radius-val');
+    const advice = document.getElementById('anchor-advice');
+    const lblDepth = document.getElementById('lbl-anchor-depth');
+    const lblRode = document.getElementById('lbl-anchor-rode');
+    const lblWind = document.getElementById('lbl-anchor-wind');
+    const lblCurr = document.getElementById('lbl-anchor-curr');
+
+    if (banner) {
+      banner.textContent = status.statusText;
+      banner.className = `anchor-status-banner ${status.statusClass}`;
+    }
+    if (scopeVal) scopeVal.textContent = `${status.scope}:1`;
+    if (radiusVal) radiusVal.textContent = `${status.swingRadius} m`;
+    if (advice) advice.textContent = status.explanation;
+
+    if (lblDepth) lblDepth.textContent = `${this.anchor.depth.toFixed(1)} m`;
+    if (lblRode) lblRode.textContent = `${this.anchor.rodeLength} m`;
+    if (lblWind) lblWind.textContent = `${this.anchor.windDir}°`;
+    if (lblCurr) lblCurr.textContent = `${this.anchor.currentDir}° (${this.anchor.currentSpeed} kts)`;
+  }
+
+  updateWeatherUI() {
+    if (!this.weather) return;
+    const p = this.weather.getCurrentPreset();
+
+    const pressure = document.getElementById('w-pressure');
+    const temp = document.getElementById('w-temp');
+    const surge = document.getElementById('w-surge');
+    const desc = document.getElementById('weather-desc');
+
+    if (pressure) pressure.textContent = `${p.pressureHpa} hPa`;
+    if (temp) temp.textContent = `${p.tempC}°C`;
+    if (surge) {
+      if (p.waterSurge > 0) surge.textContent = `+${p.waterSurge}m (Repunte)`;
+      else if (p.waterSurge < 0) surge.textContent = `${p.waterSurge}m (Bajante)`;
+      else surge.textContent = 'Normal';
+    }
+    if (desc) desc.textContent = `${p.description} ${p.nauticalAdvice}`;
 
     this.update();
   }

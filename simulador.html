@@ -625,6 +625,235 @@
     .buoy-pill.safe { border-color: rgba(56, 189, 248, 0.4); }
     .buoy-pill.safe .bp-icon { color: #38bdf8; }
 
+    /* ── TARJETA FONDEO Y BORNEO ──────────────────────────────────── */
+    .sim-anchor-card {
+      position: fixed;
+      top: max(80px, calc(env(safe-area-inset-top, 0px) + 74px));
+      right: 16px;
+      z-index: 40;
+      background: var(--panel-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--panel-border);
+      border-radius: 18px;
+      padding: 14px 16px;
+      width: 380px;
+      max-width: calc(100vw - 32px);
+      max-height: calc(100dvh - 110px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .anchor-badge {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: #38bdf8;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .anchor-status-banner {
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+    .anchor-status-banner.danger {
+      background: rgba(239, 68, 68, 0.18);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+    .anchor-status-banner.warning {
+      background: rgba(245, 158, 11, 0.18);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #fde047;
+    }
+    .anchor-status-banner.success {
+      background: rgba(16, 185, 129, 0.18);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #6ee7b7;
+    }
+    .anchor-scope-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 8px 12px;
+    }
+    .scope-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .scope-desc {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      text-align: right;
+    }
+    .anchor-sliders-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .anchor-slider-row {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .anchor-slider-row label {
+      font-size: 0.72rem;
+      color: #cbd5e1;
+      display: flex;
+      justify-content: space-between;
+    }
+    .anchor-slider-row input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent-cyan);
+    }
+    .anchor-advice {
+      font-size: 0.74rem;
+      line-height: 1.45;
+      color: #94a3b8;
+      background: rgba(255,255,255,0.02);
+      border-left: 3px solid var(--accent-cyan);
+      padding: 6px 10px;
+      border-radius: 0 6px 6px 0;
+    }
+
+    /* ── TARJETA METEOROLOGÍA RIOPLATENSE ─────────────────────────── */
+    .sim-weather-card {
+      position: fixed;
+      top: max(80px, calc(env(safe-area-inset-top, 0px) + 74px));
+      right: 16px;
+      z-index: 40;
+      background: var(--panel-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--panel-border);
+      border-radius: 18px;
+      padding: 14px 16px;
+      width: 380px;
+      max-width: calc(100vw - 32px);
+      max-height: calc(100dvh - 110px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .weather-badge {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: #f59e0b;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .weather-presets-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .weather-btn {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #e2e8f0;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .weather-btn:hover {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--accent-cyan);
+    }
+    .weather-btn.active {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: #f59e0b;
+      color: #fde047;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+    }
+    .weather-metrics-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+    }
+    .w-metric {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+      padding: 6px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .w-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .w-lbl {
+      font-size: 0.58rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+    .reefing-section {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 8px;
+    }
+    .reefing-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+    }
+    .reefing-btn-group {
+      display: flex;
+      gap: 6px;
+    }
+    .reefing-btn {
+      flex: 1;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #e2e8f0;
+      padding: 6px 8px;
+      border-radius: 6px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      text-align: center;
+    }
+    .reefing-btn:hover {
+      background: rgba(56, 189, 248, 0.2);
+    }
+    .reefing-btn.active {
+      background: #10b981;
+      color: #030d1b;
+      border-color: #10b981;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+    }
+    .weather-desc-box {
+      font-size: 0.74rem;
+      line-height: 1.45;
+      color: #cbd5e1;
+    }
+
     /* ── PANEL INFERIOR DE MANIOBRAS ───────────────────────────────── */
     .sim-controls-panel {
       position: fixed;

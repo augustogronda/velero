@@ -5,6 +5,10 @@ export class SceneEnvironment {
     this.scene = scene;
     this.isNight = false;
 
+    this.baseWaterY = 0.28;
+    this.waveFreq = 1.5;
+    this.waveAmp = 0.08;
+
     this.initLights();
     this.initWater();
     this.initGrid();
@@ -46,7 +50,7 @@ export class SceneEnvironment {
 
     this.waterMesh = new THREE.Mesh(waterGeo, this.waterMat);
     this.waterMesh.rotation.x = -Math.PI / 2;
-    this.waterMesh.position.y = 0.28; // Nivel de la línea de flotación
+    this.waterMesh.position.y = this.baseWaterY;
     this.waterMesh.receiveShadow = true;
     this.scene.add(this.waterMesh);
   }
@@ -83,14 +87,33 @@ export class SceneEnvironment {
     }
   }
 
+  applyWeatherCondition(preset) {
+    if (!preset) return;
+
+    if (preset.waterColor) this.waterMat.color.setHex(preset.waterColor);
+    if (preset.skyColor) {
+      this.scene.background.setHex(preset.skyColor);
+      this.scene.fog.color.setHex(preset.skyColor);
+    }
+    if (preset.waveFreq) this.waveFreq = preset.waveFreq;
+    if (preset.waveAmp) this.waveAmp = preset.waveAmp;
+
+    // Repunte o bajante del agua sobre la cota normal
+    const surge = preset.waterSurge || 0;
+    this.waterMesh.position.y = this.baseWaterY + surge;
+  }
+
   update(delta, time) {
-    // Animación suave de oleaje marino
+    // Animación dinámica de oleaje marino según meteorología activa
     if (this.waterMesh) {
       const pos = this.waterMesh.geometry.attributes.position;
+      const freq = this.waveFreq;
+      const amp = this.waveAmp;
+
       for (let i = 0; i < pos.count; i++) {
         const u = pos.getX(i);
         const v = pos.getY(i);
-        const wave = Math.sin(u * 0.15 + time * 1.5) * 0.08 + Math.cos(v * 0.12 + time * 1.2) * 0.06;
+        const wave = Math.sin(u * 0.15 + time * freq) * amp + Math.cos(v * 0.12 + time * (freq * 0.85)) * (amp * 0.75);
         pos.setZ(i, wave);
       }
       pos.needsUpdate = true;

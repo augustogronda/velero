@@ -43,6 +43,50 @@ export const COURSE_NOTES = {
       }
     ]
   },
+  fondeoBorneo: {
+    title: "Maniobra de Fondeo y Círculo de Borneo (PNA)",
+    icon: "⚓",
+    sections: [
+      {
+        heading: "Regla de Oro del Filado (Scope)",
+        content: "Para que el ancla clave, el tiro de la cadena en el fondo debe ser completamente horizontal. La relación reglamentaria de la Prefectura es: con buen tiempo y estadía diurna, filar de 3 a 5 veces la profundidad (sonda + francobordo); con mal tiempo, noche o viento fuerte, filar de 5 a 7 (incluso 8) veces la profundidad."
+      },
+      {
+        heading: "El Garreo (Garapeo)",
+        content: "Ocurre cuando el ancla arrastra por el fondo sin clavarse. Se detecta tomando enfilaciones a tierra de dos puntos fijos o con la alarma de fondeo del GPS. Si garrea, nunca esperar: arrancar motor de inmediato, cobrar línea y volver a fondear filando mayor longitud de cadena o cambiando de tenedero."
+      },
+      {
+        heading: "Círculo y Radio de Borneo",
+        content: "Es la circunferencia donde gira el barco fondeado según giren el viento o la marea (corriente). Su radio es igual a: Longitud de cadena/cabo filada + Eslora del velero. Al fondear en fondeaderos concurridos (San Antonio, Olivos, Quilmes), siempre debe verificarse que los círculos de borneo con barcos vecinos no se solapen."
+      },
+      {
+        heading: "Tenederos del Río de la Plata",
+        content: "El fondo del Río de la Plata y el Delta es predominantemente de fango blando y limo. El ancla por excelencia para estas aguas es la Danforth (por sus uñas anchas con gran poder de agarre) y la Bruce/Trefoil."
+      }
+    ]
+  },
+  meteorologia: {
+    title: "Meteorología Rioplatense: Pampero y Sudestada",
+    icon: "⛈️",
+    sections: [
+      {
+        heading: "La Sudestada (Viento Persistente del SE)",
+        content: "Originada por un anticiclón centrado en el Atlántico Sur y una baja relativa en el interior. Provoca viento fuerte sostenido del SE (20-35 nudos), lloviznas persistentes y 'repunte' (crecida del nivel del río) que inunda la costa. Las olas son cortas, empinadas y muy picadas debido al poco fondo del estuario."
+      },
+      {
+        heading: "El Pampero (Frente Frío Patagónico del SW)",
+        content: "Entrada brusca de masa polar patagónica que barre el aire cálido y húmedo previo del norte. Se anuncia en el horizonte SW por el 'barrón pampero' (nubes oscuras y densas). Trae ráfagas violentas de 30 a 50 nudos, caída abrupta de temperatura (hasta 15°C en minutos) y bajante rápida del nivel del río."
+      },
+      {
+        heading: "Toma de Rizos en Veleros",
+        content: "Reducir paño preventivamente antes de que la escora supere los 25°-30°. Con el 1° rizo se baja la mayor ~25%; con el 2° rizo se achica al 50%. En proa se enrolla el génova dejando una superficie reducida de tormentín. Un velero adrizado es más veloz, tiene mejor gobierno de timón y no fatiga el aparejo."
+      },
+      {
+        heading: "La Tendencia Bárica",
+        content: "Una caída rápida de más de 3 hPa en 3 horas en el barómetro es el aviso inequívoco de la llegada inminente de un temporal o frente frío activo."
+      }
+    ]
+  },
   lucesNoche: {
     title: "Luces de Navegación Reglamentarias (PNA)",
     icon: "🏮",
