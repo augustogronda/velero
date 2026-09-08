@@ -20,6 +20,12 @@ export class WindSystem {
     this.flutterIntensity = 0;
     this.optimalMainTrim = 0.2;
     this.trimEvaluation = 'Óptimo';
+    this.reefingFactor = 1.0; // 1.0 = paño completo, 0.65 = 1° rizo, 0.35 = 2° rizo
+  }
+
+  setReefingFactor(factor) {
+    this.reefingFactor = THREE.MathUtils.clamp(factor, 0.1, 1.0);
+    this.calculatePhysics();
   }
 
   setTrueWind(directionDeg, speedKnots) {
@@ -121,6 +127,8 @@ export class WindSystem {
       const lateralForce = Math.sin(THREE.MathUtils.degToRad(this.relativeWindAngle));
       baseHeel = (this.trueWindSpeed / 25) * lateralForce * (1.1 - this.mainSheetTrim * 0.4) * 0.38;
     }
+    // Modulación dinámica por rizado de velas (PNA)
+    baseHeel *= this.reefingFactor;
     this.heelingAngle = baseHeel * sideMultiplier; // Radianes
   }
 }

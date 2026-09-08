@@ -15,7 +15,7 @@ export class SimulatorHUD {
     this.weather = weatherSystem;
     this.engine = engine;
 
-    this.currentMode = 'wind'; // 'wind', 'ripa', 'iala', 'anchor', 'weather'
+    this.currentMode = 'wind'; // 'wind', 'ripa', 'iala', 'anchor'
 
     this.initDOM();
     this.populateRipaNavigation();
@@ -24,7 +24,7 @@ export class SimulatorHUD {
   }
 
   initDOM() {
-    // 1. Barra superior con los 5 modos educativos oficiales PNA
+    // 1. Barra superior unificada con los 4 grandes ejes temáticos del curso PNA
     this.header = document.createElement('header');
     this.header.className = 'sim-header';
     this.header.innerHTML = `
@@ -33,11 +33,10 @@ export class SimulatorHUD {
         <h1>Simulador Náutico 3D</h1>
       </div>
       <div class="sim-mode-selector">
-        <button class="mode-tab active" data-mode="wind">🧭 Viento</button>
-        <button class="mode-tab" data-mode="ripa">⚖️ RIPA</button>
+        <button class="mode-tab active" data-mode="wind">🧭 Viento & Clima</button>
+        <button class="mode-tab" data-mode="ripa">⚖️ RIPA (10 Cruces)</button>
         <button class="mode-tab" data-mode="iala">📍 Boyado B</button>
-        <button class="mode-tab" data-mode="anchor">⚓ Fondeo</button>
-        <button class="mode-tab" data-mode="weather">⛈️ Meteorología</button>
+        <button class="mode-tab" data-mode="anchor">⚓ Fondeo & Borneo</button>
       </div>
       <div class="sim-header-actions">
         <button id="btn-night-toggle" class="sim-btn sim-btn-night" title="Alternar modo noche y luces reglamentarias de navegación">🌙 Modo Noche</button>
@@ -47,7 +46,7 @@ export class SimulatorHUD {
     `;
     document.body.appendChild(this.header);
 
-    // 2. Widget de Rosa Náutica y Viento (Aparece en Modo Viento)
+    // 2. Widget de Rosa Náutica y Viento (Modo Viento)
     this.compassWidget = document.createElement('div');
     this.compassWidget.className = 'sim-compass-card';
     this.compassWidget.innerHTML = `
@@ -241,49 +240,7 @@ export class SimulatorHUD {
     `;
     document.body.appendChild(this.anchorCard);
 
-    // 7. Tarjeta interactiva de Meteorología Rioplatense (Modo Meteorología)
-    this.weatherCard = document.createElement('div');
-    this.weatherCard.className = 'sim-weather-card';
-    this.weatherCard.style.display = 'none';
-    this.weatherCard.innerHTML = `
-      <div class="weather-header">
-        <span class="weather-badge">⛈️ METEOROLOGÍA RIOPLATENSE & RIZADO</span>
-      </div>
-      <div class="weather-presets-grid">
-        <button class="weather-btn" data-preset="sudestada">🌪️ Sudestada (SE 26 kts)</button>
-        <button class="weather-btn" data-preset="pampero">⚡ Pampero (SW 34 kts)</button>
-        <button class="weather-btn" data-preset="calma_norte">☀️ Calma Norte (Bochorno)</button>
-        <button class="weather-btn active" data-preset="virazon">🌊 Virazón Térmica (E 15 kts)</button>
-      </div>
-      <div class="weather-metrics-bar">
-        <div class="w-metric">
-          <span class="w-val" id="w-pressure">1014 hPa</span>
-          <span class="w-lbl">Barómetro</span>
-        </div>
-        <div class="w-metric">
-          <span class="w-val" id="w-temp">22°C</span>
-          <span class="w-lbl">Temperatura</span>
-        </div>
-        <div class="w-metric">
-          <span class="w-val" id="w-surge">Normal</span>
-          <span class="w-lbl">Nivel del Río</span>
-        </div>
-      </div>
-      <div class="reefing-section">
-        <div class="reefing-title">⚙️ Maniobra de Rizado (Mayor y Foque)</div>
-        <div class="reefing-btn-group">
-          <button class="reefing-btn active" data-reef="0">Todo el Paño</button>
-          <button class="reefing-btn" data-reef="1">1° Rizo (-30%)</button>
-          <button class="reefing-btn" data-reef="2">2° Rizo (-60%)</button>
-        </div>
-      </div>
-      <p class="weather-desc-box" id="weather-desc">
-        Brisa térmica regular de la tarde. Condiciones ideales con aparejo completo.
-      </p>
-    `;
-    document.body.appendChild(this.weatherCard);
-
-    // 8. Panel de Control Táctil Inferior (Timón, Viento y Escotas)
+    // 7. Panel de Control Táctil Inferior: Rumbos, Clima Rioplatense, Rizos y Sliders
     this.controlsCard = document.createElement('div');
     this.controlsCard.className = 'sim-controls-panel';
     this.controlsCard.innerHTML = `
@@ -306,6 +263,7 @@ export class SimulatorHUD {
           <button class="btn-weather-quick" data-preset="sudestada">🌪️ Sudestada (SE 26k)</button>
           <button class="btn-weather-quick" data-preset="pampero">⚡ Pampero (SW 34k)</button>
           <button class="btn-weather-quick" data-preset="calma_norte">☀️ Calma Norte</button>
+          <button class="btn-weather-quick" data-preset="custom" id="btn-weather-custom">⚙️ Personalizado</button>
         </div>
         <span class="ctrl-label" style="margin-left:6px;">Rizos:</span>
         <div class="ctrl-reef-btns">
@@ -315,18 +273,22 @@ export class SimulatorHUD {
         </div>
       </div>
 
+      <div class="weather-info-box" id="weather-info-box">
+        🌊 <strong>Virazón Costera:</strong> Brisa térmica regular de la tarde desde el Este (15 kts). Condiciones ideales con aparejo completo.
+      </div>
+
       <div class="ctrl-row-sliders">
         <div class="slider-card">
           <label>Rumbo Barco: <strong id="lbl-hdg">0°</strong></label>
           <input type="range" id="slider-hdg" min="0" max="359" value="0">
         </div>
         <div class="slider-card">
-          <label>Dirección Viento: <strong id="lbl-wind-dir">0°</strong></label>
-          <input type="range" id="slider-wind-dir" min="0" max="359" value="0">
+          <label>Dirección Viento: <strong id="lbl-wind-dir">90°</strong></label>
+          <input type="range" id="slider-wind-dir" min="0" max="359" value="90">
         </div>
         <div class="slider-card">
-          <label>Intensidad Viento: <strong id="lbl-wind-spd">14 kts</strong></label>
-          <input type="range" id="slider-wind-spd" min="4" max="30" value="14">
+          <label>Intensidad Viento: <strong id="lbl-wind-spd">15 kts</strong></label>
+          <input type="range" id="slider-wind-spd" min="4" max="35" value="15">
         </div>
         <div class="slider-card">
           <label>Escota Mayor: <strong id="lbl-main-sheet">25%</strong></label>
@@ -340,7 +302,7 @@ export class SimulatorHUD {
     `;
     document.body.appendChild(this.controlsCard);
 
-    // 9. Drawer de Apuntes
+    // 8. Drawer de Apuntes
     this.notesDrawer = document.createElement('aside');
     this.notesDrawer.className = 'sim-notes-drawer';
     this.notesDrawer.innerHTML = `
@@ -425,18 +387,55 @@ export class SimulatorHUD {
       });
     }
 
-    // Sliders Viento y Barco
+    // Sliders de viento, rumbo y escotas con desactivación automática de preset climático
     const sliderHdg = document.getElementById('slider-hdg');
     const sliderWindDir = document.getElementById('slider-wind-dir');
     const sliderWindSpd = document.getElementById('slider-wind-spd');
     const sliderMain = document.getElementById('slider-main-sheet');
     const sliderJib = document.getElementById('slider-jib-sheet');
 
-    if (sliderHdg) sliderHdg.addEventListener('input', (e) => { this.wind.setBoatHeading(+e.target.value); this.update(); });
-    if (sliderWindDir) sliderWindDir.addEventListener('input', (e) => { this.wind.setTrueWind(+e.target.value, this.wind.trueWindSpeed); this.update(); });
-    if (sliderWindSpd) sliderWindSpd.addEventListener('input', (e) => { this.wind.setTrueWind(this.wind.trueWindDirection, +e.target.value); this.update(); });
-    if (sliderMain) sliderMain.addEventListener('input', (e) => { this.wind.setSheetTrim(+e.target.value / 100, this.wind.jibSheetTrim); this.update(); });
-    if (sliderJib) sliderJib.addEventListener('input', (e) => { this.wind.setSheetTrim(this.wind.mainSheetTrim, +e.target.value / 100); this.update(); });
+    const activateCustomWeather = () => {
+      document.querySelectorAll('.btn-weather-quick').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-preset') === 'custom');
+      });
+      const info = document.getElementById('weather-info-box');
+      if (info) {
+        info.innerHTML = `⚙️ <strong>Ajuste Personalizado:</strong> Viento a ${this.wind.trueWindSpeed} kts desde ${this.wind.trueWindDirection}°. Parámetros ajustados manualmente por el timonel.`;
+      }
+    };
+
+    if (sliderHdg) {
+      sliderHdg.addEventListener('input', (e) => {
+        this.wind.setBoatHeading(+e.target.value);
+        this.update();
+      });
+    }
+    if (sliderWindDir) {
+      sliderWindDir.addEventListener('input', (e) => {
+        this.wind.setTrueWind(+e.target.value, this.wind.trueWindSpeed);
+        activateCustomWeather();
+        this.update();
+      });
+    }
+    if (sliderWindSpd) {
+      sliderWindSpd.addEventListener('input', (e) => {
+        this.wind.setTrueWind(this.wind.trueWindDirection, +e.target.value);
+        activateCustomWeather();
+        this.update();
+      });
+    }
+    if (sliderMain) {
+      sliderMain.addEventListener('input', (e) => {
+        this.wind.setSheetTrim(+e.target.value / 100, this.wind.jibSheetTrim);
+        this.update();
+      });
+    }
+    if (sliderJib) {
+      sliderJib.addEventListener('input', (e) => {
+        this.wind.setSheetTrim(this.wind.mainSheetTrim, +e.target.value / 100);
+        this.update();
+      });
+    }
 
     // Presets de rumbo
     const presetBtns = document.querySelectorAll('.btn-preset');
@@ -536,39 +535,61 @@ export class SimulatorHUD {
       this.updateAnchorUI();
     });
 
-    // Weather presets handler (sincroniza panel de control y tarjeta de clima)
+    // Manejador de Clima Rioplatense integrado en la sección Viento
     const handleWeatherPreset = (pKey) => {
-      document.querySelectorAll('.weather-btn, .btn-weather-quick').forEach(b => {
+      document.querySelectorAll('.btn-weather-quick').forEach(b => {
         b.classList.toggle('active', b.getAttribute('data-preset') === pKey);
       });
+
+      if (pKey === 'custom') {
+        activateCustomWeather();
+        return;
+      }
+
       const preset = this.weather.setPreset(pKey);
       if (preset) {
-        const sliderWindDir = document.getElementById('slider-wind-dir');
-        const sliderWindSpd = document.getElementById('slider-wind-spd');
         if (sliderWindDir) sliderWindDir.value = preset.windDir;
         if (sliderWindSpd) sliderWindSpd.value = preset.windSpd;
         this.applyAutoTrim();
+
+        const info = document.getElementById('weather-info-box');
+        if (info) {
+          const reefNote = this.weather.reefingLevel === 1 
+            ? ' <em>[1° Rizo Tomado: Área reducida y escora aminorada]</em>'
+            : (this.weather.reefingLevel === 2 ? ' <em>[2° Rizo Tomado: Tormentín y máxima estabilidad]</em>' : '');
+          info.innerHTML = `🌪️ <strong>${preset.name}:</strong> ${preset.description} 💡 <strong>Consejo Timonel:</strong> ${preset.nauticalAdvice}${reefNote}`;
+        }
       }
-      this.updateWeatherUI();
       this.update();
     };
 
-    document.querySelectorAll('.weather-btn, .btn-weather-quick').forEach(btn => {
+    document.querySelectorAll('.btn-weather-quick').forEach(btn => {
       btn.addEventListener('click', () => {
         handleWeatherPreset(btn.getAttribute('data-preset'));
       });
     });
 
-    // Reefing buttons handler (sincroniza panel de control y tarjeta de clima)
+    // Manejador de Rizado de Velas (Mayor y Foque)
     const handleReefing = (rLevel) => {
-      document.querySelectorAll('.reefing-btn, .btn-reef-quick').forEach(b => {
+      document.querySelectorAll('.btn-reef-quick').forEach(b => {
         b.classList.toggle('active', +b.getAttribute('data-reef') === rLevel);
       });
       this.weather.setReefing(rLevel);
+
+      const info = document.getElementById('weather-info-box');
+      if (info) {
+        const reefText = rLevel === 0 
+          ? '⛵ <strong>Velas desplegadas al 100%:</strong> Superficie vélica completa para vientos moderados.'
+          : (rLevel === 1 
+              ? '⚙️ <strong>1° Rizo Tomado (-30% superficie):</strong> Centro vélico más bajo, menor brazo de palanca y reducción inmediata de escora.'
+              : '⛈️ <strong>2° Rizo Tomado (-60% superficie):</strong> Aparejo de temporal para vientos duros (Pampero/Sudestada). Máxima seguridad.');
+        info.innerHTML = reefText;
+      }
+
       this.update();
     };
 
-    document.querySelectorAll('.reefing-btn, .btn-reef-quick').forEach(btn => {
+    document.querySelectorAll('.btn-reef-quick').forEach(btn => {
       btn.addEventListener('click', () => {
         handleReefing(+btn.getAttribute('data-reef'));
       });
@@ -578,16 +599,15 @@ export class SimulatorHUD {
   setMode(mode) {
     this.currentMode = mode;
 
-    // Resetear visibilidades de tarjetas
+    // Resetear visibilidades de tarjetas secundarias
     this.compassWidget.style.display = 'none';
     this.telemetryCard.style.display = 'none';
     this.ripaCard.style.display = 'none';
     this.ialaCard.style.display = 'none';
     this.anchorCard.style.display = 'none';
-    this.weatherCard.style.display = 'none';
     this.controlsCard.style.display = 'none';
 
-    // Desactivar sistemas especializados
+    // Desactivar subsistemas especializados
     this.otherVessel.setupScenario({ active: false });
     this.iala.setActive(false);
     this.anchor.setActive(false);
@@ -622,17 +642,6 @@ export class SimulatorHUD {
       if (this.engine) {
         this.engine.camera.position.set(18, 16, 26);
         this.engine.controls.target.set(0, 0, 8);
-      }
-    } else if (mode === 'weather') {
-      this.weatherCard.style.display = 'flex';
-      this.telemetryCard.style.display = 'flex';
-      this.controlsCard.style.display = 'flex';
-      this.boat.group.position.set(0, 0, 0);
-      this.weather.setPreset(this.weather.currentPresetKey);
-      this.updateWeatherUI();
-      if (this.engine) {
-        this.engine.camera.position.set(12, 6, 16);
-        this.engine.controls.target.set(0, 1.5, 0);
       }
     }
   }
@@ -768,27 +777,6 @@ export class SimulatorHUD {
     if (lblCurr) lblCurr.textContent = `${this.anchor.currentDir}° (${this.anchor.currentSpeed} kts)`;
   }
 
-  updateWeatherUI() {
-    if (!this.weather) return;
-    const p = this.weather.getCurrentPreset();
-
-    const pressure = document.getElementById('w-pressure');
-    const temp = document.getElementById('w-temp');
-    const surge = document.getElementById('w-surge');
-    const desc = document.getElementById('weather-desc');
-
-    if (pressure) pressure.textContent = `${p.pressureHpa} hPa`;
-    if (temp) temp.textContent = `${p.tempC}°C`;
-    if (surge) {
-      if (p.waterSurge > 0) surge.textContent = `+${p.waterSurge}m (Repunte)`;
-      else if (p.waterSurge < 0) surge.textContent = `${p.waterSurge}m (Bajante)`;
-      else surge.textContent = 'Normal';
-    }
-    if (desc) desc.textContent = `${p.description} ${p.nauticalAdvice}`;
-
-    this.update();
-  }
-
   applyAutoTrim() {
     const ideal = this.wind.optimalMainTrim;
     this.wind.setSheetTrim(ideal, ideal);
@@ -852,7 +840,11 @@ export class SimulatorHUD {
       }
     }
     if (telEval) {
-      telEval.textContent = this.wind.trimEvaluation;
+      if (this.weather && this.weather.reefingLevel > 0) {
+        telEval.textContent = `Vela rizada (${this.weather.reefingLevel === 1 ? '1° Rizo -30%' : '2° Rizo -60%'}): Escora reducida y adrizamiento de seguridad. ${this.wind.trimEvaluation}`;
+      } else {
+        telEval.textContent = this.wind.trimEvaluation;
+      }
       telEval.className = `tel-eval-box ${this.wind.flutterIntensity > 0.3 ? 'eval-warning' : 'eval-good'}`;
     }
 

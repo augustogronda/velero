@@ -121,10 +121,10 @@ export class WeatherSystem {
       this.boat.sails.jibMesh.scale.set(jibScale, jibScale, jibScale);
     }
 
-    // Reducir la escora proporcionalmente a la reducción de superficie vélica
+    // Actualizar factor de rizado en el sistema de física de viento y escora
     if (this.wind) {
       const reduction = level === 0 ? 1.0 : (level === 1 ? 0.65 : 0.35);
-      this.wind.heelingAngle *= reduction;
+      this.wind.setReefingFactor(reduction);
       this.boat.setHeel(this.wind.heelingAngle);
     }
   }
