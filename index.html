@@ -631,25 +631,73 @@
     /* Barra inferior de controles 3D y cámaras */
     .bottom-bar {
       pointer-events: auto;
+      position: fixed;
+      bottom: 20px;
+      left: 24px;
+      max-width: calc(100vw - 480px);
       display: flex;
-      align-items: center;
-      gap: 12px;
-      background: rgba(10, 17, 32, 0.8);
-      backdrop-filter: blur(14px);
-      padding: 8px 18px;
-      border-radius: 9999px;
-      border: 1px solid rgba(255, 255, 255, 0.09);
-      width: fit-content;
-      font-size: 0.8rem;
+      flex-direction: column;
+      gap: 6px;
+      background: rgba(10, 17, 32, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 8px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 20px rgba(56, 189, 248, 0.08);
+      font-size: 0.78rem;
       color: var(--text-muted);
       animation: fadeInUp 0.6s ease-out;
+      z-index: 40;
+    }
+
+    .bottom-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
       flex-wrap: wrap;
     }
 
-    .control-hint {
-      display: flex;
+    .hud-group-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: rgba(255, 255, 255, 0.45);
+      margin-right: 1px;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    .hud-group {
+      display: inline-flex;
       align-items: center;
       gap: 5px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 2px 5px;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      flex-shrink: 0;
+    }
+
+    .hud-divider {
+      width: 1px;
+      height: 16px;
+      background: rgba(255, 255, 255, 0.12);
+      margin: 0 2px;
+      flex-shrink: 0;
+    }
+
+    .control-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.70rem;
+      color: rgba(255, 255, 255, 0.5);
+      padding: 2px 6px;
+      white-space: nowrap;
+      user-select: none;
+      flex-shrink: 0;
     }
 
     .desktop-hint {
@@ -666,32 +714,35 @@
 
     .control-icon {
       color: var(--accent-cyan);
-      font-size: 0.95rem;
+      font-size: 0.85rem;
     }
 
     .btn-cam {
-      background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.28);
       color: var(--accent-cyan);
-      padding: 4px 11px;
+      padding: 3px 9px;
       border-radius: 9999px;
       cursor: pointer;
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       font-weight: 600;
-      transition: all 0.2s;
+      transition: all 0.18s ease;
       display: inline-flex;
       align-items: center;
       gap: 4px;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
     .btn-cam:hover {
       background: var(--accent-cyan);
       color: #040914;
       box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
+      border-color: var(--accent-cyan);
     }
 
     .btn-water-toggle {
-      background: rgba(16, 185, 129, 0.15);
-      border: 1px solid rgba(16, 185, 129, 0.35);
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
       color: #34d399;
     }
     .btn-water-toggle:hover {
@@ -701,8 +752,8 @@
     }
 
     .btn-motion-toggle {
-      background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.35);
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.3);
       color: var(--accent-cyan);
     }
     .btn-motion-toggle:hover {
@@ -719,6 +770,28 @@
       background: #ef4444;
       color: #ffffff;
       box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+    }
+
+    .explode-slider-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(245, 158, 11, 0.08);
+      padding: 2px 8px;
+      border-radius: 9999px;
+      border: 1px solid rgba(245, 158, 11, 0.22);
+      flex-shrink: 0;
+    }
+    .explode-slider-box .slider-label {
+      font-size: 0.68rem;
+      color: var(--accent-gold);
+      font-weight: 600;
+    }
+    .explode-slider-box input[type="range"] {
+      width: 55px;
+      height: 4px;
+      accent-color: var(--accent-gold);
+      cursor: pointer;
     }
 
     /* Tooltip dinámico que sigue al ratón */
@@ -798,20 +871,27 @@
     }
 
     .btn-wireframe {
-      background: rgba(168, 85, 247, 0.15);
-      border: 1px solid rgba(168, 85, 247, 0.4);
-      color: #c084fc;
+      background: rgba(0, 229, 255, 0.1);
+      border: 1px solid rgba(0, 229, 255, 0.35);
+      color: #00e5ff;
     }
     .btn-wireframe:hover {
-      background: #a855f7;
-      color: #040914;
-      box-shadow: 0 0 12px rgba(168, 85, 247, 0.45);
+      background: rgba(0, 229, 255, 0.25);
+      color: #00e5ff;
+      box-shadow: 0 0 14px rgba(0, 229, 255, 0.5);
+      border-color: #00e5ff;
     }
     .btn-wireframe.active-wireframe {
-      background: #a855f7;
-      color: #040914;
+      background: rgba(0, 229, 255, 0.18);
+      color: #00e5ff;
       font-weight: 700;
-      box-shadow: 0 0 14px rgba(168, 85, 247, 0.5);
+      border-color: #00e5ff;
+      box-shadow: 0 0 18px rgba(0, 229, 255, 0.7), 0 0 40px rgba(0, 229, 255, 0.25);
+      animation: wireframePulse 2.2s ease-in-out infinite;
+    }
+    @keyframes wireframePulse {
+      0%, 100% { box-shadow: 0 0 14px rgba(0, 229, 255, 0.6), 0 0 30px rgba(0, 229, 255, 0.2); }
+      50%       { box-shadow: 0 0 22px rgba(0, 229, 255, 0.95), 0 0 55px rgba(0, 229, 255, 0.4); }
     }
 
     /* Indicador de Despiece en pantalla */
@@ -1026,29 +1106,41 @@
       /* Barra inferior flotante de herramientas y cámaras adaptada a móvil */
       .bottom-bar {
         display: flex;
+        flex-direction: column;
         position: fixed;
         bottom: 64px;
         left: 8px;
         right: 8px;
         width: calc(100vw - 16px);
         max-width: calc(100vw - 16px);
-        overflow-x: auto;
-        flex-wrap: nowrap;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
         z-index: 50;
-        padding: 6px 10px;
-        gap: 7px;
+        padding: 5px 8px;
+        gap: 5px;
         border-radius: 14px;
-        background: rgba(10, 17, 32, 0.9);
+        background: rgba(10, 17, 32, 0.92);
         backdrop-filter: blur(18px);
         -webkit-backdrop-filter: blur(18px);
         border: 1px solid rgba(255, 255, 255, 0.12);
         animation: none;
-        justify-content: flex-start;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
       }
-      .bottom-bar::-webkit-scrollbar {
+      .bottom-bar-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        width: 100%;
+        padding-bottom: 1px;
+      }
+      .bottom-bar-row::-webkit-scrollbar {
         display: none;
+      }
+      .hud-group-label {
+        font-size: 0.60rem;
+        flex-shrink: 0;
       }
 
       #btn-toggle-middle-drag {
@@ -1064,13 +1156,13 @@
       .btn-cam {
         white-space: nowrap;
         flex-shrink: 0;
-        font-size: 0.72rem;
-        padding: 4px 9px;
+        font-size: 0.70rem;
+        padding: 3px 8px;
       }
       .control-hint {
         white-space: nowrap;
         flex-shrink: 0;
-        font-size: 0.72rem;
+        font-size: 0.70rem;
       }
 
       /* Indicadores de modo submarino y despiece en móvil */
@@ -1152,25 +1244,49 @@
 
     <!-- Barra Inferior de Cámaras y Controles -->
     <div class="bottom-bar">
-      <div class="control-hint">
-        <span class="desktop-hint"><span class="control-icon">🖱️</span> Rueda: Zoom | Clic: Rotar | Clic Der: Panear</span>
-        <span class="mobile-hint"><span class="control-icon">👆</span> 1 dedo: Rotar | 2 dedos: Zoom</span>
+      <!-- Fila 1: Vistas, Cámaras e Información de Navegación -->
+      <div class="bottom-bar-row">
+        <span class="hud-group-label">Vistas:</span>
+        <div class="hud-group">
+          <button class="btn-cam" id="btn-cam-general" title="Vista isométrica general (Sloop)">⛵ General</button>
+          <button class="btn-cam" id="btn-cam-underwater" title="Vista subacuática de orza y bulbo">🤿 Quilla</button>
+          <button class="btn-cam" id="btn-cam-sails" title="Vista en detalle de las velas y aparejo">📐 Velas</button>
+          <button class="btn-cam" id="btn-cam-dims" title="Activar o desactivar visualización de cotas 3D">📏 Cotas 3D</button>
+          <button class="btn-cam" id="btn-reset-view" title="Restablecer vista y cámara (Atajo: Esc)">↺ Reset</button>
+        </div>
+
+        <div class="hud-divider"></div>
+
+        <div class="control-hint">
+          <span class="desktop-hint"><span class="control-icon">🖱️</span> Clic: Rotar | Rueda: Zoom | Clic Der: Panear</span>
+          <span class="mobile-hint"><span class="control-icon">👆</span> 1 dedo: Rotar | 2 dedos: Zoom</span>
+        </div>
       </div>
-      <button class="btn-cam btn-isolate" id="btn-toggle-isolate" title="Opacar las demás piezas al seleccionar una (Atajo: A)">🎯 Aislar: OFF</button>
-      <button class="btn-cam btn-wireframe" id="btn-toggle-wireframe" title="Alternar modo wireframe / alambre CAD (Atajo: W)">🌐 Wireframe: OFF</button>
-      <button class="btn-cam btn-explode" id="btn-toggle-explode" title="Activar/Desactivar separación de piezas 3D (Atajo: X)">💥 Despiece: OFF</button>
-      <div style="display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.06); padding:2px 10px; border-radius:9999px; border:1px solid rgba(255,255,255,0.12);">
-        <span style="font-size:0.72rem; color:var(--accent-gold); font-weight:600;">Separar:</span>
-        <input type="range" id="slider-explode" min="0" max="100" value="0" style="width:65px; accent-color:var(--accent-gold); cursor:pointer;">
+
+      <!-- Fila 2: Herramientas 3D, Despiece y Simulación -->
+      <div class="bottom-bar-row">
+        <span class="hud-group-label">Modos:</span>
+        <div class="hud-group">
+          <button class="btn-cam btn-isolate" id="btn-toggle-isolate" title="Opacar las demás piezas al seleccionar una (Atajo: A)">🎯 Aislar: OFF</button>
+          <button class="btn-cam btn-wireframe" id="btn-toggle-wireframe" title="Alternar modo wireframe / alambre CAD (Atajo: W)">🌐 Wireframe: OFF</button>
+        </div>
+
+        <div class="hud-group">
+          <button class="btn-cam btn-explode" id="btn-toggle-explode" title="Activar/Desactivar separación de piezas 3D (Atajo: X)">💥 Despiece: OFF</button>
+          <div class="explode-slider-box">
+            <span class="slider-label">Separar:</span>
+            <input type="range" id="slider-explode" min="0" max="100" value="0">
+          </div>
+        </div>
+
+        <div class="hud-divider"></div>
+
+        <div class="hud-group">
+          <button class="btn-cam btn-water-toggle" id="btn-toggle-water" title="Ocultar o mostrar la superficie del mar">🌊 Agua: Visible</button>
+          <button class="btn-cam btn-motion-toggle" id="btn-toggle-motion" title="Pausar o activar el balanceo y movimiento del velero (Atajo: M)">⚓ Movimiento: ON</button>
+          <button class="btn-cam" id="btn-toggle-middle-drag" title="Alternar función de apretar la rueda del mouse">🖱️ Rueda: Rotar</button>
+        </div>
       </div>
-      <button class="btn-cam" id="btn-toggle-middle-drag" title="Alternar función de apretar la rueda del mouse">🖱️ Rueda: Rotar</button>
-      <button class="btn-cam" id="btn-cam-general">⛵ General</button>
-      <button class="btn-cam" id="btn-cam-underwater">🤿 Quilla</button>
-      <button class="btn-cam" id="btn-cam-sails">📐 Velas</button>
-      <button class="btn-cam" id="btn-cam-dims" title="Activar o desactivar visualización de cotas 3D">📏 Cotas 3D</button>
-      <button class="btn-cam btn-water-toggle" id="btn-toggle-water">🌊 Agua: Visible</button>
-      <button class="btn-cam btn-motion-toggle" id="btn-toggle-motion" title="Pausar o activar el balanceo y movimiento del velero (Atajo: M)">⚓ Movimiento: ON</button>
-      <button class="btn-cam" id="btn-reset-view" title="Restablecer vista y cámara (Atajo: Esc)">Restablecer</button>
     </div>
 
     <!-- Panel Flotante Derecho con Glassmorphism / Bottom Sheet en Móviles -->
@@ -2704,6 +2820,16 @@
       const mizzenSailMesh = new THREE.Mesh(mizzenSailGeo, staysailMat);
       rigDynamicGroup.add(mizzenSailMesh);
       registerInteractive(mizzenSailMesh, "Vela Mayor");
+
+      // PANELES WIREFRAME (Queche - Mesana)
+      {
+        const m0 = new THREE.Vector3(0.0, 2.2, -2.0);
+        const m1 = new THREE.Vector3(0.0, 7.8, -2.0);
+        const m2 = new THREE.Vector3(-0.2, 2.2, -4.2);
+        const mizzenPanels = buildSailPanelLines(m0, m1, m2, 7, sailPanelMat);
+        rigDynamicGroup.add(mizzenPanels);
+        if (wireframeMode) mizzenPanels.visible = true;
+      }
     }
 
     // 5. YAWL (Palo Mayor + Palo de Mesana pequeño a POPA del timón)
@@ -2733,6 +2859,16 @@
       const yawlSailMesh = new THREE.Mesh(yawlSailGeo, staysailMat);
       rigDynamicGroup.add(yawlSailMesh);
       registerInteractive(yawlSailMesh, "Vela Mayor");
+
+      // PANELES WIREFRAME (Yawl - Mesana popa)
+      {
+        const y0 = new THREE.Vector3(0.0, 1.8, -3.7);
+        const y1 = new THREE.Vector3(0.0, 5.5, -3.7);
+        const y2 = new THREE.Vector3(-0.15, 1.8, -5.3);
+        const yawlPanels = buildSailPanelLines(y0, y1, y2, 5, sailPanelMat);
+        rigDynamicGroup.add(yawlPanels);
+        if (wireframeMode) yawlPanels.visible = true;
+      }
     }
 
     // 6. GOLETA (Palo trinquete proel + Palo mayor más alto a popa)
@@ -2761,6 +2897,16 @@
       rigDynamicGroup.add(foreSailMesh);
       registerInteractive(foreSailMesh, "Vela Mayor");
 
+      // PANELES WIREFRAME (Goleta - Trinquete)
+      {
+        const gf0 = new THREE.Vector3(0.0, 2.4, 2.0);
+        const gf1 = new THREE.Vector3(0.0, 10.2, 2.0);
+        const gf2 = new THREE.Vector3(-0.2, 2.4, -1.2);
+        const forePanels = buildSailPanelLines(gf0, gf1, gf2, 10, sailPanelMat);
+        rigDynamicGroup.add(forePanels);
+        if (wireframeMode) forePanels.visible = true;
+      }
+
       // 2. Palo de popa (Mayor, más alto)
       const mainMast = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.13, 10.8, 16), mastMat);
       mainMast.position.set(0, 6.7, -1.2);
@@ -2785,6 +2931,16 @@
       rigDynamicGroup.add(mainSailMesh);
       registerInteractive(mainSailMesh, "Vela Mayor");
 
+      // PANELES WIREFRAME (Goleta - Vela Mayor)
+      {
+        const gm0 = new THREE.Vector3(0.0, 2.4, -1.2);
+        const gm1 = new THREE.Vector3(0.0, 11.9, -1.2);
+        const gm2 = new THREE.Vector3(-0.25, 2.4, -5.2);
+        const mainPanels = buildSailPanelLines(gm0, gm1, gm2, 12, sailPanelMat);
+        rigDynamicGroup.add(mainPanels);
+        if (wireframeMode) mainPanels.visible = true;
+      }
+
       // Foque de proa
       const jibGeo = new THREE.BufferGeometry();
       const jibVerts = new Float32Array([
@@ -2797,6 +2953,16 @@
       const jibMesh = new THREE.Mesh(jibGeo, jibMat);
       rigDynamicGroup.add(jibMesh);
       registerInteractive(jibMesh, "Vela de Proa");
+
+      // PANELES WIREFRAME (Goleta - Foque)
+      {
+        const gj0 = new THREE.Vector3(0.0, 1.4, 4.65);
+        const gj1 = new THREE.Vector3(0.0, 9.5, 2.0);
+        const gj2 = new THREE.Vector3(0.2, 2.0, 2.0);
+        const gJibPanels = buildSailPanelLines(gj0, gj1, gj2, 8, sailPanelMatJib);
+        rigDynamicGroup.add(gJibPanels);
+        if (wireframeMode) gJibPanels.visible = true;
+      }
     }
 
     // ----------------------------------------------------
@@ -3497,8 +3663,8 @@
             if (orig !== undefined && mat.color) mat.color.setHex(orig);
           }
         }
-        // Mostrar / ocultar líneas de panel de vela
-        if (obj.isLine && obj.userData.isSailPanel) {
+        // Mostrar / ocultar grupos/líneas de panel de vela
+        if (obj.userData.isSailPanel && (obj.isGroup || obj.isLine || obj.isLineLoop || obj.isLineSegments)) {
           obj.visible = wireframeMode;
         }
       });
