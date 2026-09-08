@@ -29,15 +29,20 @@
       margin: 0;
       padding: 0;
       user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
     }
 
     body, html {
       width: 100%;
       height: 100%;
+      height: 100dvh;
       overflow: hidden;
       background-color: var(--bg-dark);
       font-family: 'Outfit', sans-serif;
       color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
     }
 
     /* Lienzo WebGL 3D */
@@ -241,9 +246,50 @@
       display: flex;
       flex-direction: column;
       gap: 15px;
-      transition: transform 0.3s ease, opacity 0.3s ease;
+      transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
       overflow-y: auto;
       animation: fadeInRight 0.6s ease-out;
+    }
+
+    .info-panel.panel-minimized {
+      transform: translateX(calc(100% + 45px)) !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    /* Botón flotante para reabrir ficha cuando está minimizada (Desktop & iPad) */
+    .btn-floating-panel-toggle {
+      display: none;
+      position: fixed;
+      top: 22px;
+      right: 28px;
+      z-index: 55;
+      background: rgba(10, 17, 32, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--panel-border);
+      color: #ffffff;
+      padding: 9px 18px;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.55), 0 0 18px rgba(56, 189, 248, 0.25);
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: inherit;
+      pointer-events: auto;
+    }
+    .btn-floating-panel-toggle:hover {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 10px 30px rgba(56, 189, 248, 0.45);
+      transform: translateY(-2px);
+    }
+    .btn-floating-panel-toggle.active {
+      display: inline-flex;
+      animation: fadeInRight 0.35s ease-out;
     }
 
     .info-panel::-webkit-scrollbar {
@@ -261,6 +307,33 @@
       gap: 12px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.09);
       padding-bottom: 14px;
+    }
+
+    .part-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .btn-panel-minimize {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-muted);
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    .btn-panel-minimize:hover {
+      color: #ffffff;
+      background: rgba(239, 68, 68, 0.22);
+      border-color: rgba(239, 68, 68, 0.45);
     }
 
     .part-title-wrapper {
@@ -1083,33 +1156,194 @@
     }
 
     /* ====================================================
-       DISEÑO RESPONSIVE Y ADAPTACIÓN MÓVIL (TABLETS Y CELULARES)
+       DISEÑO RESPONSIVE MODERNO (IPADS, TABLETS Y MÓVILES)
        ==================================================== */
-    @media (max-width: 860px) {
-      /* Ocultar tooltip de hover en pantallas táctiles */
+
+    /* Pulso visual cian en la pastilla táctil al seleccionar pieza */
+    @keyframes pillFlash {
+      0% { box-shadow: 0 0 0 rgba(56, 189, 248, 0); }
+      50% { box-shadow: 0 0 16px rgba(56, 189, 248, 0.8), inset 0 0 10px rgba(56, 189, 248, 0.3); border-color: var(--accent-cyan); }
+      100% { box-shadow: 0 0 0 rgba(56, 189, 248, 0); }
+    }
+    .pill-flash {
+      animation: pillFlash 0.7s ease-out;
+    }
+
+    /* ── IPAD Y TABLETS EN RETRATO (768px - 1024px) ───────── */
+    @media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
       #hover-tooltip {
         display: none !important;
       }
 
       .ui-layer {
-        padding: 8px 10px;
+        padding: 16px 18px max(18px, env(safe-area-inset-bottom, 18px)) 18px;
         pointer-events: none;
       }
 
-      /* Cabecera compacta */
+      /* Cabecera optimizada para tablet retrato */
+      .header {
+        max-width: calc(100% - 370px);
+      }
+      h1 {
+        font-size: 1.6rem;
+        line-height: 1.2;
+      }
+      .subtitle {
+        font-size: 0.8rem;
+        line-height: 1.35;
+      }
+      .tabs-nav {
+        margin-top: 8px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        gap: 6px;
+        padding-bottom: 2px;
+      }
+      .tabs-nav::-webkit-scrollbar { display: none; }
+      .tab-btn {
+        font-size: 0.74rem;
+        padding: 6px 12px;
+        min-height: 36px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .rig-selector-bar {
+        margin-top: 8px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .rig-selector-bar::-webkit-scrollbar { display: none; }
+
+      /* Panel Flotante en iPad retrato: Elegante panel lateral a la derecha */
+      .info-panel {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        bottom: auto;
+        left: auto;
+        width: 350px;
+        max-width: 360px;
+        max-height: calc(100vh - 120px);
+        border-radius: 18px;
+        padding: 20px;
+        z-index: 60;
+        transform: translateX(0);
+        transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.25s ease;
+      }
+      .info-panel.panel-minimized {
+        transform: translateX(calc(100% + 35px)) !important;
+        opacity: 0 !important;
+      }
+      .panel-handle-bar {
+        display: none !important;
+      }
+      .btn-panel-minimize {
+        display: flex;
+      }
+
+      /* Barra inferior de controles en iPad retrato */
+      .bottom-bar {
+        position: fixed;
+        bottom: max(16px, env(safe-area-inset-bottom, 16px));
+        left: 16px;
+        max-width: calc(100vw - 380px);
+        z-index: 50;
+        padding: 7px 12px;
+      }
+      .btn-cam {
+        font-size: 0.72rem;
+        padding: 5px 10px;
+        min-height: 34px;
+      }
+      #btn-toggle-middle-drag {
+        display: none;
+      }
+      .desktop-hint { display: none; }
+      .mobile-hint { display: inline; }
+
+      #wireframe-legend {
+        bottom: 90px;
+        left: 16px;
+      }
+      #underwater-indicator {
+        bottom: 90px;
+        left: 16px;
+      }
+      #explode-indicator {
+        bottom: 90px;
+        right: 380px;
+      }
+    }
+
+    /* ── IPAD Y TABLETS EN PAISAJE / PANTALLAS MEDIANAS (768px - 1200px landscape) ── */
+    @media (min-width: 768px) and (max-width: 1200px) and (orientation: landscape) {
+      .header {
+        max-width: 440px;
+      }
+      h1 {
+        font-size: 1.65rem;
+      }
+      .subtitle {
+        font-size: 0.82rem;
+      }
+      .tabs-nav {
+        gap: 6px;
+      }
+      .tab-btn {
+        font-size: 0.74rem;
+        padding: 5px 11px;
+      }
+
+      .info-panel {
+        top: 16px;
+        right: 16px;
+        width: 360px;
+        max-height: calc(100vh - 32px);
+        padding: 20px;
+      }
+      .panel-handle-bar {
+        display: none !important;
+      }
+      .btn-panel-minimize {
+        display: flex;
+      }
+
+      .bottom-bar {
+        bottom: 16px;
+        left: 16px;
+        max-width: calc(100vw - 400px);
+      }
+    }
+
+    /* ── SMARTPHONES Y PANTALLAS MÓVILES (max-width: 767px) ───────── */
+    @media (max-width: 767px) {
+      #hover-tooltip {
+        display: none !important;
+      }
+
+      .ui-layer {
+        padding: max(8px, env(safe-area-inset-top, 8px)) 10px max(8px, env(safe-area-inset-bottom, 8px)) 10px;
+        pointer-events: none;
+      }
+
+      /* Cabecera compacta táctil */
       .header {
         max-width: 100%;
       }
       .badge-bar {
         gap: 4px;
-        margin-bottom: 4px;
+        margin-bottom: 3px;
       }
       .badge, .badge-sub, .badge-water {
         font-size: 0.65rem;
         padding: 2px 8px;
       }
       h1 {
-        font-size: 1.25rem;
+        font-size: 1.22rem;
         line-height: 1.15;
         margin-bottom: 2px;
       }
@@ -1122,7 +1356,7 @@
         overflow: hidden;
       }
 
-      /* Pestañas con scroll táctil horizontal fluido */
+      /* Pestañas con scroll táctil fluido */
       .tabs-nav {
         margin-top: 6px;
         overflow-x: auto;
@@ -1131,20 +1365,19 @@
         scrollbar-width: none;
         padding-bottom: 4px;
         gap: 5px;
-        max-width: calc(100vw - 20px);
+        max-width: 100%;
       }
-      .tabs-nav::-webkit-scrollbar {
-        display: none;
-      }
+      .tabs-nav::-webkit-scrollbar { display: none; }
       .tab-btn {
         font-size: 0.72rem;
-        padding: 5px 10px;
+        padding: 6px 11px;
         white-space: nowrap;
         flex-shrink: 0;
         border-radius: 8px;
+        min-height: 34px;
       }
 
-      /* Selector de aparejos en móvil con scroll horizontal */
+      /* Selector de aparejos en móvil */
       .rig-selector-bar {
         margin-top: 6px;
         overflow-x: auto;
@@ -1153,19 +1386,18 @@
         scrollbar-width: none;
         padding: 4px 8px;
         gap: 5px;
-        max-width: calc(100vw - 20px);
+        max-width: 100%;
       }
-      .rig-selector-bar::-webkit-scrollbar {
-        display: none;
-      }
+      .rig-selector-bar::-webkit-scrollbar { display: none; }
       .rig-btn {
         font-size: 0.68rem;
-        padding: 3px 8px;
+        padding: 4px 9px;
         white-space: nowrap;
         flex-shrink: 0;
+        min-height: 30px;
       }
 
-      /* Panel Flotante transformado en Bottom Sheet deslizable */
+      /* Panel Flotante transformado en Bottom Sheet ergonómico */
       .info-panel {
         position: fixed;
         top: auto;
@@ -1174,12 +1406,13 @@
         right: 0;
         width: 100%;
         max-width: 100%;
-        max-height: 75vh;
+        max-height: 65vh;
+        max-height: 65dvh;
         border-radius: 20px 20px 0 0;
-        padding: 10px 16px max(18px, env(safe-area-inset-bottom, 18px)) 16px;
+        padding: 8px 16px max(18px, env(safe-area-inset-bottom, 18px)) 16px;
         border: 1px solid rgba(56, 189, 248, 0.35);
         border-bottom: none;
-        background: rgba(8, 14, 28, 0.94);
+        background: rgba(8, 14, 28, 0.95);
         backdrop-filter: blur(28px);
         -webkit-backdrop-filter: blur(28px);
         box-shadow: 0 -10px 35px rgba(0, 0, 0, 0.75), 0 0 20px rgba(56, 189, 248, 0.15);
@@ -1191,12 +1424,12 @@
         gap: 12px;
       }
 
-      /* Estado contraído: solo asoma la barra superior con el nombre de la pieza */
+      /* Estado contraído: pastilla interactiva compacta (48px) */
       .info-panel.collapsed {
-        transform: translateY(calc(100% - 56px));
+        transform: translateY(calc(100% - 48px - env(safe-area-inset-bottom, 0px)));
       }
 
-      /* Barra de agarre / despliegue en la parte superior del Bottom Sheet */
+      /* Barra de agarre / despliegue en móviles */
       .panel-handle-bar {
         display: flex;
         align-items: center;
@@ -1208,6 +1441,8 @@
         border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         flex-shrink: 0;
         -webkit-tap-highlight-color: transparent;
+        min-height: 40px;
+        border-radius: 12px 12px 0 0;
       }
       .panel-handle-pill {
         position: absolute;
@@ -1216,7 +1451,7 @@
         transform: translateX(-50%);
         width: 36px;
         height: 4px;
-        background: rgba(255, 255, 255, 0.32);
+        background: rgba(255, 255, 255, 0.35);
         border-radius: 9999px;
       }
       .panel-handle-info {
@@ -1255,12 +1490,16 @@
         transform: rotate(180deg);
       }
 
-      /* Barra inferior flotante de herramientas y cámaras adaptada a móvil */
+      .btn-panel-minimize {
+        display: none !important;
+      }
+
+      /* Barra inferior flotante de herramientas adaptada a móvil */
       .bottom-bar {
         display: flex;
         flex-direction: column;
         position: fixed;
-        bottom: 64px;
+        bottom: calc(56px + env(safe-area-inset-bottom, 0px));
         left: 8px;
         right: 8px;
         width: calc(100vw - 16px);
@@ -1287,29 +1526,22 @@
         width: 100%;
         padding-bottom: 1px;
       }
-      .bottom-bar-row::-webkit-scrollbar {
-        display: none;
-      }
+      .bottom-bar-row::-webkit-scrollbar { display: none; }
       .hud-group-label {
         font-size: 0.60rem;
         flex-shrink: 0;
       }
 
-      #btn-toggle-middle-drag {
-        display: none; /* No aplica en pantallas táctiles */
-      }
-      .desktop-hint {
-        display: none;
-      }
-      .mobile-hint {
-        display: inline;
-      }
+      #btn-toggle-middle-drag { display: none; }
+      .desktop-hint { display: none; }
+      .mobile-hint { display: inline; }
 
       .btn-cam {
         white-space: nowrap;
         flex-shrink: 0;
         font-size: 0.70rem;
-        padding: 3px 8px;
+        padding: 4px 9px;
+        min-height: 32px;
       }
       .control-hint {
         white-space: nowrap;
@@ -1317,16 +1549,15 @@
         font-size: 0.70rem;
       }
 
-      /* Indicadores de modo submarino y despiece en móvil */
       #underwater-indicator {
-        bottom: 112px;
+        bottom: calc(118px + env(safe-area-inset-bottom, 0px));
         left: 10px;
         font-size: 0.68rem;
         padding: 4px 10px;
         z-index: 40;
       }
       #explode-indicator {
-        bottom: 112px;
+        bottom: calc(118px + env(safe-area-inset-bottom, 0px));
         right: 10px;
         font-size: 0.68rem;
         padding: 4px 10px;
@@ -1355,9 +1586,83 @@
       #wireframe-legend .wf-sep { display: none; }
     }
 
-    /* ── Pantallas muy pequeñas (< 480px) ──────────────────────────── */
+    /* ── CELULARES EN ORIENTACIÓN HORIZONTAL (max-height: 520px landscape) ── */
+    @media (max-height: 520px) and (orientation: landscape) {
+      .ui-layer {
+        padding: 6px 10px;
+      }
+      .header {
+        max-width: calc(100vw - 320px);
+      }
+      h1 {
+        font-size: 1.05rem;
+        margin-bottom: 1px;
+      }
+      .subtitle {
+        display: none;
+      }
+      .tabs-nav {
+        margin-top: 4px;
+        gap: 4px;
+      }
+      .tab-btn {
+        font-size: 0.68rem;
+        padding: 3px 8px;
+        min-height: 28px;
+      }
+
+      /* Panel como cajón lateral derecho en landscape móvil */
+      .info-panel {
+        position: fixed;
+        top: 8px;
+        bottom: 8px;
+        right: 8px;
+        left: auto;
+        width: 295px;
+        max-width: 310px;
+        max-height: calc(100vh - 16px);
+        border-radius: 14px;
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        padding: 14px;
+        z-index: 70;
+        transform: translateX(0);
+      }
+      .info-panel.panel-minimized {
+        transform: translateX(calc(100% + 20px)) !important;
+        opacity: 0 !important;
+      }
+      .panel-handle-bar {
+        display: none !important;
+      }
+      .btn-panel-minimize {
+        display: flex !important;
+      }
+      .btn-floating-panel-toggle {
+        top: 8px;
+        right: 8px;
+        padding: 6px 12px;
+        font-size: 0.72rem;
+      }
+
+      .bottom-bar {
+        position: fixed;
+        bottom: 6px;
+        left: 6px;
+        max-width: calc(100vw - 320px);
+        padding: 4px 8px;
+        gap: 4px;
+        z-index: 50;
+      }
+      .btn-cam {
+        font-size: 0.65rem;
+        padding: 2px 6px;
+        min-height: 26px;
+      }
+    }
+
+    /* ── PANTALLAS MUY PEQUEÑAS (< 480px) ──────────────────────────── */
     @media (max-width: 480px) {
-      h1 { font-size: 1.1rem; }
+      h1 { font-size: 1.12rem; }
       .btn-cam { font-size: 0.65rem; padding: 3px 6px; }
       .bottom-bar { padding: 4px 6px; gap: 4px; }
       .hud-group-label { display: none; }
@@ -1376,22 +1681,20 @@
   <!-- Tooltip flotante en cursor -->
   <div id="hover-tooltip">Componente</div>
 
-  <!-- ── Banner de aviso móvil (solo se activa en JS si es touch device) ── -->
+  <!-- ── Banner de guía táctil educativa para móviles ── -->
   <div id="mobile-notice">
     <div class="mn-inner">
-      <div class="mn-icon">⚓</div>
+      <div class="mn-icon">⛵</div>
       <div class="mn-body">
         <div class="mn-title">
-          Mejor experiencia en escritorio
-          <span class="mn-chip">📱 Móvil detectado</span>
+          Navegación Táctil 3D
+          <span class="mn-chip">💡 Modo Educativo</span>
         </div>
         <p class="mn-desc">
-          Esta app 3D funciona en celular, pero en <strong>PC o tablet</strong> tenés
-          <strong>más botones, más detalle</strong> y controles completos de órbita y despiece.
-          Algunas funciones avanzadas pueden ser difíciles de usar en pantalla pequeña.
+          <strong>1 dedo:</strong> rota el velero en 360° · <strong>2 dedos:</strong> zoom y paneo · <strong>Toca cualquier pieza:</strong> para identificarla en el cuaderno náutico.
         </p>
         <div class="mn-actions">
-          <button class="mn-btn-dismiss" id="mn-btn-ok">Entendido, seguir aquí</button>
+          <button class="mn-btn-dismiss" id="mn-btn-ok">¡Comenzar Inspección!</button>
         </div>
       </div>
       <button class="mn-btn-close" id="mn-btn-close" aria-label="Cerrar">✕</button>
@@ -1441,6 +1744,11 @@
 
   <!-- Interfaz de Usuario HUD -->
   <div class="ui-layer">
+    <!-- Botón flotante para reabrir ficha cuando está minimizada (Desktop & iPad) -->
+    <button id="btn-floating-panel-toggle" class="btn-floating-panel-toggle" aria-label="Abrir ficha técnica náutica" title="Toca para abrir la ficha de detalles">
+      <span>📋</span> <span id="floating-panel-btn-text">Ficha Náutica · 🛶 Casco</span>
+    </button>
+
     <!-- Cabecera Superior Izquierda -->
     <header class="header">
       <div class="badge-bar">
@@ -1549,7 +1857,15 @@
             </div>
             <h2 class="part-title" id="panel-title">Casco</h2>
           </div>
-          <div class="part-icon" id="panel-icon">🛶</div>
+          <div class="part-header-actions">
+            <div class="part-icon" id="panel-icon">🛶</div>
+            <button class="btn-panel-minimize" id="btn-panel-minimize" title="Ocultar ficha para ver velero en pantalla completa" aria-label="Ocultar ficha">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
         </div>
 
         <p class="part-description" id="panel-desc">
@@ -3397,12 +3713,19 @@
     const btnToggleExplode = document.getElementById('btn-toggle-explode');
     const sliderExplode = document.getElementById('slider-explode');
 
-    // Elementos del panel flotante / Bottom Sheet móvil
+    // Elementos del panel flotante / Bottom Sheet móvil / Ficha iPad & Desktop
     const infoPanel = document.getElementById('info-panel');
     const panelHandleBar = document.getElementById('panel-handle-bar');
     const btnSheetToggle = document.getElementById('btn-sheet-toggle');
     const handleTitle = document.getElementById('handle-title');
     const handleTag = document.getElementById('handle-tag');
+    const btnFloatingPanelToggle = document.getElementById('btn-floating-panel-toggle');
+    const btnPanelMinimize = document.getElementById('btn-panel-minimize');
+    const floatingPanelBtnText = document.getElementById('floating-panel-btn-text');
+
+    function isMobilePortrait() {
+      return window.innerWidth <= 767 && window.innerHeight > 520;
+    }
 
     function setSheetExpanded(expanded) {
       if (!infoPanel) return;
@@ -3421,6 +3744,17 @@
       setSheetExpanded(isCollapsed);
     }
 
+    function setDesktopPanelOpen(open) {
+      if (!infoPanel) return;
+      if (open) {
+        infoPanel.classList.remove('panel-minimized');
+        if (btnFloatingPanelToggle) btnFloatingPanelToggle.classList.remove('active');
+      } else {
+        infoPanel.classList.add('panel-minimized');
+        if (btnFloatingPanelToggle) btnFloatingPanelToggle.classList.add('active');
+      }
+    }
+
     if (panelHandleBar) {
       panelHandleBar.addEventListener('click', toggleSheet);
     }
@@ -3428,6 +3762,22 @@
       btnSheetToggle.addEventListener('click', (e) => {
         e.stopPropagation();
         toggleSheet();
+      });
+    }
+    if (btnPanelMinimize) {
+      btnPanelMinimize.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (isMobilePortrait()) {
+          setSheetExpanded(false);
+        } else {
+          setDesktopPanelOpen(false);
+        }
+      });
+    }
+    if (btnFloatingPanelToggle) {
+      btnFloatingPanelToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setDesktopPanelOpen(true);
       });
     }
 
@@ -3736,8 +4086,20 @@
             const clickedMesh = intersects[0].object;
             const partName = clickedMesh.userData.partName;
             selectPart(partName);
-            if (window.innerWidth <= 860) {
-              setSheetExpanded(true); // Desplegar información de la pieza tocada
+            // Feedback táctil visual: en smartphones animar la pastilla inferior; si ya estaba abierto el panel, se actualiza
+            if (window.innerWidth <= 767) {
+              if (panelHandleBar) {
+                panelHandleBar.classList.remove('pill-flash');
+                void panelHandleBar.offsetWidth; // Forzar reflow
+                panelHandleBar.classList.add('pill-flash');
+              }
+            } else if (infoPanel && infoPanel.classList.contains('panel-minimized')) {
+              // En tablet / desktop si estaba minimizado, dar pulso al botón flotante
+              if (btnFloatingPanelToggle) {
+                btnFloatingPanelToggle.classList.remove('pill-flash');
+                void btnFloatingPanelToggle.offsetWidth;
+                btnFloatingPanelToggle.classList.add('pill-flash');
+              }
             }
           }
         }
@@ -3852,7 +4214,14 @@
       }
 
       if (handleTitle) {
-        handleTitle.textContent = `${info.icon} ${info.title}`;
+        handleTitle.innerHTML = `${info.icon} ${info.title}`;
+      }
+      if (handleTag) {
+        const isCollapsed = infoPanel && infoPanel.classList.contains('collapsed');
+        handleTag.textContent = `${info.tag} · ${isCollapsed ? 'Toca para ver detalles ▴' : 'Toca para contraer ▾'}`;
+      }
+      if (floatingPanelBtnText) {
+        floatingPanelBtnText.innerHTML = `${info.icon} ${info.title}`;
       }
 
       // Actualizar botones chips
@@ -4375,9 +4744,9 @@
       const btnClose = document.getElementById('mn-btn-close');
       if (!notice) return;
 
-      const isTouchDevice = () =>
+      const isMobileTouchDevice = () =>
         ('ontouchstart' in window || navigator.maxTouchPoints > 0) &&
-        window.innerWidth <= 860;
+        window.innerWidth <= 767;
 
       function dismiss() {
         notice.classList.add('dismissing');
@@ -4386,9 +4755,9 @@
       }
 
       function maybeShow() {
-        if (isTouchDevice() && !sessionStorage.getItem('mobileNoticeDismissed')) {
-          // Pequeño delay para que el usuario vea primero el 3D cargando
-          setTimeout(() => { notice.style.display = 'block'; }, 1800);
+        if (isMobileTouchDevice() && !sessionStorage.getItem('mobileNoticeDismissed')) {
+          // Pequeño delay para que el usuario vea primero el velero 3D cargando
+          setTimeout(() => { notice.style.display = 'block'; }, 1500);
         }
       }
 
