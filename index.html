@@ -437,6 +437,121 @@
       line-height: 1.45;
     }
 
+    /* Sección de Láminas Técnicas de Estudio (Lámina 01 y 02) */
+    .sheets-section {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .sheet-tabs {
+      display: flex;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .sheet-tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 7px 8px;
+      border-radius: 7px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .sheet-tab-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .sheet-tab-btn.active {
+      background: var(--accent-cyan);
+      color: #030d1b;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
+    }
+    .sheet-subpanel {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .sheet-subpanel.active {
+      display: flex;
+    }
+    .sheet-table {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      max-height: 380px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .sheet-table::-webkit-scrollbar {
+      width: 4px;
+    }
+    .sheet-table::-webkit-scrollbar-thumb {
+      background: rgba(56, 189, 248, 0.3);
+      border-radius: 4px;
+    }
+    .sheet-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-size: 0.8rem;
+    }
+    .sheet-row:hover {
+      background: rgba(56, 189, 248, 0.12);
+      border-color: var(--accent-cyan);
+      transform: translateX(3px);
+    }
+    .sheet-row-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sheet-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 4px;
+      border-radius: 5px;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: var(--accent-cyan);
+      font-weight: 700;
+      font-size: 0.7rem;
+    }
+    .sheet-dim-badge {
+      font-size: 0.7rem;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-gold);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      font-weight: 600;
+    }
+    .sheet-note-card {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-size: 0.78rem;
+      color: #a7f3d0;
+      line-height: 1.45;
+    }
+
     /* Barra inferior de controles 3D y cámaras */
     .bottom-bar {
       pointer-events: auto;
@@ -887,11 +1002,13 @@
       <!-- Selector de vistas temáticas -->
       <nav class="tabs-nav">
         <button class="tab-btn active" id="tab-all" data-category="all">Todos</button>
-        <button class="tab-btn" id="tab-hull" data-category="casco">Casco & Cubierta</button>
+        <button class="tab-btn" id="tab-hull" data-category="casco">1/ Casco & Cubierta</button>
         <button class="tab-btn" id="tab-sub" data-category="submarino">⚓ Obra Viva & Quilla</button>
-        <button class="tab-btn" id="tab-rigging" data-category="jarcia">Arboladura & Jarcia</button>
-        <button class="tab-btn" id="tab-sails" data-category="velas">⛵ 2/ Velas & Puños</button>
-        <button class="tab-btn" id="tab-rigs" data-category="aparejos">📐 2/ Aparejos (6 Tipos)</button>
+        <button class="tab-btn" id="tab-rigging" data-category="jarcia">1/ Arboladura & Jarcia</button>
+        <button class="tab-btn" id="tab-sails" data-category="velas">⛵ 2/ Velas & Maniobra</button>
+        <button class="tab-btn" id="tab-dims" data-category="dimensiones">📏 Cotas Navales</button>
+        <button class="tab-btn" id="tab-rigs" data-category="aparejos">📐 Aparejos (6 Tipos)</button>
+        <button class="tab-btn" id="tab-sheets" data-category="laminas">📋 Láminas Técnicas</button>
         <button class="tab-btn" id="tab-explode" data-category="despiece">💥 Despiece 3D</button>
       </nav>
 
@@ -922,6 +1039,7 @@
       <button class="btn-cam" id="btn-cam-general">⛵ General</button>
       <button class="btn-cam" id="btn-cam-underwater">🤿 Quilla</button>
       <button class="btn-cam" id="btn-cam-sails">📐 Velas</button>
+      <button class="btn-cam" id="btn-cam-dims" title="Activar o desactivar visualización de cotas 3D">📏 Cotas 3D</button>
       <button class="btn-cam btn-water-toggle" id="btn-toggle-water">🌊 Agua: Visible</button>
       <button class="btn-cam" id="btn-reset-view">Restablecer</button>
     </div>
@@ -1011,6 +1129,115 @@
           <div class="rig-card-desc">Dos o más palos donde el palo de popa (mayor) es igual o más alto que el de proa (trinquete). Ambos con grandes velas áuricas o bermudianas para travesías oceánicas.</div>
         </div>
       </div>
+
+      <!-- Vista de Láminas Técnicas Oficiales (Compendio Teórico Lámina 01 & 02) -->
+      <div class="sheets-section" id="sheets-section">
+        <div class="sheet-tabs">
+          <button class="sheet-tab-btn active" id="btn-sheet-1" data-sheet="1">LÁMINA 01: Nomenclatura</button>
+          <button class="sheet-tab-btn" id="btn-sheet-2" data-sheet="2">LÁMINA 02: Velas & Maniobra</button>
+        </div>
+
+        <!-- Subpanel Lámina 01 -->
+        <div class="sheet-subpanel active" id="subpanel-sheet-1">
+          <div style="border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:0.72rem; color:var(--accent-cyan); font-weight:700; text-transform:uppercase; letter-spacing:0.06em;">LÁMINA TÉCNICA 01</span>
+              <span style="font-size:0.7rem; color:var(--text-muted);">Escala Referencial</span>
+            </div>
+            <h3 style="font-size:1.15rem; color:#fff; font-family:'Space Grotesk';">NOMENCLATURA DE VELERO</h3>
+            <p style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">Vistas Generales: Banda, Cubierta y Secciones Transversales (Proa y Popa). Haz clic en cualquier elemento para <b style="color:var(--accent-cyan);">enfocarlo en el 3D</b>:</p>
+          </div>
+
+          <div style="font-size:0.74rem; font-weight:700; color:var(--accent-gold); text-transform:uppercase; letter-spacing:0.05em; margin-top:2px;">DIMENSIONES Y VISTAS GENERALES:</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+            <div class="sheet-row" data-sheet-part="Eslora Total">
+              <span class="sheet-num">LOA</span>
+              <span style="font-weight:600;">Eslora Total</span>
+            </div>
+            <div class="sheet-row" data-sheet-part="Eslora en Flotación">
+              <span class="sheet-num">LWL</span>
+              <span style="font-weight:600;">Eslora Flotación</span>
+            </div>
+            <div class="sheet-row" data-sheet-part="Manga Total">
+              <span class="sheet-num">B</span>
+              <span style="font-weight:600;">Manga Total</span>
+            </div>
+            <div class="sheet-row" data-sheet-part="Calado">
+              <span class="sheet-num">CAL</span>
+              <span style="font-weight:600;">Calado</span>
+            </div>
+            <div class="sheet-row" data-sheet-part="Francobordo Mínimo" style="grid-column: span 2;">
+              <span class="sheet-num">A</span>
+              <span style="font-weight:600;">A · Francobordo Mínimo en Flotación</span>
+            </div>
+          </div>
+
+          <div style="font-size:0.74rem; font-weight:700; color:var(--accent-cyan); text-transform:uppercase; letter-spacing:0.05em; margin-top:6px;">TABLA DE NOMENCLATURA OFICIAL (1 - 19):</div>
+          <div class="sheet-table">
+            <div class="sheet-row" data-sheet-part="Casco"><div class="sheet-row-left"><span class="sheet-num">1</span><span>Casco (Estructura Principal)</span></div><span>🛶</span></div>
+            <div class="sheet-row" data-sheet-part="Palo"><div class="sheet-row-left"><span class="sheet-num">2</span><span>Palo / Mástil</span></div><span>🌲</span></div>
+            <div class="sheet-row" data-sheet-part="Quillote"><div class="sheet-row-left"><span class="sheet-num">3</span><span>Quillote (Bulbo de plomo)</span></div><span>⚓</span></div>
+            <div class="sheet-row" data-sheet-part="Obenques"><div class="sheet-row-left"><span class="sheet-num">4</span><span>Obenques altos y bajos</span></div><span>🕸️</span></div>
+            <div class="sheet-row" data-sheet-part="Estay Proel"><div class="sheet-row-left"><span class="sheet-num">5</span><span>Estay Proel (Forestay)</span></div><span>📏</span></div>
+            <div class="sheet-row" data-sheet-part="Estay Popel"><div class="sheet-row-left"><span class="sheet-num">6</span><span>Estay Popel (Baquestay)</span></div><span>⚓</span></div>
+            <div class="sheet-row" data-sheet-part="Botavara"><div class="sheet-row-left"><span class="sheet-num">7</span><span>Botavara</span></div><span>📐</span></div>
+            <div class="sheet-row" data-sheet-part="Estay Popel Auxiliar"><div class="sheet-row-left"><span class="sheet-num">8</span><span>Estay Popel Auxiliar (Pata de gallo)</span></div><span>🪢</span></div>
+            <div class="sheet-row" data-sheet-part="Crucetas"><div class="sheet-row-left"><span class="sheet-num">9</span><span>Crucetas</span></div><span>⚔️</span></div>
+            <div class="sheet-row" data-sheet-part="Tope"><div class="sheet-row-left"><span class="sheet-num">10</span><span>Tope (Tope del Mástil)</span></div><span>🔝</span></div>
+            <div class="sheet-row" data-sheet-part="Cubierta"><div class="sheet-row-left"><span class="sheet-num">11</span><span>Cubierta</span></div><span>🛹</span></div>
+            <div class="sheet-row" data-sheet-part="Cockpit"><div class="sheet-row-left"><span class="sheet-num">12</span><span>Cockpit (Bañera)</span></div><span>🪑</span></div>
+            <div class="sheet-row" data-sheet-part="Fogonadura"><div class="sheet-row-left"><span class="sheet-num">13</span><span>Fogonadura</span></div><span>⭕</span></div>
+            <div class="sheet-row" data-sheet-part="Bancada"><div class="sheet-row-left"><span class="sheet-num">14</span><span>Bancada (Asientos del Cockpit)</span></div><span>🛋️</span></div>
+            <div class="sheet-row" data-sheet-part="Escotilla"><div class="sheet-row-left"><span class="sheet-num">15</span><span>Escotilla (Acceso a cabina)</span></div><span>🚪</span></div>
+            <div class="sheet-row" data-sheet-part="Carroza"><div class="sheet-row-left"><span class="sheet-num">16</span><span>Carroza (Cabin trunk)</span></div><span>🏠</span></div>
+            <div class="sheet-row" data-sheet-part="Tambucho"><div class="sheet-row-left"><span class="sheet-num">17</span><span>Tambucho (Proa)</span></div><span>🪟</span></div>
+            <div class="sheet-row" data-sheet-part="Francobordo"><div class="sheet-row-left"><span class="sheet-num">18</span><span>Francobordo</span></div><span>📏</span></div>
+            <div class="sheet-row" data-sheet-part="Pala de Timón"><div class="sheet-row-left"><span class="sheet-num">19</span><span>Pala de Timón (Gobierno)</span></div><span>🧭</span></div>
+          </div>
+        </div>
+
+        <!-- Subpanel Lámina 02 -->
+        <div class="sheet-subpanel" id="subpanel-sheet-2">
+          <div style="border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:0.72rem; color:var(--accent-cyan); font-weight:700; text-transform:uppercase; letter-spacing:0.06em;">LÁMINA TÉCNICA 02</span>
+              <span style="font-size:0.7rem; color:var(--text-muted);">Escala Referencial</span>
+            </div>
+            <h3 style="font-size:1.15rem; color:#fff; font-family:'Space Grotesk';">VELAS Y APAREJOS</h3>
+            <p style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">Anatomía de las Velas · Puntos de Trabajo (Puños) · Notas de Maniobra</p>
+          </div>
+
+          <div style="font-size:0.74rem; font-weight:700; color:var(--accent-gold); text-transform:uppercase; letter-spacing:0.05em;">PUNTOS DE TRABAJO (PUÑOS 1, 2 Y 3):</div>
+          <div class="sheet-table" style="max-height:none;">
+            <div class="sheet-row" data-sheet-part="Puño de Driza"><div class="sheet-row-left"><span class="sheet-num" style="background:var(--accent-cyan); color:#030d1b;">1</span><div><b>PUÑO DE DRIZA</b><div style="font-size:0.72rem; color:var(--text-muted);">Punto superior de izado de la vela.</div></div></div></div>
+            <div class="sheet-row" data-sheet-part="Puño de Amura"><div class="sheet-row-left"><span class="sheet-num" style="background:var(--accent-cyan); color:#030d1b;">2</span><div><b>PUÑO DE AMURA</b><div style="font-size:0.72rem; color:var(--text-muted);">Punto inferior fijado al barco / tintero.</div></div></div></div>
+            <div class="sheet-row" data-sheet-part="Puño de Escota"><div class="sheet-row-left"><span class="sheet-num" style="background:var(--accent-cyan); color:#030d1b;">3</span><div><b>PUÑO DE ESCOTA</b><div style="font-size:0.72rem; color:var(--text-muted);">Punto donde trabaja la escota y el repique.</div></div></div></div>
+          </div>
+
+          <div style="font-size:0.74rem; font-weight:700; color:var(--accent-cyan); text-transform:uppercase; letter-spacing:0.05em; margin-top:6px;">BORDES Y COMPONENTES DE LA VELA:</div>
+          <div class="sheet-table" style="max-height:220px;">
+            <div class="sheet-row" data-sheet-part="Gratil"><div class="sheet-row-left"><span class="sheet-num">G</span><span>Gratil (Borde de ataque al mástil/estay)</span></div><span>📏</span></div>
+            <div class="sheet-row" data-sheet-part="Baluma con Battens"><div class="sheet-row-left"><span class="sheet-num">B</span><span>Baluma (Borde posterior con sables)</span></div><span>🪶</span></div>
+            <div class="sheet-row" data-sheet-part="Alunamiento"><div class="sheet-row-left"><span class="sheet-num">AL</span><span>Alunamiento (Curvatura convexa de baluma)</span></div><span>🏹</span></div>
+            <div class="sheet-row" data-sheet-part="Pujamen y Repique"><div class="sheet-row-left"><span class="sheet-num">P</span><span>Pujamen (Borde inferior sobre botavara)</span></div><span>➖</span></div>
+            <div class="sheet-row" data-sheet-part="Refuerzo de Pujamen"><div class="sheet-row-left"><span class="sheet-num">RP</span><span>Refuerzo de Pujamen</span></div><span>🛡️</span></div>
+            <div class="sheet-row" data-sheet-part="Fajas de Rizos"><div class="sheet-row-left"><span class="sheet-num">R</span><span>Fajas de Rizos (Achique de vela mayor)</span></div><span>✂️</span></div>
+            <div class="sheet-row" data-sheet-part="Garruchos"><div class="sheet-row-left"><span class="sheet-num">Gk</span><span>Garruchos (Sujeción en estay proel)</span></div><span>🧷</span></div>
+            <div class="sheet-row" data-sheet-part="Herraje Tintero"><div class="sheet-row-left"><span class="sheet-num">T</span><span>Herraje Tintero (Articulación botavara)</span></div><span>⚙️</span></div>
+          </div>
+
+          <div style="font-size:0.74rem; font-weight:700; color:#34d399; text-transform:uppercase; letter-spacing:0.05em; margin-top:6px;">NOTAS DE MANIOBRA DEL MANUAL:</div>
+          <div class="sheet-note-card">
+            <p>• <b>DRIZAS:</b> Cabos que izan las velas.</p>
+            <p>• <b>AMURA:</b> Fija la vela al barco.</p>
+            <p>• <b>ESCOTAS:</b> Controlan y orientan las velas.</p>
+            <p>• <b>HERRAJE TINTERO:</b> Articula el movimiento de la botavara con el palo.</p>
+            <p>• <b>EL REPIQUE:</b> Ajusta el estiramiento del pujamen.</p>
+            <p>• <b>LOS BATTENS:</b> Sostienen la baluma y evitan pliegues en el alunamiento.</p>
+            <p>• <b>LA FAJA DE RIZOS:</b> Define una geometría menor para reducir la superficie de la vela mayor.</p>
+          </div>
+        </div>
+      </div>
     </aside>
   </div>
 
@@ -1020,298 +1247,403 @@
     // BASE DE DATOS EXTENDIDA (LÁMINA 1 Y LÁMINA 2)
     // ----------------------------------------------------
     const BOAT_PARTS_INFO = {
-      // 1/ NOMENCLATURA - CASCO & SUBMARINO
+      // ====================================================
+      // LÁMINA 01: NOMENCLATURA DE VELERO (1 - 19)
+      // ====================================================
       "Casco": {
         num: "1",
         category: "casco",
-        tag: "1/ Nomenclatura - Estructura",
+        tag: "1/ Nomenclatura · Estructura Principal",
         icon: "🛶",
-        title: "Casco y Roda / Espejo",
-        desc: "Cuerpo estanco principal del barco. Se compone de Obra Viva (sumergida) y Obra Muerta (emergida), separadas por la línea de flotación. Al frente se ubica la Roda y atrás el Espejo de popa.",
-        note: "El francobordo es la altura vertical entre la línea de flotación y la cubierta. Define la reserva de flotabilidad contra el oleaje."
+        title: "1. Casco (Hull)",
+        desc: "Cuerpo estanco principal del barco que desplaza el agua y proporciona flotabilidad. Se divide por la línea de flotación en Obra Viva (sumergida) y Obra Muerta (emergida). Al frente remata en la Roda y atrás en el Espejo de popa.",
+        note: "Lámina 01: '1. CASCO'. La distancia vertical entre la línea de flotación y la cubierta es el francobordo, que define la reserva de flotabilidad."
       },
       "Obra Viva": {
-        num: "1",
+        num: "1-OV",
         category: "submarino",
-        tag: "1/ Nomenclatura - Casco Sumergido",
+        tag: "1/ Nomenclatura · Casco Sumergido",
         icon: "🔴",
         title: "Obra Viva (Carena)",
-        desc: "Parte del casco sumergida permanentemente bajo la línea de flotación. Su forma hidrodinámica determina el calado, el desplazamiento y la resistencia al avance del barco.",
-        note: "Se recubre periódicamente con pintura 'antifouling' (roja o negra) que impide que se adhieran caracolillos, moluscos y algas."
+        desc: "Superficie exterior del casco que permanece permanentemente sumergida bajo la línea de flotación. Su volumen sumergido iguala el peso del barco según el principio de Arquímedes.",
+        note: "Se recubre periódicamente con pintura antifouling auto-pulimentable (roja) para evitar que crustáceos y algas aumenten la resistencia por fricción."
+      },
+      "Palo": {
+        num: "2",
+        category: "jarcia",
+        tag: "1/ Nomenclatura · Arboladura",
+        icon: "🌲",
+        title: "2. Palo / Mástil (Mast)",
+        desc: "Gran viga vertical perfilada de aluminio o fibra de carbono que soporta la fuerza de sustentación de las velas. Atraviesa la cubierta por la fogonadura y apoya en la carlinga.",
+        note: "Lámina 01: '2. PALO / MÁSTIL'. Trabaja bajo una enorme compresión longitudinal mantenida por los estayes proel y popel y los obenques."
       },
       "Quillote": {
         num: "3",
         category: "submarino",
-        tag: "1/ Nomenclatura - Apéndice Sumergido",
+        tag: "1/ Nomenclatura · Apéndice Sumergido",
         icon: "⚓",
-        title: "Quillote con Bulbo de Plomo",
-        desc: "Aleta pesada vertical fijada bajo el casco. Su enorme peso de plomo inferior crea el par adrizante para evitar que el velero zozobre, y su plano lateral contrarresta el abatimiento por el viento.",
-        note: "En los apuntes se detalla: 'El quillote aporta estabilidad evitando el abatimiento lateral y permitiendo la ceñida'."
-      },
-      "Pala de Timón": {
-        num: "19",
-        category: "submarino",
-        tag: "1/ Nomenclatura - Gobierno",
-        icon: "🧭",
-        title: "Pala de Timón (Rudder)",
-        desc: "Placa hidrodinámica sumergida bajo el espejo de popa que gira sobre su mecha para desviar el flujo de agua y dirigir el rumbo del barco.",
-        note: "Para gobernar requiere 'arrancada' (velocidad del agua pasando sobre la pala). Sin flujo relativo de agua no responde."
-      },
-      "Línea de Flotación": {
-        num: "LF",
-        category: "submarino",
-        tag: "1/ Nomenclatura - Nivel de Mar",
-        icon: "〰️",
-        title: "Línea de Flotación",
-        desc: "Línea perimetral donde la superficie del mar corta el casco. Separa estrictamente la Obra Viva (sumergida) de la Obra Muerta (emergida).",
-        note: "La 'eslora en flotación' y 'manga en flotación' medidas sobre esta línea determinan la velocidad teórica de desplazamiento del casco."
-      },
-      "Roda": {
-        num: "R",
-        category: "casco",
-        tag: "1/ Nomenclatura - Proa",
-        icon: "🔪",
-        title: "Roda (Proa)",
-        desc: "Pieza estructural afilada que forma la proa de la embarcación y corta las olas de frente. En su parte superior se enverga el arraigo del Estay Proel.",
-        note: "En la lámina 1 se dibuja en la sección de proa como el borde frontal vertical de ataque del barco."
-      },
-      "Espejo de Popa": {
-        num: "E",
-        category: "casco",
-        tag: "1/ Nomenclatura - Popa",
-        icon: "🛡️",
-        title: "Espejo de Popa",
-        desc: "Plano transversal vertical o inclinado que cierra el casco por la popa. En él se fija el arraigo del Estay Popel (baquestay) y la mecha del timón.",
-        note: "Un espejo ancho y plano favorece el planeo en popa redonda y proporciona una amplia bañera para la tripulación."
-      },
-      "Cubierta": {
-        num: "11",
-        category: "casco",
-        tag: "1/ Nomenclatura - Plano Superior",
-        icon: "🛹",
-        title: "Cubierta (Deck)",
-        desc: "Piso horizontal estanco superior. Brinda espacio de trabajo para las maniobras de proa, pasillos laterales y alberga las escotillas.",
-        note: "La línea imaginaria que divide el barco longitudinalmente de proa a popa por la mitad de la cubierta se llama 'Línea de Crujía'."
-      },
-      "Cockpit": {
-        num: "12",
-        category: "casco",
-        tag: "1/ Nomenclatura - Puesto de Mando",
-        icon: "🪑",
-        title: "Cockpit (Bañera)",
-        desc: "Zona rebajada situada a popa sobre la cubierta donde se ubica la tripulación y el timonel para gobernar el barco protegidos del viento y olas.",
-        note: "Dispone de desagües automáticos ('imbornales') para desalojar rápidamente el agua de mar que pueda embarcarse."
-      },
-      "Fogonadura": {
-        num: "13",
-        category: "casco",
-        tag: "1/ Nomenclatura - Paso Estructural",
-        icon: "⭕",
-        title: "Fogonadura",
-        desc: "Abertura circular reforzada en la cubierta por donde el mástil pasa hacia el interior del casco para asentarse sobre la carlinga.",
-        note: "Lleva una funda flexible de goma o lona sellada que impide la entrada de agua al interior de la cabina."
-      },
-      "Bancada": {
-        num: "14",
-        category: "casco",
-        tag: "1/ Nomenclatura - Cockpit",
-        icon: "🛋️",
-        title: "Bancadas del Cockpit",
-        desc: "Asientos longitudinales situados a las bandas del cockpit. Permiten que la tripulación se siente o haga contrapeso ('hacer banda') a barlovento.",
-        note: "Debajo de las bancadas se encuentran grandes cofres estancos para guardar cabos, defensas y el depósito de combustible."
-      },
-      "Escotilla": {
-        num: "15",
-        category: "casco",
-        tag: "1/ Nomenclatura - Accesos",
-        icon: "🚪",
-        title: "Escotilla de Cabina",
-        desc: "Abertura con tapa corrediza sobre la carroza que permite bajar al interior de la cabina y camarotes de la embarcación.",
-        note: "Cuenta con guías y tablillas verticales para cerrarla herméticamente en caso de temporal o mala mar."
-      },
-      "Carroza": {
-        num: "16",
-        category: "casco",
-        tag: "1/ Nomenclatura - Cabina",
-        icon: "🏠",
-        title: "Carroza (Roof)",
-        desc: "Estructura elevada sobre la cubierta central que proporciona altura interior de pie para la habitabilidad del camarote y cocina.",
-        note: "Sobre el techo de la carroza corren los cabos de maniobra (drizas, rizos y contras) hacia los pianos de mordazas."
-      },
-      "Tambucho": {
-        num: "17",
-        category: "casco",
-        tag: "1/ Nomenclatura - Proa",
-        icon: "🪟",
-        title: "Tambucho de Proa",
-        desc: "Escotilla hermética situada en la cubierta de proa. Sirve para iluminación y ventilación del camarote de proa y salida de emergencia o izado rápido de velas.",
-        note: "Debe asegurarse con pestillos de seguridad antes de zarpar para resistir el impacto de olas en la proa."
-      },
-
-      // 1/ NOMENCLATURA - ARBOLADURA & JARCIA
-      "Palo": {
-        num: "2",
-        category: "jarcia",
-        tag: "1/ Nomenclatura - Arboladura",
-        icon: "🌲",
-        title: "Palo (Mástil)",
-        desc: "Gran mástil vertical de aluminio o carbono que sostiene las velas y la jarcia firme. Pasa a través de la cubierta por la fogonadura.",
-        note: "Soporta una compresión gigantesca ejercida por el tiro de los estayes, obenques y el empuje aerodinámico de las velas."
-      },
-      "Crucetas": {
-        num: "4/9",
-        category: "jarcia",
-        tag: "1/ Nomenclatura - Arboladura",
-        icon: "⚔️",
-        title: "Crucetas (Spreaders)",
-        desc: "Brazos transversales metálicos montados a los lados del palo. Su función es abrir el ángulo con el que los obenques altos tiran del mástil, aumentando la firmeza.",
-        note: "Distribuyen el esfuerzo del obenque para evitar que el mástil flexione o pandee lateralmente ante rachas fuertes."
-      },
-      "Estay Proel": {
-        num: "5",
-        category: "jarcia",
-        tag: "1/ Nomenclatura - Jarcia Firme",
-        icon: "📏",
-        title: "Estay Proel (Forestay)",
-        desc: "Cable de acero tensor que une la roda de proa con la parte superior del mástil. Evita que el mástil caiga hacia popa y sirve para envergar la vela de proa mediante garruchos.",
-        note: "En la lámina 2 se destaca: 'El gratil de la vela de proa se afirma al estay proel mediante los garruchos'."
-      },
-      "Botavara": {
-        num: "7",
-        category: "jarcia",
-        tag: "1/ Nomenclatura - Arboladura Móvil",
-        icon: "📐",
-        title: "Botavara (Boom)",
-        desc: "Palo horizontal articulado a la base del mástil mediante el herraje tintero. Sujeta el pujamen de la vela mayor y permite abrir o cerrar su ángulo con la escota.",
-        note: "En el puño de escota de la vela mayor se afirma el cabo de repique para estirar el pujamen a lo largo de la botavara."
-      },
-      "Estay Popel": {
-        num: "8",
-        category: "jarcia",
-        tag: "1/ Nomenclatura - Jarcia Firme",
-        icon: "⚓",
-        title: "Estay Popel (Baquestay)",
-        desc: "Cable de acero firme que va desde el espejo de popa hasta el tope del mástil. Contrarresta la tensión del estay proel e impide que el palo caiga hacia proa.",
-        note: "Tensar el estay popel permite flexionar levemente el mástil para aplanar la vela mayor cuando el viento aumenta."
-      },
-      "Tope": {
-        num: "10",
-        category: "jarcia",
-        tag: "1/ Nomenclatura - Mástil",
-        icon: "🔝",
-        title: "Tope del Palo",
-        desc: "Punto más alto del mástil. Allí se ubica la arraigada de los estayes, las poleas de drizas para izar las velas, la veleta y la luz de navegación.",
-        note: "En el tope se iza el Puño de Driza de la vela mayor mediante la driza correspondiente."
+        title: "3. Quillote con Bulbo de Plomo",
+        desc: "Aleta pesada fijada bajo el plano de crujía del casco. Cumple una doble función vital: su bulbo de plomo inferior crea un par adrizante contra la escora, y su plano vertical evita el abatimiento lateral (deriva).",
+        note: "Lámina 01: '3. QUILLOTE'. 'El quillote aporta estabilidad evitando el abatimiento lateral y permitiendo la ceñida contra el viento'."
       },
       "Obenques": {
         num: "4",
         category: "jarcia",
-        tag: "1/ Nomenclatura - Jarcia Firme Lateral",
+        tag: "1/ Nomenclatura · Jarcia Firme Lateral",
         icon: "🕸️",
-        title: "Obenques Altos y Bajos",
-        desc: "Cables de acero laterales a babor y estribor. Los altos van al tope del mástil pasando por las puntas de las crucetas; los bajos van directos a la altura de las crucetas.",
-        note: "Impiden la inclinación y flexión lateral del mástil cuando el viento llena las velas y ejerce palanca lateral."
+        title: "4. Obenques Altos y Bajos (Shrouds)",
+        desc: "Cables de acero inoxidable trenzado (1x19) a ambas bandas. Los obenques altos van del tope del palo a cubierta pasando por las crucetas; los obenques bajos nacen a la altura de las crucetas y van directo a cubierta.",
+        note: "Lámina 01: '4. OBENQUES ALTOS Y BAJOS'. Mantienen el mástil perfectamente recto en el plano transversal e impiden que pandee o flexione lateralmente."
       },
-      "Herraje Tintero": {
-        num: "T",
+      "Estay Proel": {
+        num: "5",
         category: "jarcia",
-        tag: "2/ Velas - Herraje Articulado",
-        icon: "⚙️",
-        title: "Herraje Tintero (Ganso)",
-        desc: "Herraje articulado metálico ubicado en el mástil donde se conecta la botavara. Permite que la botavara gire libremente de banda a banda y suba o baje.",
-        note: "Apunte textual del cuaderno: 'La vela mayor se amura en un herraje llamado tintero que articula el movimiento de la botavara con el palo'."
+        tag: "1/ Nomenclatura · Jarcia Firme Longitudinal",
+        icon: "📏",
+        title: "5. Estay Proel (Forestay)",
+        desc: "Cable firme que une el herraje de proa (junto a la roda) con la parte alta del mástil. Impide que el mástil caiga hacia popa y sirve de guía para envergar la vela de proa mediante garruchos.",
+        note: "Lámina 01: '5. ESTAY PROEL'. En la Lámina 02 se detalla: 'El gratil de la vela de proa se afirma al estay proel mediante los garruchos'."
+      },
+      "Estay Popel": {
+        num: "6",
+        category: "jarcia",
+        tag: "1/ Nomenclatura · Jarcia Firme Longitudinal",
+        icon: "⚓",
+        title: "6. Estay Popel (Baquestay Principal)",
+        desc: "Cable tensor de acero que va desde el tope del mástil hacia la popa. Contrarresta la tensión del estay proel e impide que el mástil caiga hacia adelante con viento en popa.",
+        note: "Lámina 01: '6. ESTAY POPEL'. Al tensar el baquestay se arquea el mástil hacia popa, lo que aplana la bolsa de la vela mayor y reduce la escora en ceñida."
+      },
+      "Botavara": {
+        num: "7",
+        category: "jarcia",
+        tag: "1/ Nomenclatura · Arboladura Móvil",
+        icon: "📐",
+        title: "7. Botavara (Boom)",
+        desc: "Percha horizontal articulada al mástil mediante el herraje tintero. Sujeta el pujamen de la vela mayor y permite orientar su ángulo con la escota y graduar su tensión con el repique.",
+        note: "Lámina 01: '7. BOTAVARA'. Lámina 02: 'El herraje tintero articula el movimiento de la botavara con el palo'."
+      },
+      "Estay Popel Auxiliar": {
+        num: "8",
+        category: "jarcia",
+        tag: "1/ Nomenclatura · Jarcia Firme",
+        icon: "🪢",
+        title: "8. Estay Popel Auxiliar (Pata de Gallo)",
+        desc: "Bifurcación o sistema tensor auxiliar que conecta la base del estay popel con las dos esquinas del espejo de popa (pata de gallo de baquestay), repartiendo la carga y dejando libre el paso central.",
+        note: "Lámina 01: '8. ESTAY POPEL AUXILIAR'. Permite incorporar poleas desmultiplicadoras o aparejo de baquestay para trimar la tensión del mástil en navegación."
+      },
+      "Crucetas": {
+        num: "9",
+        category: "jarcia",
+        tag: "1/ Nomenclatura · Arboladura",
+        icon: "⚔️",
+        title: "9. Crucetas (Spreaders)",
+        desc: "Brazos transversales de perfil aerodinámico que sobresalen a babor y estribor del mástil. Abren el ángulo con el que los obenques altos tiran del palo, multiplicando la sustentación lateral.",
+        note: "Lámina 01: '9. CRUCETAS'. Trabajan a compresión pura. Un ángulo de cruceta correctamente calado evita el pandeo del mástil bajo rachas severas."
+      },
+      "Tope": {
+        num: "10",
+        category: "jarcia",
+        tag: "1/ Nomenclatura · Mástil",
+        icon: "🔝",
+        title: "10. Tope del Palo (Masthead)",
+        desc: "Extremo superior del mástil. Alberga las cajas de poleas para las drizas de mayor y spinnaker, los arraigos de estayes y obenques, la veleta (windex), la antena de VHF y las luces de navegación.",
+        note: "Lámina 01: '10. TOPE'. En el tope se hace firme la driza que iza el Puño de Driza de la vela mayor."
+      },
+      "Cubierta": {
+        num: "11",
+        category: "casco",
+        tag: "1/ Nomenclatura · Plano Superior",
+        icon: "🛹",
+        title: "11. Cubierta (Deck)",
+        desc: "Superficie estanca horizontal superior que cierra el casco. Proporciona espacio de trabajo para las maniobras de proa, pasillos laterales (candeleros y pasamanos) y aloja las escotillas.",
+        note: "Lámina 01: '11. CUBIERTA'. La unión entre el casco y la cubierta se denomina 'regala' o 'trancanil' y debe ser 100% estanca."
+      },
+      "Cockpit": {
+        num: "12",
+        category: "casco",
+        tag: "1/ Nomenclatura · Puesto de Mando",
+        icon: "🪑",
+        title: "12. Cockpit (Bañera)",
+        desc: "Pozo o área rebajada en la popa de la cubierta donde se concentran el timonel y la tripulación para gobernar el barco protegidos del oleaje y viento.",
+        note: "Lámina 01: '12. COCKPIT'. Cuenta con desagües automáticos ('imbornales') que descargan por gravedad cualquier agua que embarque hacia el mar."
+      },
+      "Fogonadura": {
+        num: "13",
+        category: "casco",
+        tag: "1/ Nomenclatura · Paso de Cubierta",
+        icon: "⭕",
+        title: "13. Fogonadura (Mast Partners)",
+        desc: "Orificio circular reforzado en la cubierta por donde el mástil pasa hacia el interior del barco para apoyarse sobre la carlinga en la quilla.",
+        note: "Lámina 01: '13. FOGONADURA'. Incorpora cuñas de goma para trimar la caída del mástil y una bota o funda impermeable que sella la entrada de agua."
+      },
+      "Bancada": {
+        num: "14",
+        category: "casco",
+        tag: "1/ Nomenclatura · Asientos del Cockpit",
+        icon: "🛋️",
+        title: "14. Bancadas (Cockpit Seats)",
+        desc: "Asientos longitudinales situados a las bandas del cockpit. Permiten que la tripulación se siente cómodamente o se siente sobre la regala para hacer contrapeso ('hacer banda') a barlovento.",
+        note: "Lámina 01: '14. BANCADA'. Debajo de las bancadas se encuentran grandes tambuchos o cofres estancos de estiba para amarras, defensas y combustible."
+      },
+      "Escotilla": {
+        num: "15",
+        category: "casco",
+        tag: "1/ Nomenclatura · Acceso a Cabina",
+        icon: "🚪",
+        title: "15. Escotilla (Companionway)",
+        desc: "Abertura principal de entrada situada en la pared posterior de la carroza que permite descender al interior de la cabina y camarotes mediante una escala.",
+        note: "Lámina 01: '15. ESCOTILLA'. Dispone de una tapa corrediza superior y tablillas verticales encastrables para cerrarla herméticamente en caso de temporal."
+      },
+      "Carroza": {
+        num: "16",
+        category: "casco",
+        tag: "1/ Nomenclatura · Superestructura",
+        icon: "🏠",
+        title: "16. Carroza (Coachroof / Cabin Trunk)",
+        desc: "Estructura elevada sobre el centro de la cubierta que brinda altura interior habitable (altura de pie) al salón, cocina y aseo del velero.",
+        note: "Lámina 01: '16. CARROZA'. Sobre el techo de la carroza se montan las guías de reenvió de drizas, rizos y contra hacia los pianos de mordazas."
+      },
+      "Tambucho": {
+        num: "17",
+        category: "casco",
+        tag: "1/ Nomenclatura · Proa",
+        icon: "🪟",
+        title: "17. Tambucho de Proa (Forehatch)",
+        desc: "Escotilla translúcida estanca ubicada en la cubierta de proa. Sirve para iluminación y ventilación natural del camarote de proa y como salida de emergencia.",
+        note: "Lámina 01: '17. TAMBUCHO'. En maniobras de regata permite izar y arriar velas de proa (spinnaker o génova) directamente desde el pañol de velas."
+      },
+      "Francobordo": {
+        num: "18",
+        category: "casco",
+        tag: "1/ Nomenclatura · Altura Estructural",
+        icon: "📏",
+        title: "18. Francobordo (Freeboard)",
+        desc: "Distancia vertical medida en el costado del barco entre la superficie del agua (línea de flotación) y la cubierta principal en su punto más bajo.",
+        note: "Lámina 01: '18. FRANCOBORDO' y 'A · FRANCOBORDO MÍNIMO EN FLOTACIÓN'. Garantiza la reserva de flotabilidad e impide que las olas barran la cubierta."
+      },
+      "Pala de Timón": {
+        num: "19",
+        category: "submarino",
+        tag: "1/ Nomenclatura · Gobierno",
+        icon: "🧭",
+        title: "19. Pala de Timón (Rudder)",
+        desc: "Aleta hidrodinámica sumergida bajo el espejo de popa que pivota sobre su mecha. Al orientarse a una banda crea sustentación lateral que cambia el rumbo del velero.",
+        note: "Lámina 01: '19. PALA DE TIMÓN'. Requiere arrancada (velocidad relativa del agua pasando por el perfil) para generar fuerza de giro; parado no tiene gobierno."
+      },
+      "Línea de Flotación": {
+        num: "LF",
+        category: "submarino",
+        tag: "1/ Nomenclatura · Nivel de Mar",
+        icon: "〰️",
+        title: "Línea de Flotación (Waterline)",
+        desc: "Intersección del plano de la superficie del agua con el casco del velero con su desplazamiento y carga normal. Delimita la obra viva de la obra muerta.",
+        note: "Lámina 01: 'LÍNEA DE FLOTACIÓN'. Separa la carena sumergida (antifouling) del costado emergido del barco."
+      },
+      "Roda": {
+        num: "R",
+        category: "casco",
+        tag: "1/ Nomenclatura · Proa",
+        icon: "🔪",
+        title: "Roda de Proa (Stem)",
+        desc: "Perfil estructural vertical o inclinado más avanzado que conforma la proa y corta las olas de frente. En su extremo superior se arraiga el estay proel.",
+        note: "Lámina 01: Sección de proa. Define el ángulo de entrada del casco en el agua y el lanzamiento de proa."
+      },
+      "Espejo de Popa": {
+        num: "E",
+        category: "casco",
+        tag: "1/ Nomenclatura · Popa",
+        icon: "🛡️",
+        title: "Espejo de Popa (Transom)",
+        desc: "Plano transversal vertical o inclinado que cierra el casco en su extremo posterior. En él se montan el arraigo del baquestay, la pala de timón o la plataforma de baño.",
+        note: "Lámina 01: Sección de popa. Un espejo ancho aporta estabilidad de formas y permite una bañera espaciosa."
       },
 
-      // 2/ VELAS Y PUÑOS (LÁMINA 2 COMPLETA)
+      // ====================================================
+      // LÁMINA 01: DIMENSIONES NAVALES Y COTAS (VISTAS GENERALES)
+      // ====================================================
+      "Eslora Total": {
+        num: "LOA",
+        category: "dimensiones",
+        tag: "Dimensiones · Longitud Máxima",
+        icon: "↔️",
+        title: "Eslora Total (Length Overall - LOA)",
+        desc: "Longitud máxima exterior de la embarcación medida entre los puntos más salientes de la proa (roda) y de la popa (espejo o coronamiento), excluyendo accesorios desmontables.",
+        note: "Lámina 01: 'ESLORA TOTAL'. Es la dimensión comercial y oficial del barco que determina la tarifa de amarre en puertos y la categoría de navegación."
+      },
+      "Eslora en Flotación": {
+        num: "LWL",
+        category: "dimensiones",
+        tag: "Dimensiones · Plano de Agua",
+        icon: "🚢",
+        title: "Eslora en Flotación (LWL)",
+        desc: "Longitud del plano del agua medida sobre la línea de flotación entre la entrada de la roda y la salida de popa cuando el barco flota en reposo.",
+        note: "Lámina 01: 'ESLORA EN FLOTACIÓN /////////'. Determina directamente la velocidad crítica de casco en régimen de desplazamiento: V = 1.34 × √(LWL en pies)."
+      },
+      "Manga Total": {
+        num: "B",
+        category: "dimensiones",
+        tag: "Dimensiones · Anchura Máxima",
+        icon: "↔️",
+        title: "Manga Total (Beam - B)",
+        desc: "Anchura máxima del casco medida perpendicularmente a la línea de crujía en la sección transversal más ancha (sección maestra).",
+        note: "Lámina 01: 'B · MANGA TOTAL'. Aporta estabilidad inicial de forma (resistencia a la escora) y determina la amplitud de la bañera e interiores."
+      },
+      "Calado": {
+        num: "CAL",
+        category: "dimensiones",
+        tag: "Dimensiones · Profundidad",
+        icon: "⬇️",
+        title: "Calado (Draft)",
+        desc: "Distancia vertical máxima desde la línea de flotación hasta el punto más profundo del quillote o bulbo de plomo.",
+        note: "Lámina 01: 'CALADO'. Es la profundidad mínima requerida para fondear o navegar con seguridad sin tocar fondo ni varar."
+      },
+      "Francobordo Mínimo": {
+        num: "A",
+        category: "dimensiones",
+        tag: "Dimensiones · Francobordo Mínimo",
+        icon: "⬆️",
+        title: "Francobordo Mínimo (A)",
+        desc: "La menor distancia vertical entre la línea de flotación y la cubierta principal, medida usualmente en la sección de popa o en el centro del barco.",
+        note: "Lámina 01: 'A · FRANCOBORDO MÍN. / A · MÍNIMO EN FLOTACIÓN'. Es la reserva de flotabilidad indispensable para evitar que el agua inunde la cubierta al escorar."
+      },
+
+      // ====================================================
+      // LÁMINA 02: VELAS, PUÑOS, MANIOBRA Y BORDES
+      // ====================================================
       "Vela Mayor": {
         num: "M",
         category: "velas",
-        tag: "2/ Velas - Vela Principal",
+        tag: "2/ Velas · Vela Principal",
         icon: "⛵",
         title: "Vela Mayor (Mainsail)",
-        desc: "La vela principal izada a popa del mástil y cazada sobre la botavara. Es el ala aerodinámica impulsora que genera empuje por sustentación.",
-        note: "Consta de tres puños (Driza, Amura, Escota), tres lados (Gratil, Baluma, Pujamen), battens y fajas de rizos para acortar trapo."
+        desc: "Vela principal bermudiana o áurica que se iza a popa del mástil y se afirma sobre la botavara. Es el ala aerodinámica que genera empuje por sustentación.",
+        note: "Lámina 02: 'VELA MAYOR'. Posee tres puños (Driza 1, Amura 2, Escota 3), tres bordes (Gratil, Baluma, Pujamen), battens, alunamiento y fajas de rizos."
       },
       "Vela de Proa": {
         num: "F",
         category: "velas",
-        tag: "2/ Velas - Vela de Proa",
+        tag: "2/ Velas · Vela de Proa",
         icon: "📐",
         title: "Vela de Proa (Foque / Génova)",
-        desc: "Vela triangular envergada al estay proel con garruchos. Canaliza y acelera el viento hacia la cara de sotavento de la mayor (efecto vénturi).",
-        note: "Esencial para lograr ángulos de ceñida cerrados contra el viento y mantener el velero balanceado sobre su centro de deriva."
+        desc: "Vela triangular envergada al estay proel mediante garruchos. Acelera y canaliza el flujo de aire hacia la cara de sotavento de la mayor (efecto vénturi).",
+        note: "Lámina 02: 'VELA DE PROA'. Clave para ganar sustentación en ceñida y equilibrar el centro vélico respecto al quillote."
       },
       "Puño de Driza": {
         num: "①",
         category: "velas",
-        tag: "2/ Velas - Puños (Vértices)",
+        tag: "2/ Velas · Puntos de Trabajo",
         icon: "1️⃣",
-        title: "① Puño de Driza",
+        title: "① Puño de Driza (Head)",
         desc: "El vértice superior de la vela (tanto de la mayor como del foque). En él se hace firme la driza para izar la vela hasta el tope del mástil.",
-        note: "Apunte textual del cuaderno: 'Las drizas son los cabos que izan las velas'."
+        note: "Lámina 02: '1. PUÑO DE DRIZA: Punto superior de izado de la vela. DRIZAS: Cabos que izan las velas'."
       },
       "Puño de Amura": {
         num: "②",
         category: "velas",
-        tag: "2/ Velas - Puños (Vértices)",
+        tag: "2/ Velas · Puntos de Trabajo",
         icon: "2️⃣",
-        title: "② Puño de Amura",
-        desc: "Vértice inferior delantero de la vela. Fija la vela al barco: en el foque va a la roda de proa y en la mayor al herraje tintero.",
-        note: "Apunte textual del cuaderno: 'La amura se hace fija a las velas al barco. La vela mayor se amura en el tintero'."
+        title: "② Puño de Amura (Tack)",
+        desc: "Vértice inferior delantero fijado al barco. En la vela mayor se afirma en el herraje tintero; en el foque se grilleta al arraigo de proa junto a la roda.",
+        note: "Lámina 02: '2. PUÑO DE AMURA: Punto inferior fijado al barco. AMURA: Fija la vela al barco'."
       },
       "Puño de Escota": {
         num: "③",
         category: "velas",
-        tag: "2/ Velas - Puños (Vértices)",
+        tag: "2/ Velas · Puntos de Trabajo",
         icon: "3️⃣",
-        title: "③ Puño de Escota",
-        desc: "Vértice inferior trasero de la vela. En él se afirman las escotas o el repique para abrir o cazar la vela y regular su potencia.",
-        note: "Apunte textual del cuaderno: 'Las escotas son los cabos que controlan las velas. En el puño de escota se afirma el repique que permite ajustar el pujamen'."
+        title: "③ Puño de Escota (Clew)",
+        desc: "Vértice inferior trasero de la vela. En la mayor va afirmado al cabo de repique en el extremo de la botavara; en el foque se atan las escotas de babor y estribor.",
+        note: "Lámina 02: '3. PUÑO DE ESCOTA: Punto donde trabaja la escota. ESCOTAS: Controlan y orientan las velas. El repique ajusta el estiramiento del pujamen'."
       },
       "Gratil": {
         num: "G",
         category: "velas",
-        tag: "2/ Velas - Bordes de la Vela",
+        tag: "2/ Velas · Borde de Ataque",
         icon: "📏",
-        title: "Gratil (Borde de Ataque)",
-        desc: "Borde delantero de la vela. En la vela mayor va introducido en la relinga o patines del mástil; en el foque va afirmado con garruchos al estay proel.",
-        note: "Es el borde de ataque aerodinámico que primero corta el flujo de viento."
+        title: "Gratil (Luff)",
+        desc: "Borde delantero de la vela. En la mayor va relingado o con patines dentro del carril del mástil; en el foque va afirmado con garruchos al estay proel.",
+        note: "Lámina 02: 'GRÁTIL'. Es el borde de ataque que primero corta el viento aparente y define la entrada del perfil aerodinámico."
       },
       "Baluma con Battens": {
         num: "B",
         category: "velas",
-        tag: "2/ Velas - Bordes y Sables",
+        tag: "2/ Velas · Borde Posterior y Sables",
         icon: "🪶",
-        title: "Baluma con Battens (Sables) & Alunamiento",
-        desc: "Borde posterior libre de la vela que va del puño de driza al de escota. Incorpora battens (sables flexibles) dentro de fundas horizontales.",
-        note: "Apunte textual del cuaderno: 'Los battens, ubicados en la baluma, permiten evitar el pliegue del alunamiento'."
+        title: "Baluma con Battens (Leech & Battens)",
+        desc: "Borde posterior libre de la vela que va desde el puño de driza hasta el puño de escota. Incorpora fundas transversales donde se alojan los battens (sables flexibles).",
+        note: "Lámina 02: 'BALUMA' y 'BATTENS'. 'Los battens sostienen la baluma y evitan pliegues en el alunamiento'."
+      },
+      "Alunamiento": {
+        num: "AL",
+        category: "velas",
+        tag: "2/ Velas · Geometría Aerodinámica",
+        icon: "🏹",
+        title: "Alunamiento (Roach)",
+        desc: "Curvatura convexa positiva de la baluma que sobresale por detrás de la línea recta imaginaria entre el puño de driza y el de escota.",
+        note: "Lámina 02: 'ALUNAMIENTO'. Otorga mayor superficie vélica en la parte alta sin requerir un mástil más alto, optimizada mediante los battens."
       },
       "Pujamen y Repique": {
         num: "P",
         category: "velas",
-        tag: "2/ Velas - Borde Inferior",
+        tag: "2/ Velas · Borde Inferior",
         icon: "➖",
-        title: "Pujamen y Cabo de Repique",
-        desc: "Borde inferior horizontal de la vela mayor que descansa a lo largo de la botavara entre el puño de amura y el puño de escota.",
-        note: "Apunte textual del cuaderno: 'En el puño de escota se hace firme un cabo que se llama repique que permite ajustar el estiramiento del pujamen'."
+        title: "Pujamen y Cabo de Repique (Foot & Outhaul)",
+        desc: "Borde horizontal inferior de la vela mayor que descansa a lo largo de la botavara entre el puño de amura y el puño de escota.",
+        note: "Lámina 02: 'PUJAMEN'. 'El repique ajusta el estiramiento del pujamen'. Tensa el pujamen para aplanar la vela con viento fuerte o lo amolla para darle bolsa con ventolina."
+      },
+      "Refuerzo de Pujamen": {
+        num: "RP",
+        category: "velas",
+        tag: "2/ Velas · Refuerzos Textiles",
+        icon: "🛡️",
+        title: "Refuerzo de Pujamen",
+        desc: "Faja de tejido reforzado de dacron cosida a lo largo de la parte baja del pujamen y en los puños para distribuir las cargas de tracción de la botavara.",
+        note: "Lámina 02: 'REFUERZO DE PUJAMEN'. Evita desgarros y deformaciones por la tensión del repique y de la escota."
       },
       "Fajas de Rizos": {
         num: "R",
         category: "velas",
-        tag: "2/ Velas - Reducción de Trapo",
+        tag: "2/ Velas · Reducción de Trapo",
         icon: "✂️",
-        title: "Fajas de Rizos (Matafiones)",
-        desc: "Líneas horizontales reforzadas con ollados a través de las cuales se atan los matafiones para recoger la parte baja de la vela mayor con vientos fuertes.",
-        note: "Apunte textual del cuaderno: 'La faja de rizos es la línea donde se ubica la nueva geometría de la mayor y sirve para achicar la superficie de la vela'."
+        title: "Fajas de Rizos (Reefing Points)",
+        desc: "Líneas horizontales reforzadas provistas de ollados y matafiones para recoger y atar la parte baja de la vela mayor cuando arrecia el viento.",
+        note: "Lámina 02: 'FAJA DE RIZOS'. 'La faja de rizos define una geometría menor para reducir la superficie de la vela mayor sin perder el equilibrio del rumbo'."
       },
       "Garruchos": {
         num: "Gk",
         category: "velas",
-        tag: "2/ Velas - Sujeción de Proa",
+        tag: "2/ Velas · Estay Proel",
         icon: "🧷",
-        title: "Garruchos del Estay Proel",
-        desc: "Mosquetones metálicos o aros cosidos al gratil del foque que se enganchan a lo largo del estay proel, guiando la vela de proa al subir y bajar.",
-        note: "En la lámina 2 se señalan explícitamente como 'Garruchos' fijados al Estay Proel."
+        title: "Garruchos (Hanks)",
+        desc: "Mosquetones metálicos de resorte de bronce o plástico de alta resistencia colocados a intervalos regulares en el gratil de la vela de proa para afirmarla al estay proel.",
+        note: "Lámina 02: 'GARRUCHOS'. Guían la vela de proa al izar o arriar sobre el estay proel manteniéndola perfectamente orientada."
+      },
+      "Herraje Tintero": {
+        num: "T",
+        category: "jarcia",
+        tag: "2/ Velas · Articulación",
+        icon: "⚙️",
+        title: "Herraje Tintero (Gooseneck)",
+        desc: "Gozne metálico articulado fijado en la cara posterior del mástil donde encaja la espiga de la botavara y se amura la vela mayor.",
+        note: "Lámina 02: 'HERRAJE TINTERO'. 'El herraje tintero articula el movimiento de la botavara con el palo, permitiendo que abra, cierre, suba y baje'."
+      },
+      "Drizas": {
+        num: "D",
+        category: "velas",
+        tag: "2/ Velas · Maniobra de Izado",
+        icon: "🧵",
+        title: "Drizas (Halyards)",
+        desc: "Cabos de alta tenacidad (dyneema o poliéster trenzado) que suben por el mástil y sirven para izar las velas haciéndose firmes en los puños de driza.",
+        note: "Lámina 02: 'DRIZAS: Cabos que izan las velas'."
+      },
+      "Escotas": {
+        num: "E",
+        category: "velas",
+        tag: "2/ Velas · Maniobra de Orientación",
+        icon: "🪢",
+        title: "Escotas (Sheets)",
+        desc: "Cabos que se hacen firmes en los puños de escota y en la botavara para regular la apertura de las velas respecto al ángulo del viento (cazar o filar).",
+        note: "Lámina 02: 'ESCOTAS: Controlan y orientan las velas'."
       }
     };
 
@@ -1788,6 +2120,13 @@
     fixedHullGroup.add(rudderMesh);
     registerInteractive(rudderMesh, "Pala de Timón");
 
+    // 18. FRANCOBORDO (LÁMINA 01: Altura entre flotación y cubierta en popa/costado)
+    const freeboardHitGeo = new THREE.BoxGeometry(2.55, 1.0, 3.8);
+    const freeboardHit = new THREE.Mesh(freeboardHitGeo, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }));
+    freeboardHit.position.set(0, 0.76, -1.8);
+    fixedHullGroup.add(freeboardHit);
+    registerInteractive(freeboardHit, "Francobordo");
+
     // ----------------------------------------------------
     // GRUPO DINÁMICO DE APAREJOS (CAMBIA EN VIVO EN 3D)
     // ----------------------------------------------------
@@ -1923,6 +2262,19 @@
       rigDynamicGroup.add(repiqueMesh);
       registerInteractive(repiqueMesh, "Pujamen y Repique");
 
+      // REFUERZO DE PUJAMEN (Lámina 2)
+      const footReinfMesh = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.22, 4.8), metalFitMat);
+      footReinfMesh.position.set(-0.15, 2.6, -1.55);
+      rigDynamicGroup.add(footReinfMesh);
+      registerInteractive(footReinfMesh, "Refuerzo de Pujamen");
+
+      // ALUNAMIENTO (Lámina 2: Curvatura convexa de la baluma)
+      const roachHitGeo = new THREE.BoxGeometry(0.4, 6.8, 1.2);
+      const roachHit = new THREE.Mesh(roachHitGeo, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }));
+      roachHit.position.set(-0.15, 7.2, -1.8);
+      rigDynamicGroup.add(roachHit);
+      registerInteractive(roachHit, "Alunamiento");
+
       // VELA DE PROA (FOQUE)
       const jibGeo = new THREE.BufferGeometry();
       const jibVerts = new Float32Array([
@@ -1947,7 +2299,7 @@
         registerInteractive(garruchoMesh, "Garruchos");
       }
 
-      // PUÑOS SEÑALIZADOS EN 3D
+      // PUÑOS SEÑALIZADOS EN 3D (Lámina 2)
       function addHandle(pos, name) {
         const h = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 16), metalFitMat);
         h.position.copy(pos);
@@ -1958,20 +2310,38 @@
       addHandle(new THREE.Vector3(0.0, 2.55, 0.95), "Puño de Amura");
       addHandle(new THREE.Vector3(-0.3, 2.55, -4.05), "Puño de Escota");
 
-      // JARCIA FIRME (ESTAYES Y OBENQUES)
+      // JARCIA FIRME (ESTAYES Y OBENQUES SEGÚN LÁMINA 01)
       function addRigCable(p1, p2, name) {
         const line = createLine(p1, p2);
         rigDynamicGroup.add(line);
         registerDecorativeExplodable(line, name);
       }
+      // 5. ESTAY PROEL
       addRigCable(new THREE.Vector3(0, 1.4, 4.7), new THREE.Vector3(0, 11.2, 0.95), "Estay Proel");
-      addRigCable(new THREE.Vector3(0, 1.35, -3.9), new THREE.Vector3(0, 12.15, 0.95), "Estay Popel");
-      addRigCable(new THREE.Vector3(0.9, 7.6, 0.95), new THREE.Vector3(0, 11.2, 0.95), "Obenques");
-      addRigCable(new THREE.Vector3(1.2, 1.3, 0.95), new THREE.Vector3(0.9, 7.6, 0.95), "Obenques");
-      addRigCable(new THREE.Vector3(-0.9, 7.6, 0.95), new THREE.Vector3(0, 11.2, 0.95), "Obenques");
-      addRigCable(new THREE.Vector3(-1.2, 1.3, 0.95), new THREE.Vector3(-0.9, 7.6, 0.95), "Obenques");
 
-      // Hitboxes para selección rápida
+      // 6. ESTAY POPEL PRINCIPAL (BAQUESTAY)
+      addRigCable(new THREE.Vector3(0, 4.0, -2.6), new THREE.Vector3(0, 12.15, 0.95), "Estay Popel");
+
+      // 8. ESTAY POPEL AUXILIAR (PATA DE GALLO A POPA)
+      const auxL = createLine(new THREE.Vector3(-1.05, 1.35, -3.85), new THREE.Vector3(0, 4.0, -2.6));
+      const auxR = createLine(new THREE.Vector3(1.05, 1.35, -3.85), new THREE.Vector3(0, 4.0, -2.6));
+      rigDynamicGroup.add(auxL);
+      rigDynamicGroup.add(auxR);
+      registerDecorativeExplodable(auxL, "Estay Popel Auxiliar");
+      registerDecorativeExplodable(auxR, "Estay Popel Auxiliar");
+
+      // 4. OBENQUES ALTOS Y BAJOS
+      // Obenques altos (tope a cubierta pasando por las crucetas)
+      addRigCable(new THREE.Vector3(1.0, 7.6, 0.95), new THREE.Vector3(0, 11.2, 0.95), "Obenques");
+      addRigCable(new THREE.Vector3(1.2, 1.3, 0.95), new THREE.Vector3(1.0, 7.6, 0.95), "Obenques");
+      addRigCable(new THREE.Vector3(-1.0, 7.6, 0.95), new THREE.Vector3(0, 11.2, 0.95), "Obenques");
+      addRigCable(new THREE.Vector3(-1.2, 1.3, 0.95), new THREE.Vector3(-1.0, 7.6, 0.95), "Obenques");
+
+      // Obenques bajos (desde el mástil a la altura de las crucetas a cubierta)
+      addRigCable(new THREE.Vector3(1.15, 1.3, 0.95), new THREE.Vector3(0, 7.5, 0.95), "Obenques");
+      addRigCable(new THREE.Vector3(-1.15, 1.3, 0.95), new THREE.Vector3(0, 7.5, 0.95), "Obenques");
+
+      // Hitboxes para selección interactiva rápida
       const stayHitGeo = new THREE.CylinderGeometry(0.14, 0.14, 10.2, 8);
       const stayHitMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 });
       
@@ -1981,12 +2351,20 @@
       rigDynamicGroup.add(forestayHit);
       registerInteractive(forestayHit, "Estay Proel");
 
-      const backstayHit = new THREE.Mesh(stayHitGeo, stayHitMat);
-      backstayHit.position.set(0, 6.7, -1.45);
-      backstayHit.rotation.x = -0.42;
+      // Hitbox Estay Popel (6)
+      const backstayHit = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 8.5, 8), stayHitMat);
+      backstayHit.position.set(0, 8.0, -0.8);
+      backstayHit.rotation.x = -0.38;
       rigDynamicGroup.add(backstayHit);
       registerInteractive(backstayHit, "Estay Popel");
 
+      // Hitbox Estay Popel Auxiliar (8)
+      const auxStayHit = new THREE.Mesh(new THREE.BoxGeometry(2.4, 2.8, 0.8), stayHitMat);
+      auxStayHit.position.set(0, 2.6, -3.2);
+      rigDynamicGroup.add(auxStayHit);
+      registerInteractive(auxStayHit, "Estay Popel Auxiliar");
+
+      // Hitbox Obenques Altos y Bajos (4)
       const shroudsHit = new THREE.Mesh(new THREE.BoxGeometry(2.5, 9.5, 0.5), stayHitMat);
       shroudsHit.position.set(0, 6.5, 0.95);
       rigDynamicGroup.add(shroudsHit);
@@ -2164,6 +2542,113 @@
     }
 
     // ----------------------------------------------------
+    // GRUPO DE COTAS Y DIMENSIONES NAVALES 3D (LÁMINA 01)
+    // ----------------------------------------------------
+    const dimensionsGroup = new THREE.Group();
+    boatGroup.add(dimensionsGroup);
+    dimensionsGroup.visible = false;
+
+    function buildDimensions() {
+      const dimMat = new THREE.LineBasicMaterial({ color: 0xf59e0b, linewidth: 2 });
+      const dimCyanMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, linewidth: 3 });
+      const dimGreenMat = new THREE.LineBasicMaterial({ color: 0x10b981, linewidth: 2 });
+      const dimHitMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 });
+
+      // 1. ESLORA TOTAL (LOA) - Proa a Popa
+      const loaLine = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(2.1, 1.35, 4.7),
+          new THREE.Vector3(2.1, 1.35, -3.85)
+        ]),
+        dimMat
+      );
+      dimensionsGroup.add(loaLine);
+      dimensionsGroup.add(createLine(new THREE.Vector3(1.7, 1.35, 4.7), new THREE.Vector3(2.4, 1.35, 4.7)));
+      dimensionsGroup.add(createLine(new THREE.Vector3(1.7, 1.35, -3.85), new THREE.Vector3(2.4, 1.35, -3.85)));
+
+      const loaHit = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 8.8, 8), dimHitMat);
+      loaHit.rotation.x = Math.PI / 2;
+      loaHit.position.set(2.1, 1.35, 0.42);
+      dimensionsGroup.add(loaHit);
+      registerInteractive(loaHit, "Eslora Total");
+
+      // 2. ESLORA EN FLOTACIÓN (LWL) - Plano de Agua con trama ////////
+      const lwlLine = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(1.7, 0.35, 3.5),
+          new THREE.Vector3(1.7, 0.35, -3.4)
+        ]),
+        dimCyanMat
+      );
+      dimensionsGroup.add(lwlLine);
+
+      for (let z = -3.2; z <= 3.3; z += 0.5) {
+        const hatch = createLine(new THREE.Vector3(1.4, 0.35, z - 0.2), new THREE.Vector3(2.0, 0.35, z + 0.2));
+        dimensionsGroup.add(hatch);
+      }
+
+      const lwlHit = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 7.0, 8), dimHitMat);
+      lwlHit.rotation.x = Math.PI / 2;
+      lwlHit.position.set(1.7, 0.35, 0.05);
+      dimensionsGroup.add(lwlHit);
+      registerInteractive(lwlHit, "Eslora en Flotación");
+
+      // 3. MANGA TOTAL (B) - Anchura máxima transversal
+      const beamLine = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(-1.3, 1.45, 0.0),
+          new THREE.Vector3(1.3, 1.45, 0.0)
+        ]),
+        dimMat
+      );
+      dimensionsGroup.add(beamLine);
+      dimensionsGroup.add(createLine(new THREE.Vector3(-1.3, 1.2, 0.0), new THREE.Vector3(-1.3, 1.7, 0.0)));
+      dimensionsGroup.add(createLine(new THREE.Vector3(1.3, 1.2, 0.0), new THREE.Vector3(1.3, 1.7, 0.0)));
+
+      const beamHit = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 2.7, 8), dimHitMat);
+      beamHit.rotation.z = Math.PI / 2;
+      beamHit.position.set(0, 1.45, 0.0);
+      dimensionsGroup.add(beamHit);
+      registerInteractive(beamHit, "Manga Total");
+
+      // 4. CALADO (DRAFT) - Nivel de flotación hasta fondo del quillote
+      const draftLine = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(1.4, 0.28, 0.35),
+          new THREE.Vector3(1.4, -2.85, 0.35)
+        ]),
+        dimMat
+      );
+      dimensionsGroup.add(draftLine);
+      dimensionsGroup.add(createLine(new THREE.Vector3(1.1, 0.28, 0.35), new THREE.Vector3(1.7, 0.28, 0.35)));
+      dimensionsGroup.add(createLine(new THREE.Vector3(1.1, -2.85, 0.35), new THREE.Vector3(1.7, -2.85, 0.35)));
+
+      const draftHit = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 3.2, 8), dimHitMat);
+      draftHit.position.set(1.4, -1.3, 0.35);
+      dimensionsGroup.add(draftHit);
+      registerInteractive(draftHit, "Calado");
+
+      // 5. FRANCOBORDO MÍNIMO (A)
+      const freeboardLine = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(1.35, 0.28, -2.2),
+          new THREE.Vector3(1.35, 1.25, -2.2)
+        ]),
+        dimGreenMat
+      );
+      dimensionsGroup.add(freeboardLine);
+      dimensionsGroup.add(createLine(new THREE.Vector3(1.1, 0.28, -2.2), new THREE.Vector3(1.6, 0.28, -2.2)));
+      dimensionsGroup.add(createLine(new THREE.Vector3(1.1, 1.25, -2.2), new THREE.Vector3(1.6, 1.25, -2.2)));
+
+      const freeboardMinHit = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 1.1, 8), dimHitMat);
+      freeboardMinHit.position.set(1.35, 0.76, -2.2);
+      dimensionsGroup.add(freeboardMinHit);
+      registerInteractive(freeboardMinHit, "Francobordo Mínimo");
+    }
+
+    buildDimensions();
+
+    // ----------------------------------------------------
     // RAYCASTING E INTERACTIVIDAD DE USUARIO
     // ----------------------------------------------------
     const raycaster = new THREE.Raycaster();
@@ -2182,6 +2667,13 @@
 
     const partDetailView = document.getElementById('part-detail-view');
     const rigsSection = document.getElementById('rigs-section');
+    const sheetsSection = document.getElementById('sheets-section');
+    const btnSheet1 = document.getElementById('btn-sheet-1');
+    const btnSheet2 = document.getElementById('btn-sheet-2');
+    const subpanelSheet1 = document.getElementById('subpanel-sheet-1');
+    const subpanelSheet2 = document.getElementById('subpanel-sheet-2');
+    const btnCamDims = document.getElementById('btn-cam-dims');
+
     const tabButtons = document.querySelectorAll('.tab-btn');
     const rigSelectorBar = document.getElementById('rig-selector-bar');
     const rigButtons = document.querySelectorAll('.rig-btn');
@@ -2225,6 +2717,68 @@
       });
     }
 
+    // Alternar subpaneles de Lámina 01 y 02 en la vista teórica
+    if (btnSheet1 && btnSheet2) {
+      btnSheet1.addEventListener('click', () => {
+        btnSheet1.classList.add('active');
+        btnSheet2.classList.remove('active');
+        if (subpanelSheet1) subpanelSheet1.classList.add('active');
+        if (subpanelSheet2) subpanelSheet2.classList.remove('active');
+      });
+      btnSheet2.addEventListener('click', () => {
+        btnSheet2.classList.add('active');
+        btnSheet1.classList.remove('active');
+        if (subpanelSheet2) subpanelSheet2.classList.add('active');
+        if (subpanelSheet1) subpanelSheet1.classList.remove('active');
+      });
+    }
+
+    // Delegación de clics en las filas de las Láminas Técnicas
+    document.querySelectorAll('.sheet-row[data-sheet-part]').forEach(row => {
+      row.addEventListener('click', () => {
+        const partName = row.getAttribute('data-sheet-part');
+        if (BOAT_PARTS_INFO[partName]) {
+          selectPart(partName);
+          if (BOAT_PARTS_INFO[partName].category === "dimensiones") {
+            dimensionsGroup.visible = true;
+            if (btnCamDims) {
+              btnCamDims.style.borderColor = 'var(--accent-gold)';
+              btnCamDims.style.color = 'var(--accent-gold)';
+            }
+            if (partName === "Manga Total") {
+              camera.position.set(0, 14, 0.01);
+              controls.target.set(0, 0, 0);
+            } else if (partName === "Calado") {
+              camera.position.set(10, -3.5, 6);
+              controls.target.set(0, -1.0, 0);
+            } else {
+              camera.position.set(13, 2.5, 0.0);
+              controls.target.set(0, 1.0, 0);
+            }
+            controls.update();
+          }
+          if (window.innerWidth <= 860) setSheetExpanded(true);
+        }
+      });
+    });
+
+    // Botón de alternar visualización de cotas 3D en barra inferior
+    let dimsVisible = false;
+    if (btnCamDims) {
+      btnCamDims.addEventListener('click', () => {
+        dimsVisible = !dimsVisible;
+        dimensionsGroup.visible = dimsVisible;
+        btnCamDims.style.borderColor = dimsVisible ? 'var(--accent-gold)' : 'rgba(56, 189, 248, 0.3)';
+        btnCamDims.style.color = dimsVisible ? 'var(--accent-gold)' : 'var(--accent-cyan)';
+        if (dimsVisible) {
+          camera.position.set(13, 2.5, 0.0);
+          controls.target.set(0, 1.0, 0);
+          controls.update();
+          selectPart("Eslora Total");
+        }
+      });
+    }
+
     // En pantallas de celulares / móviles, iniciar el Bottom Sheet contraído para priorizar la vista 3D
     if (window.innerWidth <= 860 && infoPanel) {
       setSheetExpanded(false);
@@ -2261,22 +2815,48 @@
         if (cat === "aparejos") {
           partDetailView.style.display = 'none';
           rigsSection.style.display = 'flex';
+          if (sheetsSection) sheetsSection.style.display = 'none';
           rigSelectorBar.style.display = 'flex';
+          dimensionsGroup.visible = false;
           if (handleTitle) handleTitle.textContent = "📐 2/ Tipos de Aparejos";
           if (window.innerWidth <= 860) setSheetExpanded(true);
+        } else if (cat === "laminas") {
+          partDetailView.style.display = 'none';
+          rigsSection.style.display = 'none';
+          if (sheetsSection) sheetsSection.style.display = 'flex';
+          rigSelectorBar.style.display = 'none';
+          if (handleTitle) handleTitle.textContent = "📋 Compendio Láminas 1 & 2";
+          if (window.innerWidth <= 860) setSheetExpanded(true);
+        } else if (cat === "dimensiones") {
+          partDetailView.style.display = 'block';
+          rigsSection.style.display = 'none';
+          if (sheetsSection) sheetsSection.style.display = 'none';
+          rigSelectorBar.style.display = 'none';
+          dimensionsGroup.visible = true;
+          if (btnCamDims) {
+            btnCamDims.style.borderColor = 'var(--accent-gold)';
+            btnCamDims.style.color = 'var(--accent-gold)';
+          }
+          camera.position.set(13, 2.5, 0.0);
+          controls.target.set(0, 1.0, 0);
+          controls.update();
+          selectPart("Eslora Total");
+          renderChips("dimensiones");
+          if (handleTitle) handleTitle.textContent = "📏 Cotas y Dimensiones Navales";
         } else if (cat === "despiece") {
           partDetailView.style.display = 'block';
           rigsSection.style.display = 'none';
+          if (sheetsSection) sheetsSection.style.display = 'none';
           rigSelectorBar.style.display = 'none';
           setExplodeFactor(1.0);
           renderChips('all');
         } else {
           partDetailView.style.display = 'block';
           rigsSection.style.display = 'none';
+          if (sheetsSection) sheetsSection.style.display = 'none';
           rigSelectorBar.style.display = 'none';
 
           if (cat === "submarino") {
-            // Si el usuario hace clic en "⚓ Obra Viva & Quilla", mover suavemente la cámara bajo el agua
             moveCameraUnderwater();
           }
 
@@ -2416,6 +2996,15 @@
 
       partDetailView.style.display = 'block';
       rigsSection.style.display = 'none';
+      if (sheetsSection) sheetsSection.style.display = 'none';
+
+      if (info.category === "dimensiones") {
+        dimensionsGroup.visible = true;
+        if (btnCamDims) {
+          btnCamDims.style.borderColor = 'var(--accent-gold)';
+          btnCamDims.style.color = 'var(--accent-gold)';
+        }
+      }
 
       panelNum.textContent = info.num;
       panelTitle.textContent = info.title;
