@@ -7,6 +7,7 @@ import { RipaEngine } from './simulation/RipaEngine.js';
 import { IalaSystem } from './simulation/IalaSystem.js';
 import { AnchorSystem } from './simulation/AnchorSystem.js';
 import { WeatherSystem } from './simulation/WeatherSystem.js';
+import { WindVisualizer } from './simulation/WindVisualizer.js';
 import { SimulatorHUD } from './ui/SimulatorHUD.js';
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -31,6 +32,9 @@ window.addEventListener('DOMContentLoaded', () => {
   const ripaEngine = new RipaEngine(otherVessel);
   const weatherSystem = new WeatherSystem(environment, windSystem, boat);
 
+  const windVisualizer = new WindVisualizer(engine.scene, windSystem);
+  engine.addUpdatable(windVisualizer);
+
   const hud = new SimulatorHUD(
     windSystem,
     boat,
@@ -40,7 +44,8 @@ window.addEventListener('DOMContentLoaded', () => {
     ialaSystem,
     anchorSystem,
     weatherSystem,
-    engine
+    engine,
+    windVisualizer
   );
 
   engine.start();

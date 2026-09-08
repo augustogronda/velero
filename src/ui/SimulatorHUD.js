@@ -4,7 +4,7 @@ import { RIPA_SCENARIOS } from '../simulation/RipaEngine.js';
 import { WEATHER_PRESETS } from '../simulation/WeatherSystem.js';
 
 export class SimulatorHUD {
-  constructor(windSystem, boat, environment, otherVessel, ripaEngine, ialaSystem, anchorSystem, weatherSystem, engine = null) {
+  constructor(windSystem, boat, environment, otherVessel, ripaEngine, ialaSystem, anchorSystem, weatherSystem, engine = null, windVisualizer = null) {
     this.wind = windSystem;
     this.boat = boat;
     this.env = environment;
@@ -14,6 +14,7 @@ export class SimulatorHUD {
     this.anchor = anchorSystem;
     this.weather = weatherSystem;
     this.engine = engine;
+    this.windVis = windVisualizer;
 
     this.currentMode = 'wind'; // 'wind', 'ripa', 'iala', 'anchor'
 
@@ -39,7 +40,7 @@ export class SimulatorHUD {
         <button class="mode-tab" data-mode="anchor">⚓ Fondeo & Borneo</button>
       </div>
       <div class="sim-header-actions">
-        <button id="btn-env-settings" class="sim-btn" title="Ajustar brillo del sol y transparencia/animación del agua">☀️ Luz & Agua</button>
+        <button id="btn-env-settings" class="sim-btn" title="Ajustar brillo del sol, agua y viento 3D">☀️ Luz & Agua</button>
         <button id="btn-night-toggle" class="sim-btn sim-btn-night" title="Alternar modo noche y luces reglamentarias de navegación">🌙 Modo Noche</button>
         <button id="btn-notes-toggle" class="sim-btn" title="Ver apuntes y glosario del curso">📖 Apuntes PNA</button>
         <a href="index.html" class="sim-btn sim-btn-link" title="Volver a la vista de partes y despiece 3D">⛵ Nomenclatura ➔</a>
@@ -53,7 +54,7 @@ export class SimulatorHUD {
     this.envCard.style.display = 'none';
     this.envCard.innerHTML = `
       <div class="env-card-header">
-        <span>☀️ Ajustes de Luz y Agua</span>
+        <span>☀️ Ajustes de Luz, Agua y Viento</span>
         <button id="btn-env-close" class="btn-env-close" aria-label="Cerrar panel">✕</button>
       </div>
       <div class="env-card-body">
@@ -85,6 +86,21 @@ export class SimulatorHUD {
           <div class="env-row" id="row-wave-height">
             <label>Altura de Olas: <strong id="lbl-wave-height">0.07 m</strong></label>
             <input type="range" id="slider-wave-height" min="0.02" max="0.20" step="0.01" value="0.07">
+          </div>
+        </div>
+
+        <div class="env-section">
+          <div class="env-section-title">💨 Flujo de Viento 3D (Aerodinámica)</div>
+          <div class="env-row">
+            <label>Animación de Viento:</label>
+            <div class="env-toggle-group">
+              <button id="btn-wind-lines-on" class="env-toggle-btn active">💨 Activo</button>
+              <button id="btn-wind-lines-off" class="env-toggle-btn">🚫 Oculto (0% CPU)</button>
+            </div>
+          </div>
+          <div class="env-row" id="row-wind-opacity">
+            <label>Visibilidad / Opacidad: <strong id="lbl-wind-opacity">70%</strong></label>
+            <input type="range" id="slider-wind-opacity" min="0.2" max="1.0" step="0.05" value="0.7">
           </div>
         </div>
       </div>
@@ -299,6 +315,7 @@ export class SimulatorHUD {
           <button class="btn-preset" data-heading="180">Popa</button>
         </div>
         <button id="btn-auto-trim" class="btn-auto-trim" title="Cazar/filar automáticamente para máximo rendimiento">🎯 Trimado Óptimo</button>
+        <button id="btn-toggle-wind-lines" class="btn-toggle-wind-lines active" title="Alternar líneas de flujo aerodinámico de viento 3D">💨 Viento 3D: ON</button>
       </div>
 
       <div class="ctrl-row-weather">
@@ -493,6 +510,45 @@ export class SimulatorHUD {
         const val = +e.target.value;
         this.env.setWaveIntensity(val);
         if (lblWaveH) lblWaveH.textContent = val.toFixed(2) + ' m';
+      });
+    }
+
+    // Control de Líneas de Viento 3D (Streamlines aerodinámicas)
+    const btnQuickWindLines = document.getElementById('btn-toggle-wind-lines');
+    const btnWindLinesOn = document.getElementById('btn-wind-lines-on');
+    const btnWindLinesOff = document.getElementById('btn-wind-lines-off');
+    const rowWindOp = document.getElementById('row-wind-opacity');
+    const sliderWindOp = document.getElementById('slider-wind-opacity');
+    const lblWindOp = document.getElementById('lbl-wind-opacity');
+
+    const updateWindLinesState = (enabled) => {
+      if (this.windVis) this.windVis.setEnabled(enabled);
+      if (btnQuickWindLines) {
+        btnQuickWindLines.classList.toggle('active', enabled);
+        btnQuickWindLines.textContent = enabled ? '💨 Viento 3D: ON' : '💨 Viento 3D: OFF';
+      }
+      if (btnWindLinesOn) btnWindLinesOn.classList.toggle('active', enabled);
+      if (btnWindLinesOff) btnWindLinesOff.classList.toggle('active', !enabled);
+      if (rowWindOp) rowWindOp.style.display = enabled ? 'flex' : 'none';
+    };
+
+    if (btnQuickWindLines) {
+      btnQuickWindLines.addEventListener('click', () => {
+        const next = this.windVis ? !this.windVis.enabled : false;
+        updateWindLinesState(next);
+      });
+    }
+
+    if (btnWindLinesOn && btnWindLinesOff) {
+      btnWindLinesOn.addEventListener('click', () => updateWindLinesState(true));
+      btnWindLinesOff.addEventListener('click', () => updateWindLinesState(false));
+    }
+
+    if (sliderWindOp) {
+      sliderWindOp.addEventListener('input', (e) => {
+        const val = +e.target.value;
+        if (this.windVis) this.windVis.setOpacity(val);
+        if (lblWindOp) lblWindOp.textContent = Math.round(val * 100) + '%';
       });
     }
 

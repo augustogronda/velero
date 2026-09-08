@@ -938,6 +938,33 @@
       background: var(--accent-gold);
       color: #040914;
     }
+    .btn-toggle-wind-lines {
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: var(--accent-cyan);
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 0.73rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: inherit;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-toggle-wind-lines:hover {
+      background: rgba(56, 189, 248, 0.22);
+      border-color: var(--accent-cyan);
+      color: #ffffff;
+    }
+    .btn-toggle-wind-lines.active {
+      background: var(--accent-cyan);
+      color: #030d1b;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+    }
     .ctrl-row-weather {
       display: flex;
       align-items: center;
