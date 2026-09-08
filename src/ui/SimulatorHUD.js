@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import { COURSE_NOTES } from './CourseNotes.js';
 
 export class SimulatorHUD {
