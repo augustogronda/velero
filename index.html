@@ -2563,8 +2563,7 @@
         const p_driza  = new THREE.Vector3(0.0, 11.9, 0.9);
         const p_escota = new THREE.Vector3(-0.3, 2.55, -4.05);
         const mainPanels = buildSailPanelLines(p_amura, p_driza, p_escota, 12, sailPanelMat);
-        rigDynamicGroup.add(mainPanels);
-        // Si wireframe ya activo al re-construir, mostrar inmediatamente
+        mainSailMesh.add(mainPanels); // hijo de la vela → se mueve con el despiece
         if (wireframeMode) mainPanels.visible = true;
       }
 
@@ -2638,7 +2637,7 @@
         const j_driza  = new THREE.Vector3(0.0, 10.5, 0.95);
         const j_escota = new THREE.Vector3(0.25, 2.0, 0.85);
         const jibPanels = buildSailPanelLines(j_amura, j_driza, j_escota, 9, sailPanelMatJib);
-        rigDynamicGroup.add(jibPanels);
+        jibMesh.add(jibPanels); // hijo de la vela → se mueve con el despiece
         if (wireframeMode) jibPanels.visible = true;
       }
 
@@ -2756,7 +2755,7 @@
         const cp1 = new THREE.Vector3(0.0, 11.5, 3.1);
         const cp2 = new THREE.Vector3(-0.3, 2.4, -3.0);
         const catPanels = buildSailPanelLines(cp0, cp1, cp2, 12, sailPanelMat);
-        rigDynamicGroup.add(catPanels);
+        sailMesh.add(catPanels); // hijo de la vela → se mueve con el despiece
         if (wireframeMode) catPanels.visible = true;
       }
     }
@@ -2784,7 +2783,7 @@
         const s1 = new THREE.Vector3(0.0, 8.2, 0.95);
         const s2 = new THREE.Vector3(0.18, 1.8, 0.9);
         const stayPanels = buildSailPanelLines(s0, s1, s2, 7, sailPanelMatJib);
-        rigDynamicGroup.add(stayPanels);
+        staysailMesh.add(stayPanels); // hijo de la vela → se mueve con el despiece
         if (wireframeMode) stayPanels.visible = true;
       }
 
@@ -2827,7 +2826,7 @@
         const m1 = new THREE.Vector3(0.0, 7.8, -2.0);
         const m2 = new THREE.Vector3(-0.2, 2.2, -4.2);
         const mizzenPanels = buildSailPanelLines(m0, m1, m2, 7, sailPanelMat);
-        rigDynamicGroup.add(mizzenPanels);
+        mizzenSailMesh.add(mizzenPanels); // hijo de la vela → se mueve con el despiece
         if (wireframeMode) mizzenPanels.visible = true;
       }
     }
@@ -2866,7 +2865,7 @@
         const y1 = new THREE.Vector3(0.0, 5.5, -3.7);
         const y2 = new THREE.Vector3(-0.15, 1.8, -5.3);
         const yawlPanels = buildSailPanelLines(y0, y1, y2, 5, sailPanelMat);
-        rigDynamicGroup.add(yawlPanels);
+        yawlSailMesh.add(yawlPanels); // hijo de la vela → se mueve con el despiece
         if (wireframeMode) yawlPanels.visible = true;
       }
     }
@@ -2903,7 +2902,7 @@
         const gf1 = new THREE.Vector3(0.0, 10.2, 2.0);
         const gf2 = new THREE.Vector3(-0.2, 2.4, -1.2);
         const forePanels = buildSailPanelLines(gf0, gf1, gf2, 10, sailPanelMat);
-        rigDynamicGroup.add(forePanels);
+        foreSailMesh.add(forePanels); // hijo de la vela → se mueve con el despiece
         if (wireframeMode) forePanels.visible = true;
       }
 
@@ -2937,7 +2936,7 @@
         const gm1 = new THREE.Vector3(0.0, 11.9, -1.2);
         const gm2 = new THREE.Vector3(-0.25, 2.4, -5.2);
         const mainPanels = buildSailPanelLines(gm0, gm1, gm2, 12, sailPanelMat);
-        rigDynamicGroup.add(mainPanels);
+        mainSailMesh.add(mainPanels); // hijo de la vela → se mueve con el despiece
         if (wireframeMode) mainPanels.visible = true;
       }
 
@@ -2960,7 +2959,7 @@
         const gj1 = new THREE.Vector3(0.0, 9.5, 2.0);
         const gj2 = new THREE.Vector3(0.2, 2.0, 2.0);
         const gJibPanels = buildSailPanelLines(gj0, gj1, gj2, 8, sailPanelMatJib);
-        rigDynamicGroup.add(gJibPanels);
+        jibMesh.add(gJibPanels); // hijo de la vela → se mueve con el despiece
         if (wireframeMode) gJibPanels.visible = true;
       }
     }
