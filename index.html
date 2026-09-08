@@ -1135,7 +1135,7 @@
         <span class="desktop-hint"><span class="control-icon">🖱️</span> Rueda: Zoom | Clic: Rotar | Clic Der: Panear</span>
         <span class="mobile-hint"><span class="control-icon">👆</span> 1 dedo: Rotar | 2 dedos: Zoom</span>
       </div>
-      <button class="btn-cam btn-isolate active-isolate" id="btn-toggle-isolate" title="Opacar las demás piezas al seleccionar una (Atajo: A)">🎯 Aislar: ON</button>
+      <button class="btn-cam btn-isolate" id="btn-toggle-isolate" title="Opacar las demás piezas al seleccionar una (Atajo: A)">🎯 Aislar: OFF</button>
       <button class="btn-cam btn-wireframe" id="btn-toggle-wireframe" title="Alternar modo wireframe / alambre CAD (Atajo: W)">🌐 Wireframe: OFF</button>
       <button class="btn-cam btn-explode" id="btn-toggle-explode" title="Activar/Desactivar separación de piezas 3D (Atajo: X)">💥 Despiece: OFF</button>
       <div style="display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.06); padding:2px 10px; border-radius:9999px; border:1px solid rgba(255,255,255,0.12);">
@@ -1865,7 +1865,7 @@
     scene.add(boatGroup);
 
     let interactiveMeshes = [];
-    let isolateMode = true;
+    let isolateMode = false;
     let wireframeMode = false;
 
     // Materiales comunes PBR
