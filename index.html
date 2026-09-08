@@ -349,16 +349,86 @@
     }
 
     /* Lista rápida de piezas seleccionables */
+    .quick-list-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
     .quick-list-title {
       font-size: 0.74rem;
       text-transform: uppercase;
       font-weight: 700;
       letter-spacing: 0.06em;
       color: var(--text-muted);
-      margin-top: 4px;
+    }
+
+    .quick-search-box {
+      width: 100%;
+      position: relative;
+      margin: 6px 0 10px 0;
+    }
+
+    .quick-search-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 9px;
+      padding: 7px 12px;
+      color: #ffffff;
+      font-size: 0.78rem;
+      outline: none;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .quick-search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .quick-search-input:focus {
+      border-color: var(--accent-cyan);
+      background: rgba(56, 189, 248, 0.1);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
     }
 
     .quick-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .quick-group {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .quick-group-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .quick-group-count {
+      font-size: 0.68rem;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 1px 6px;
+      border-radius: 9999px;
+      color: var(--text-muted);
+    }
+
+    .quick-group-chips {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
@@ -513,6 +583,12 @@
       background: rgba(56, 189, 248, 0.12);
       border-color: var(--accent-cyan);
       transform: translateX(3px);
+    }
+    .sheet-row.active-row {
+      background: rgba(56, 189, 248, 0.22) !important;
+      border-color: var(--accent-cyan) !important;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
+      transform: translateX(4px);
     }
     .sheet-row-left {
       display: flex;
@@ -681,6 +757,40 @@
       color: #040914;
       font-weight: 700;
       box-shadow: 0 0 14px rgba(245, 158, 11, 0.5);
+    }
+
+    .btn-isolate {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: var(--accent-cyan);
+    }
+    .btn-isolate:hover {
+      background: var(--accent-cyan);
+      color: #040914;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+    }
+    .btn-isolate.active-isolate {
+      background: var(--accent-cyan);
+      color: #040914;
+      font-weight: 700;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.5);
+    }
+
+    .btn-wireframe {
+      background: rgba(168, 85, 247, 0.15);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      color: #c084fc;
+    }
+    .btn-wireframe:hover {
+      background: #a855f7;
+      color: #040914;
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.45);
+    }
+    .btn-wireframe.active-wireframe {
+      background: #a855f7;
+      color: #040914;
+      font-weight: 700;
+      box-shadow: 0 0 14px rgba(168, 85, 247, 0.5);
     }
 
     /* Indicador de Despiece en pantalla */
@@ -1027,10 +1137,12 @@
     <!-- Barra Inferior de Cámaras y Controles -->
     <div class="bottom-bar">
       <div class="control-hint">
-        <span class="desktop-hint"><span class="control-icon">🖱️</span> Rueda apretada o Clic: Rotar | Rueda: Zoom | Clic Der: Panear</span>
+        <span class="desktop-hint"><span class="control-icon">🖱️</span> Rueda: Zoom | Clic: Rotar | Clic Der: Panear</span>
         <span class="mobile-hint"><span class="control-icon">👆</span> 1 dedo: Rotar | 2 dedos: Zoom</span>
       </div>
-      <button class="btn-cam btn-explode" id="btn-toggle-explode" title="Activar/Desactivar separación de piezas 3D">💥 Despiece: OFF</button>
+      <button class="btn-cam btn-isolate active-isolate" id="btn-toggle-isolate" title="Opacar las demás piezas al seleccionar una (Atajo: A)">🎯 Aislar: ON</button>
+      <button class="btn-cam btn-wireframe" id="btn-toggle-wireframe" title="Alternar modo wireframe / alambre CAD (Atajo: W)">🌐 Wireframe: OFF</button>
+      <button class="btn-cam btn-explode" id="btn-toggle-explode" title="Activar/Desactivar separación de piezas 3D (Atajo: X)">💥 Despiece: OFF</button>
       <div style="display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.06); padding:2px 10px; border-radius:9999px; border:1px solid rgba(255,255,255,0.12);">
         <span style="font-size:0.72rem; color:var(--accent-gold); font-weight:600;">Separar:</span>
         <input type="range" id="slider-explode" min="0" max="100" value="0" style="width:65px; accent-color:var(--accent-gold); cursor:pointer;">
@@ -1041,7 +1153,7 @@
       <button class="btn-cam" id="btn-cam-sails">📐 Velas</button>
       <button class="btn-cam" id="btn-cam-dims" title="Activar o desactivar visualización de cotas 3D">📏 Cotas 3D</button>
       <button class="btn-cam btn-water-toggle" id="btn-toggle-water">🌊 Agua: Visible</button>
-      <button class="btn-cam" id="btn-reset-view">Restablecer</button>
+      <button class="btn-cam" id="btn-reset-view" title="Restablecer vista y cámara (Atajo: Esc)">Restablecer</button>
     </div>
 
     <!-- Panel Flotante Derecho con Glassmorphism / Bottom Sheet en Móviles -->
@@ -1086,9 +1198,15 @@
           </p>
         </div>
 
-        <div class="quick-list-title">Componentes interactivos:</div>
+        <div class="quick-list-header">
+          <div class="quick-list-title">Componentes interactivos:</div>
+          <span id="quick-list-total" style="font-size:0.7rem; color:var(--text-muted); font-weight:600;"></span>
+        </div>
+        <div class="quick-search-box">
+          <input type="text" class="quick-search-input" id="part-search-input" placeholder="🔍 Buscar pieza o cota naval..." autocomplete="off">
+        </div>
         <div class="quick-list" id="quick-list">
-          <!-- Chips generados dinámicamente con JavaScript -->
+          <!-- Chips agrupados generados dinámicamente con JavaScript -->
         </div>
       </div>
 
@@ -1137,6 +1255,16 @@
           <button class="sheet-tab-btn" id="btn-sheet-2" data-sheet="2">LÁMINA 02: Velas & Maniobra</button>
         </div>
 
+        <!-- Tarjeta de vista previa activa en Láminas Técnicas -->
+        <div class="sheet-note-card" id="sheet-part-preview" style="display:none; flex-direction:column; gap:4px; background:rgba(56,189,248,0.08); border:1px solid rgba(56,189,248,0.35); border-radius:10px; padding:10px 12px;">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <b class="preview-title" style="color:var(--accent-cyan); font-size:0.86rem;"></b>
+            <span style="font-size:0.66rem; color:#38bdf8; font-weight:700; text-transform:uppercase; background:rgba(56,189,248,0.15); padding:2px 7px; border-radius:9999px;">Enfoque 3D</span>
+          </div>
+          <p class="preview-desc" style="font-size:0.79rem; color:#e2e8f0; line-height:1.42; margin-top:2px;"></p>
+          <p class="preview-note" style="font-size:0.75rem; color:#fed7aa; font-style:italic; border-top:1px solid rgba(255,255,255,0.08); padding-top:4px; margin-top:3px;"></p>
+        </div>
+
         <!-- Subpanel Lámina 01 -->
         <div class="sheet-subpanel active" id="subpanel-sheet-1">
           <div style="border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
@@ -1166,7 +1294,7 @@
               <span class="sheet-num">CAL</span>
               <span style="font-weight:600;">Calado</span>
             </div>
-            <div class="sheet-row" data-sheet-part="Francobordo Mínimo" style="grid-column: span 2;">
+            <div class="sheet-row" data-sheet-part="Francobordo" style="grid-column: span 2;">
               <span class="sheet-num">A</span>
               <span style="font-weight:600;">A · Francobordo Mínimo en Flotación</span>
             </div>
@@ -1413,13 +1541,13 @@
         note: "Lámina 01: '17. TAMBUCHO'. En maniobras de regata permite izar y arriar velas de proa (spinnaker o génova) directamente desde el pañol de velas."
       },
       "Francobordo": {
-        num: "18",
+        num: "18/A",
         category: "casco",
-        tag: "1/ Nomenclatura · Altura Estructural",
+        tag: "1/ Nomenclatura · Altura Estructural & Cota A",
         icon: "📏",
-        title: "18. Francobordo (Freeboard)",
-        desc: "Distancia vertical medida en el costado del barco entre la superficie del agua (línea de flotación) y la cubierta principal en su punto más bajo.",
-        note: "Lámina 01: '18. FRANCOBORDO' y 'A · FRANCOBORDO MÍNIMO EN FLOTACIÓN'. Garantiza la reserva de flotabilidad e impide que las olas barran la cubierta."
+        title: "18. Francobordo (Freeboard - Cota A)",
+        desc: "Distancia vertical medida en el costado del barco entre la superficie del agua (línea de flotación) y la cubierta principal. Es la reserva de flotabilidad indispensable para evitar que las olas barran la cubierta y que el agua ingrese al escorar.",
+        note: "Lámina 01: '18. FRANCOBORDO' y 'A · FRANCOBORDO MÍNIMO EN FLOTACIÓN'. En navegación escorada, define el francobordo residual antes de meter la regala en el agua."
       },
       "Pala de Timón": {
         num: "19",
@@ -1497,15 +1625,6 @@
         desc: "Distancia vertical máxima desde la línea de flotación hasta el punto más profundo del quillote o bulbo de plomo.",
         note: "Lámina 01: 'CALADO'. Es la profundidad mínima requerida para fondear o navegar con seguridad sin tocar fondo ni varar."
       },
-      "Francobordo Mínimo": {
-        num: "A",
-        category: "dimensiones",
-        tag: "Dimensiones · Francobordo Mínimo",
-        icon: "⬆️",
-        title: "Francobordo Mínimo (A)",
-        desc: "La menor distancia vertical entre la línea de flotación y la cubierta principal, medida usualmente en la sección de popa o en el centro del barco.",
-        note: "Lámina 01: 'A · FRANCOBORDO MÍN. / A · MÍNIMO EN FLOTACIÓN'. Es la reserva de flotabilidad indispensable para evitar que el agua inunde la cubierta al escorar."
-      },
 
       // ====================================================
       // LÁMINA 02: VELAS, PUÑOS, MANIOBRA Y BORDES
@@ -1529,13 +1648,13 @@
         note: "Lámina 02: 'VELA DE PROA'. Clave para ganar sustentación en ceñida y equilibrar el centro vélico respecto al quillote."
       },
       "Puño de Driza": {
-        num: "①",
+        num: "①/D",
         category: "velas",
-        tag: "2/ Velas · Puntos de Trabajo",
+        tag: "2/ Velas · Puntos de Trabajo & Drizas",
         icon: "1️⃣",
-        title: "① Puño de Driza (Head)",
-        desc: "El vértice superior de la vela (tanto de la mayor como del foque). En él se hace firme la driza para izar la vela hasta el tope del mástil.",
-        note: "Lámina 02: '1. PUÑO DE DRIZA: Punto superior de izado de la vela. DRIZAS: Cabos que izan las velas'."
+        title: "① Puño de Driza & Drizas (Head & Halyards)",
+        desc: "El vértice superior de la vela (tanto de la mayor como del foque). En él se hacen firmes las drizas (cabos de alta resistencia en dyneema o poliéster que suben por el mástil) para izar la vela hasta el tope.",
+        note: "Lámina 02: '1. PUÑO DE DRIZA: Punto superior de izado. DRIZAS: Cabos que izan las velas. Trabajan bajo gran tensión mantenidas por mordazas (stoppers)'."
       },
       "Puño de Amura": {
         num: "②",
@@ -1547,13 +1666,13 @@
         note: "Lámina 02: '2. PUÑO DE AMURA: Punto inferior fijado al barco. AMURA: Fija la vela al barco'."
       },
       "Puño de Escota": {
-        num: "③",
+        num: "③/E",
         category: "velas",
-        tag: "2/ Velas · Puntos de Trabajo",
+        tag: "2/ Velas · Puntos de Trabajo & Escotas",
         icon: "3️⃣",
-        title: "③ Puño de Escota (Clew)",
-        desc: "Vértice inferior trasero de la vela. En la mayor va afirmado al cabo de repique en el extremo de la botavara; en el foque se atan las escotas de babor y estribor.",
-        note: "Lámina 02: '3. PUÑO DE ESCOTA: Punto donde trabaja la escota. ESCOTAS: Controlan y orientan las velas. El repique ajusta el estiramiento del pujamen'."
+        title: "③ Puño de Escota & Escotas (Clew & Sheets)",
+        desc: "Vértice inferior trasero de la vela. En la mayor va afirmado al cabo de repique en el extremo de la botavara; en el foque se atan las escotas de babor y estribor (cabos que orientan y triman las velas según el viento).",
+        note: "Lámina 02: '3. PUÑO DE ESCOTA: Punto donde trabaja la escota. ESCOTAS: Controlan y orientan las velas (cazar o filar). El repique ajusta el estiramiento del pujamen'."
       },
       "Gratil": {
         num: "G",
@@ -1583,22 +1702,13 @@
         note: "Lámina 02: 'ALUNAMIENTO'. Otorga mayor superficie vélica en la parte alta sin requerir un mástil más alto, optimizada mediante los battens."
       },
       "Pujamen y Repique": {
-        num: "P",
+        num: "P/RP",
         category: "velas",
-        tag: "2/ Velas · Borde Inferior",
+        tag: "2/ Velas · Borde Inferior & Refuerzos",
         icon: "➖",
-        title: "Pujamen y Cabo de Repique (Foot & Outhaul)",
-        desc: "Borde horizontal inferior de la vela mayor que descansa a lo largo de la botavara entre el puño de amura y el puño de escota.",
-        note: "Lámina 02: 'PUJAMEN'. 'El repique ajusta el estiramiento del pujamen'. Tensa el pujamen para aplanar la vela con viento fuerte o lo amolla para darle bolsa con ventolina."
-      },
-      "Refuerzo de Pujamen": {
-        num: "RP",
-        category: "velas",
-        tag: "2/ Velas · Refuerzos Textiles",
-        icon: "🛡️",
-        title: "Refuerzo de Pujamen",
-        desc: "Faja de tejido reforzado de dacron cosida a lo largo de la parte baja del pujamen y en los puños para distribuir las cargas de tracción de la botavara.",
-        note: "Lámina 02: 'REFUERZO DE PUJAMEN'. Evita desgarros y deformaciones por la tensión del repique y de la escota."
+        title: "Pujamen, Repique & Refuerzo (Foot & Outhaul)",
+        desc: "Borde horizontal inferior de la vela mayor que descansa a lo largo de la botavara. Posee refuerzos estructurales de tejido dacron y el cabo de repique, que ajusta la tensión para aplanar la vela con viento fuerte o aflojarla para darle bolsa con ventolina.",
+        note: "Lámina 02: 'PUJAMEN y REFUERZO DE PUJAMEN'. 'El repique ajusta el estiramiento del pujamen'. Evita deformaciones y optimiza el perfil vélico."
       },
       "Fajas de Rizos": {
         num: "R",
@@ -1626,24 +1736,6 @@
         title: "Herraje Tintero (Gooseneck)",
         desc: "Gozne metálico articulado fijado en la cara posterior del mástil donde encaja la espiga de la botavara y se amura la vela mayor.",
         note: "Lámina 02: 'HERRAJE TINTERO'. 'El herraje tintero articula el movimiento de la botavara con el palo, permitiendo que abra, cierre, suba y baje'."
-      },
-      "Drizas": {
-        num: "D",
-        category: "velas",
-        tag: "2/ Velas · Maniobra de Izado",
-        icon: "🧵",
-        title: "Drizas (Halyards)",
-        desc: "Cabos de alta tenacidad (dyneema o poliéster trenzado) que suben por el mástil y sirven para izar las velas haciéndose firmes en los puños de driza.",
-        note: "Lámina 02: 'DRIZAS: Cabos que izan las velas'."
-      },
-      "Escotas": {
-        num: "E",
-        category: "velas",
-        tag: "2/ Velas · Maniobra de Orientación",
-        icon: "🪢",
-        title: "Escotas (Sheets)",
-        desc: "Cabos que se hacen firmes en los puños de escota y en la botavara para regular la apertura de las velas respecto al ángulo del viento (cazar o filar).",
-        note: "Lámina 02: 'ESCOTAS: Controlan y orientan las velas'."
       }
     };
 
@@ -1957,17 +2049,31 @@
         partName: partName,
         originalEmissive: mesh.material && mesh.material.emissive ? mesh.material.emissive.getHex() : 0x000000,
         originalColor: mesh.material && mesh.material.color ? mesh.material.color.getHex() : 0xffffff,
+        originalOpacity: mesh.material && mesh.material.opacity !== undefined ? mesh.material.opacity : 1.0,
+        originalTransparent: mesh.material && mesh.material.transparent !== undefined ? mesh.material.transparent : false,
+        originalDepthWrite: mesh.material && mesh.material.depthWrite !== undefined ? mesh.material.depthWrite : true,
         basePos: mesh.position.clone(),
         explodeOffset: offset,
         targetPos: mesh.position.clone().add(offset)
       };
+
+      if (wireframeMode && mesh.material && mesh.material.opacity > 0.05) {
+        mesh.material.wireframe = true;
+      }
+
       interactiveMeshes.push(mesh);
       allExplodableObjects.push(mesh);
     }
 
     function registerDecorativeExplodable(obj, partName, customOffset = null) {
       const offset = customOffset || getPartExplodeOffset(partName);
+      if (obj.material) {
+        obj.material = obj.material.clone();
+      }
       obj.userData = {
+        partName: partName,
+        originalOpacity: obj.material && obj.material.opacity !== undefined ? obj.material.opacity : 0.85,
+        originalTransparent: obj.material && obj.material.transparent !== undefined ? obj.material.transparent : true,
         basePos: obj.position.clone(),
         explodeOffset: offset,
         targetPos: obj.position.clone().add(offset)
@@ -2168,6 +2274,12 @@
       } else if (rigType === "goleta") {
         buildGoletaRig();
       }
+      if (typeof wireframeMode !== 'undefined' && wireframeMode && typeof setWireframeMode === 'function') {
+        setWireframeMode(true);
+      }
+      if (typeof highlightSelectedPart === 'function' && typeof selectedPartName !== 'undefined' && selectedPartName) {
+        highlightSelectedPart(selectedPartName);
+      }
 
       // Actualizar chips de la interfaz si el DOM ya está listo
       if (typeof renderChips === 'function' && typeof quickListContainer !== 'undefined' && quickListContainer) {
@@ -2266,7 +2378,7 @@
       const footReinfMesh = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.22, 4.8), metalFitMat);
       footReinfMesh.position.set(-0.15, 2.6, -1.55);
       rigDynamicGroup.add(footReinfMesh);
-      registerInteractive(footReinfMesh, "Refuerzo de Pujamen");
+      registerInteractive(footReinfMesh, "Pujamen y Repique");
 
       // ALUNAMIENTO (Lámina 2: Curvatura convexa de la baluma)
       const roachHitGeo = new THREE.BoxGeometry(0.4, 6.8, 1.2);
@@ -2563,6 +2675,7 @@
         dimMat
       );
       dimensionsGroup.add(loaLine);
+      registerDecorativeExplodable(loaLine, "Eslora Total");
       dimensionsGroup.add(createLine(new THREE.Vector3(1.7, 1.35, 4.7), new THREE.Vector3(2.4, 1.35, 4.7)));
       dimensionsGroup.add(createLine(new THREE.Vector3(1.7, 1.35, -3.85), new THREE.Vector3(2.4, 1.35, -3.85)));
 
@@ -2581,6 +2694,7 @@
         dimCyanMat
       );
       dimensionsGroup.add(lwlLine);
+      registerDecorativeExplodable(lwlLine, "Eslora en Flotación");
 
       for (let z = -3.2; z <= 3.3; z += 0.5) {
         const hatch = createLine(new THREE.Vector3(1.4, 0.35, z - 0.2), new THREE.Vector3(2.0, 0.35, z + 0.2));
@@ -2602,6 +2716,7 @@
         dimMat
       );
       dimensionsGroup.add(beamLine);
+      registerDecorativeExplodable(beamLine, "Manga Total");
       dimensionsGroup.add(createLine(new THREE.Vector3(-1.3, 1.2, 0.0), new THREE.Vector3(-1.3, 1.7, 0.0)));
       dimensionsGroup.add(createLine(new THREE.Vector3(1.3, 1.2, 0.0), new THREE.Vector3(1.3, 1.7, 0.0)));
 
@@ -2620,6 +2735,7 @@
         dimMat
       );
       dimensionsGroup.add(draftLine);
+      registerDecorativeExplodable(draftLine, "Calado");
       dimensionsGroup.add(createLine(new THREE.Vector3(1.1, 0.28, 0.35), new THREE.Vector3(1.7, 0.28, 0.35)));
       dimensionsGroup.add(createLine(new THREE.Vector3(1.1, -2.85, 0.35), new THREE.Vector3(1.7, -2.85, 0.35)));
 
@@ -2637,13 +2753,14 @@
         dimGreenMat
       );
       dimensionsGroup.add(freeboardLine);
+      registerDecorativeExplodable(freeboardLine, "Francobordo");
       dimensionsGroup.add(createLine(new THREE.Vector3(1.1, 0.28, -2.2), new THREE.Vector3(1.6, 0.28, -2.2)));
       dimensionsGroup.add(createLine(new THREE.Vector3(1.1, 1.25, -2.2), new THREE.Vector3(1.6, 1.25, -2.2)));
 
       const freeboardMinHit = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 1.1, 8), dimHitMat);
       freeboardMinHit.position.set(1.35, 0.76, -2.2);
       dimensionsGroup.add(freeboardMinHit);
-      registerInteractive(freeboardMinHit, "Francobordo Mínimo");
+      registerInteractive(freeboardMinHit, "Francobordo");
     }
 
     buildDimensions();
@@ -2739,24 +2856,6 @@
         const partName = row.getAttribute('data-sheet-part');
         if (BOAT_PARTS_INFO[partName]) {
           selectPart(partName);
-          if (BOAT_PARTS_INFO[partName].category === "dimensiones") {
-            dimensionsGroup.visible = true;
-            if (btnCamDims) {
-              btnCamDims.style.borderColor = 'var(--accent-gold)';
-              btnCamDims.style.color = 'var(--accent-gold)';
-            }
-            if (partName === "Manga Total") {
-              camera.position.set(0, 14, 0.01);
-              controls.target.set(0, 0, 0);
-            } else if (partName === "Calado") {
-              camera.position.set(10, -3.5, 6);
-              controls.target.set(0, -1.0, 0);
-            } else {
-              camera.position.set(13, 2.5, 0.0);
-              controls.target.set(0, 1.0, 0);
-            }
-            controls.update();
-          }
           if (window.innerWidth <= 860) setSheetExpanded(true);
         }
       });
@@ -2784,24 +2883,107 @@
       setSheetExpanded(false);
     }
 
-    // Renderizado de chips clasificados
-    function renderChips(categoryFilter = "all") {
+    const CATEGORY_NAMES = {
+      "casco": "🛶 Casco & Estructura",
+      "submarino": "⚓ Obra Viva & Quilla",
+      "jarcia": "🌲 Arboladura & Jarcia",
+      "velas": "⛵ Velas, Puños & Maniobra",
+      "dimensiones": "📏 Cotas & Dimensiones Navales"
+    };
+
+    const partSearchInput = document.getElementById('part-search-input');
+    const quickListTotal = document.getElementById('quick-list-total');
+
+    function getCurrentCategoryFilter() {
+      const activeTab = document.querySelector('.tabs-nav .tab-btn.active');
+      const cat = activeTab ? activeTab.getAttribute('data-category') : 'all';
+      if (cat === "aparejos" || cat === "laminas" || cat === "despiece") return "all";
+      return cat;
+    }
+
+    function createPartChip(partName) {
+      const info = BOAT_PARTS_INFO[partName];
+      const chip = document.createElement('button');
+      chip.className = `part-chip ${partName === selectedPartName ? 'active' : ''}`;
+      chip.setAttribute('data-part', partName);
+      chip.innerHTML = `<span class="chip-num">${info.num}</span> ${partName}`;
+      chip.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectPart(partName);
+      });
+      return chip;
+    }
+
+    // Renderizado de chips clasificados y optimizados
+    function renderChips(categoryFilter = "all", searchQuery = "") {
+      if (!quickListContainer) return;
       quickListContainer.innerHTML = '';
-      Object.keys(BOAT_PARTS_INFO).forEach(partName => {
+
+      const query = (searchQuery !== undefined && searchQuery !== null ? searchQuery : (partSearchInput ? partSearchInput.value : '')).trim().toLowerCase();
+
+      // Filtrar piezas según categoría y búsqueda en vivo
+      const filteredParts = Object.keys(BOAT_PARTS_INFO).filter(partName => {
         const info = BOAT_PARTS_INFO[partName];
         if (categoryFilter !== "all" && info.category !== categoryFilter) {
-          return;
+          return false;
         }
+        if (!query) return true;
+        const textToSearch = `${partName} ${info.num} ${info.title} ${info.desc} ${info.tag}`.toLowerCase();
+        return textToSearch.includes(query);
+      });
 
-        const chip = document.createElement('button');
-        chip.className = `part-chip ${partName === selectedPartName ? 'active' : ''}`;
-        chip.setAttribute('data-part', partName);
-        chip.innerHTML = `<span class="chip-num">${info.num}</span> ${partName}`;
-        chip.addEventListener('click', (e) => {
-          e.stopPropagation();
-          selectPart(partName);
+      if (quickListTotal) {
+        quickListTotal.textContent = `${filteredParts.length} piezas`;
+      }
+
+      if (filteredParts.length === 0) {
+        quickListContainer.innerHTML = `
+          <div style="color:var(--text-muted); font-size:0.8rem; padding:14px 6px; text-align:center;">
+            🔍 No se encontraron piezas que coincidan con <i>"${query}"</i>.
+          </div>
+        `;
+        return;
+      }
+
+      // Si se muestra "Todos" y no hay filtro de texto, agrupamos por categoría
+      if (categoryFilter === "all" && !query) {
+        const categoriesOrder = ["casco", "submarino", "jarcia", "velas", "dimensiones"];
+        categoriesOrder.forEach(catKey => {
+          const groupParts = filteredParts.filter(p => BOAT_PARTS_INFO[p].category === catKey);
+          if (groupParts.length === 0) return;
+
+          const groupEl = document.createElement('div');
+          groupEl.className = 'quick-group';
+
+          const titleEl = document.createElement('div');
+          titleEl.className = 'quick-group-title';
+          titleEl.innerHTML = `<span>${CATEGORY_NAMES[catKey] || catKey}</span> <span class="quick-group-count">${groupParts.length}</span>`;
+          groupEl.appendChild(titleEl);
+
+          const chipsContainer = document.createElement('div');
+          chipsContainer.className = 'quick-group-chips';
+
+          groupParts.forEach(partName => {
+            chipsContainer.appendChild(createPartChip(partName));
+          });
+
+          groupEl.appendChild(chipsContainer);
+          quickListContainer.appendChild(groupEl);
         });
-        quickListContainer.appendChild(chip);
+      } else {
+        // Vista de categoría específica o resultados de búsqueda
+        const chipsContainer = document.createElement('div');
+        chipsContainer.className = 'quick-group-chips';
+        filteredParts.forEach(partName => {
+          chipsContainer.appendChild(createPartChip(partName));
+        });
+        quickListContainer.appendChild(chipsContainer);
+      }
+    }
+
+    if (partSearchInput) {
+      partSearchInput.addEventListener('input', (e) => {
+        renderChips(getCurrentCategoryFilter(), e.target.value);
       });
     }
 
@@ -2987,6 +3169,38 @@
       }
     });
 
+    function focusPartView(partName) {
+      if (partName === "Manga Total") {
+        camera.position.set(0, 14, 0.01);
+        controls.target.set(0, 1.2, 0);
+        controls.update();
+      } else if (partName === "Calado") {
+        camera.position.set(10, -3.5, 6);
+        controls.target.set(0, -1.2, 0);
+        controls.update();
+      } else if (partName === "Eslora Total") {
+        camera.position.set(13, 2.5, 0.0);
+        controls.target.set(0, 1.2, 0);
+        controls.update();
+      } else if (partName === "Eslora en Flotación") {
+        camera.position.set(11, 0.6, 0.0);
+        controls.target.set(0, 0.35, 0);
+        controls.update();
+      } else if (partName === "Francobordo") {
+        camera.position.set(11, 2.0, -1.8);
+        controls.target.set(0, 0.8, -1.8);
+        controls.update();
+      } else if (partName === "Roda") {
+        camera.position.set(0, 2.5, 11);
+        controls.target.set(0, 1.2, 2.5);
+        controls.update();
+      } else if (partName === "Espejo de Popa") {
+        camera.position.set(0, 2.6, -11);
+        controls.target.set(0, 1.2, -2.5);
+        controls.update();
+      }
+    }
+
     // Función de selección
     function selectPart(partName) {
       if (!BOAT_PARTS_INFO[partName]) return;
@@ -2994,11 +3208,26 @@
       selectedPartName = partName;
       const info = BOAT_PARTS_INFO[partName];
 
-      partDetailView.style.display = 'block';
-      rigsSection.style.display = 'none';
-      if (sheetsSection) sheetsSection.style.display = 'none';
+      const activeTab = document.querySelector('.tabs-nav .tab-btn.active');
+      const isLaminasTab = activeTab && activeTab.getAttribute('data-category') === 'laminas';
+      const isAparejosTab = activeTab && activeTab.getAttribute('data-category') === 'aparejos';
 
-      if (info.category === "dimensiones") {
+      if (isLaminasTab) {
+        // En la vista de láminas, NO ocultar las láminas para permitir navegar y alternar entre cortes y piezas
+        partDetailView.style.display = 'none';
+        rigsSection.style.display = 'none';
+        if (sheetsSection) sheetsSection.style.display = 'flex';
+      } else if (isAparejosTab) {
+        partDetailView.style.display = 'none';
+        rigsSection.style.display = 'flex';
+        if (sheetsSection) sheetsSection.style.display = 'none';
+      } else {
+        partDetailView.style.display = 'block';
+        rigsSection.style.display = 'none';
+        if (sheetsSection) sheetsSection.style.display = 'none';
+      }
+
+      if (info.category === "dimensiones" || partName === "Francobordo") {
         dimensionsGroup.visible = true;
         if (btnCamDims) {
           btnCamDims.style.borderColor = 'var(--accent-gold)';
@@ -3013,6 +3242,18 @@
       panelDesc.textContent = info.desc;
       panelFeatureText.textContent = info.note;
 
+      // Actualizar tarjeta de vista previa en láminas técnicas
+      const sheetPreview = document.getElementById('sheet-part-preview');
+      if (sheetPreview) {
+        sheetPreview.style.display = 'flex';
+        const titleSpan = sheetPreview.querySelector('.preview-title');
+        const descP = sheetPreview.querySelector('.preview-desc');
+        const noteP = sheetPreview.querySelector('.preview-note');
+        if (titleSpan) titleSpan.innerHTML = `${info.icon} ${info.title}`;
+        if (descP) descP.textContent = info.desc;
+        if (noteP) noteP.textContent = info.note;
+      }
+
       if (handleTitle) {
         handleTitle.textContent = `${info.icon} ${info.title}`;
       }
@@ -3026,22 +3267,135 @@
         }
       });
 
+      // Actualizar filas activas en las láminas
+      document.querySelectorAll('.sheet-row[data-sheet-part]').forEach(row => {
+        if (row.getAttribute('data-sheet-part') === partName) {
+          row.classList.add('active-row');
+        } else {
+          row.classList.remove('active-row');
+        }
+      });
+
+      focusPartView(partName);
       highlightSelectedPart(partName);
     }
 
-    function highlightSelectedPart(targetPartName) {
-      interactiveMeshes.forEach(mesh => {
-        if (!mesh.material || !mesh.material.emissive) return;
+    let isolateMode = true;
+    let wireframeMode = false;
 
-        if (mesh.userData.partName === targetPartName) {
-          mesh.material.emissive.setHex(0x0284c7); // Cyan brillante
-          mesh.material.emissiveIntensity = 0.8;
+    function setWireframeMode(enabled) {
+      wireframeMode = enabled;
+      boatGroup.traverse((obj) => {
+        if (obj.isMesh && obj.material) {
+          if (obj.material.opacity === 0 && obj.material.transparent === true) return;
+          obj.material.wireframe = wireframeMode;
+        }
+      });
+
+      const btnWireframe = document.getElementById('btn-toggle-wireframe');
+      if (btnWireframe) {
+        btnWireframe.classList.toggle('active-wireframe', wireframeMode);
+        btnWireframe.textContent = wireframeMode ? "🌐 Wireframe: ON" : "🌐 Wireframe: OFF";
+      }
+    }
+
+    function toggleWireframeMode() {
+      setWireframeMode(!wireframeMode);
+    }
+
+    function toggleIsolateMode() {
+      isolateMode = !isolateMode;
+      const btnIsolate = document.getElementById('btn-toggle-isolate');
+      if (btnIsolate) {
+        btnIsolate.classList.toggle('active-isolate', isolateMode);
+        btnIsolate.textContent = isolateMode ? "🎯 Aislar: ON" : "🎯 Aislar: OFF";
+      }
+      highlightSelectedPart(selectedPartName);
+    }
+
+    const btnToggleIsolate = document.getElementById('btn-toggle-isolate');
+    if (btnToggleIsolate) {
+      btnToggleIsolate.addEventListener('click', toggleIsolateMode);
+    }
+
+    const btnToggleWireframe = document.getElementById('btn-toggle-wireframe');
+    if (btnToggleWireframe) {
+      btnToggleWireframe.addEventListener('click', toggleWireframeMode);
+    }
+
+    function highlightSelectedPart(targetPartName) {
+      // 1. Mallas interactivas principales
+      interactiveMeshes.forEach(mesh => {
+        if (!mesh.material) return;
+        const isHitbox = mesh.material.opacity === 0 && mesh.material.transparent === true;
+        if (isHitbox) return;
+
+        const isTarget = mesh.userData.partName === targetPartName;
+
+        if (isTarget) {
+          if (mesh.material.emissive) {
+            mesh.material.emissive.setHex(0x0284c7); // Cyan brillante
+            mesh.material.emissiveIntensity = 0.85;
+          }
+          mesh.material.transparent = mesh.userData.originalTransparent !== undefined ? mesh.userData.originalTransparent : false;
+          mesh.material.opacity = mesh.userData.originalOpacity !== undefined ? mesh.userData.originalOpacity : 1.0;
+          mesh.material.depthWrite = mesh.userData.originalDepthWrite !== undefined ? mesh.userData.originalDepthWrite : true;
         } else {
-          mesh.material.emissive.setHex(mesh.userData.originalEmissive || 0x000000);
-          mesh.material.emissiveIntensity = 0.0;
+          if (mesh.material.emissive) {
+            mesh.material.emissive.setHex(mesh.userData.originalEmissive || 0x000000);
+            mesh.material.emissiveIntensity = 0.0;
+          }
+          if (isolateMode && targetPartName) {
+            mesh.material.transparent = true;
+            mesh.material.opacity = 0.18; // Opacar el resto de componentes (ghosting)
+            mesh.material.depthWrite = false;
+          } else {
+            mesh.material.transparent = mesh.userData.originalTransparent !== undefined ? mesh.userData.originalTransparent : false;
+            mesh.material.opacity = mesh.userData.originalOpacity !== undefined ? mesh.userData.originalOpacity : 1.0;
+            mesh.material.depthWrite = mesh.userData.originalDepthWrite !== undefined ? mesh.userData.originalDepthWrite : true;
+          }
+        }
+      });
+
+      // 2. Líneas y cables decorativos
+      allExplodableObjects.forEach(obj => {
+        if (obj.isLine && obj.material) {
+          const isTarget = obj.userData && obj.userData.partName === targetPartName;
+          if (isolateMode && targetPartName && !isTarget) {
+            obj.material.opacity = 0.12;
+          } else {
+            obj.material.opacity = (obj.userData && obj.userData.originalOpacity) || 0.85;
+          }
         }
       });
     }
+
+    // Atajos de teclado para navegación y modos rápidos
+    window.addEventListener('keydown', (e) => {
+      // Ignorar atajos si el usuario escribe en el buscador
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+        if (e.key === 'Escape') {
+          e.target.value = '';
+          renderChips(getCurrentCategoryFilter(), '');
+          e.target.blur();
+        }
+        return;
+      }
+      const key = e.key.toLowerCase();
+      if (key === 'w') {
+        toggleWireframeMode();
+      } else if (key === 'a' || key === 'i') {
+        toggleIsolateMode();
+      } else if (key === 'x') {
+        toggleExplodedView();
+      } else if (key === 'escape') {
+        controls.reset();
+        camera.position.set(13, 7.5, 14);
+        controls.target.set(0, 1.8, 0);
+        controls.update();
+        selectPart("Casco");
+      }
+    });
 
     // ----------------------------------------------------
     // CONTROLADORES DE CÁMARA Y ÓRBITA SUBMARINA
@@ -3215,18 +3569,28 @@
         tooltip.style.display = 'block';
 
         if (hoveredMesh !== hitMesh) {
-          if (hoveredMesh && hoveredMesh.material && hoveredMesh.material.emissive) {
+          if (hoveredMesh && hoveredMesh.material) {
             if (hoveredMesh.userData.partName !== selectedPartName) {
-              hoveredMesh.material.emissive.setHex(hoveredMesh.userData.originalEmissive || 0x000000);
-              hoveredMesh.material.emissiveIntensity = 0.0;
+              if (hoveredMesh.material.emissive) {
+                hoveredMesh.material.emissive.setHex(hoveredMesh.userData.originalEmissive || 0x000000);
+                hoveredMesh.material.emissiveIntensity = 0.0;
+              }
+              if (isolateMode && selectedPartName) {
+                hoveredMesh.material.opacity = 0.18;
+              }
             }
           }
 
           hoveredMesh = hitMesh;
 
-          if (hoveredMesh.material && hoveredMesh.material.emissive) {
-            hoveredMesh.material.emissive.setHex(0x38bdf8);
-            hoveredMesh.material.emissiveIntensity = 0.55;
+          if (hoveredMesh.material) {
+            if (hoveredMesh.material.emissive) {
+              hoveredMesh.material.emissive.setHex(0x38bdf8);
+              hoveredMesh.material.emissiveIntensity = 0.55;
+            }
+            if (isolateMode && selectedPartName && hoveredMesh.userData.partName !== selectedPartName) {
+              hoveredMesh.material.opacity = 0.52;
+            }
           }
         }
       } else {
@@ -3234,13 +3598,21 @@
         tooltip.style.display = 'none';
 
         if (hoveredMesh) {
-          if (hoveredMesh.material && hoveredMesh.material.emissive) {
+          if (hoveredMesh.material) {
             if (hoveredMesh.userData.partName !== selectedPartName) {
-              hoveredMesh.material.emissive.setHex(hoveredMesh.userData.originalEmissive || 0x000000);
-              hoveredMesh.material.emissiveIntensity = 0.0;
+              if (hoveredMesh.material.emissive) {
+                hoveredMesh.material.emissive.setHex(hoveredMesh.userData.originalEmissive || 0x000000);
+                hoveredMesh.material.emissiveIntensity = 0.0;
+              }
+              if (isolateMode && selectedPartName) {
+                hoveredMesh.material.opacity = 0.18;
+              }
             } else {
-              hoveredMesh.material.emissive.setHex(0x0284c7);
-              hoveredMesh.material.emissiveIntensity = 0.8;
+              if (hoveredMesh.material.emissive) {
+                hoveredMesh.material.emissive.setHex(0x0284c7);
+                hoveredMesh.material.emissiveIntensity = 0.85;
+              }
+              hoveredMesh.material.opacity = hoveredMesh.userData.originalOpacity !== undefined ? hoveredMesh.userData.originalOpacity : 1.0;
             }
           }
           hoveredMesh = null;
