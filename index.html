@@ -978,6 +978,110 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    /* ── Banner de aviso móvil ─────────────────────────────────────── */
+    #mobile-notice {
+      display: none; /* Solo se muestra en móvil via JS */
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      background: rgba(6, 10, 20, 0.96);
+      border-top: 1px solid rgba(56, 189, 248, 0.3);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 14px 18px max(16px, env(safe-area-inset-bottom, 16px)) 18px;
+      box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.7);
+      animation: slideUpNotice 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      pointer-events: auto;
+    }
+    @keyframes slideUpNotice {
+      from { transform: translateY(100%); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    #mobile-notice.dismissing {
+      animation: slideDownNotice 0.3s ease-in forwards;
+    }
+    @keyframes slideDownNotice {
+      to { transform: translateY(110%); opacity: 0; }
+    }
+    .mn-inner {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .mn-icon {
+      font-size: 1.6rem;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .mn-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .mn-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #f8fafc;
+      line-height: 1.2;
+    }
+    .mn-desc {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      line-height: 1.45;
+    }
+    .mn-desc strong { color: #38bdf8; }
+    .mn-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .mn-btn-dismiss {
+      flex: 1;
+      min-width: 100px;
+      padding: 7px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.07);
+      color: #94a3b8;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .mn-btn-dismiss:active { background: rgba(255,255,255,0.14); }
+    .mn-btn-close {
+      background: none;
+      border: none;
+      color: #475569;
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 2px 4px;
+      flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+      align-self: flex-start;
+    }
+    .mn-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #fbbf24;
+      font-size: 0.64rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
     /* ====================================================
        DISEÑO RESPONSIVE Y ADAPTACIÓN MÓVIL (TABLETS Y CELULARES)
        ==================================================== */
@@ -1228,6 +1332,35 @@
         padding: 4px 10px;
         z-index: 40;
       }
+
+      /* Leyenda wireframe en móvil: compacta, arriba izquierda para no tapar el 3D */
+      #wireframe-legend {
+        bottom: auto;
+        top: 8px;
+        left: 8px;
+        right: 8px;
+        width: calc(100vw - 16px);
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 4px 10px;
+        padding: 7px 12px;
+        border-radius: 10px;
+        font-size: 0.64rem;
+      }
+      #wireframe-legend .wf-legend-title {
+        width: 100%;
+        margin-bottom: 0;
+        font-size: 0.60rem;
+      }
+      #wireframe-legend .wf-sep { display: none; }
+    }
+
+    /* ── Pantallas muy pequeñas (< 480px) ──────────────────────────── */
+    @media (max-width: 480px) {
+      h1 { font-size: 1.1rem; }
+      .btn-cam { font-size: 0.65rem; padding: 3px 6px; }
+      .bottom-bar { padding: 4px 6px; gap: 4px; }
+      .hud-group-label { display: none; }
     }
   </style>
 
@@ -1243,9 +1376,31 @@
   <!-- Tooltip flotante en cursor -->
   <div id="hover-tooltip">Componente</div>
 
+  <!-- ── Banner de aviso móvil (solo se activa en JS si es touch device) ── -->
+  <div id="mobile-notice">
+    <div class="mn-inner">
+      <div class="mn-icon">⚓</div>
+      <div class="mn-body">
+        <div class="mn-title">
+          Mejor experiencia en escritorio
+          <span class="mn-chip">📱 Móvil detectado</span>
+        </div>
+        <p class="mn-desc">
+          Esta app 3D funciona en celular, pero en <strong>PC o tablet</strong> tenés
+          <strong>más botones, más detalle</strong> y controles completos de órbita y despiece.
+          Algunas funciones avanzadas pueden ser difíciles de usar en pantalla pequeña.
+        </p>
+        <div class="mn-actions">
+          <button class="mn-btn-dismiss" id="mn-btn-ok">Entendido, seguir aquí</button>
+        </div>
+      </div>
+      <button class="mn-btn-close" id="mn-btn-close" aria-label="Cerrar">✕</button>
+    </div>
+  </div>
+
   <!-- Indicador visual cuando la cámara está bajo el agua -->
   <div id="underwater-indicator">
-    <span>🤿</span> VISTA SUBMARINA: Obra Viva, Quillote & Timón
+    <span>🤿</span> VISTA SUBMARINA: Obra Viva, Quillote &amp; Timón
   </div>
 
   <!-- Indicador visual cuando el modo despiece está activo -->
@@ -4212,6 +4367,36 @@
     // Iniciar con aparejo Sloop y seleccionar Casco por defecto
     buildRig("sloop");
     selectPart("Casco");
+
+    // ── Aviso de experiencia móvil ────────────────────────────────────────
+    (function initMobileNotice() {
+      const notice   = document.getElementById('mobile-notice');
+      const btnOk    = document.getElementById('mn-btn-ok');
+      const btnClose = document.getElementById('mn-btn-close');
+      if (!notice) return;
+
+      const isTouchDevice = () =>
+        ('ontouchstart' in window || navigator.maxTouchPoints > 0) &&
+        window.innerWidth <= 860;
+
+      function dismiss() {
+        notice.classList.add('dismissing');
+        sessionStorage.setItem('mobileNoticeDismissed', '1');
+        setTimeout(() => { notice.style.display = 'none'; notice.classList.remove('dismissing'); }, 320);
+      }
+
+      function maybeShow() {
+        if (isTouchDevice() && !sessionStorage.getItem('mobileNoticeDismissed')) {
+          // Pequeño delay para que el usuario vea primero el 3D cargando
+          setTimeout(() => { notice.style.display = 'block'; }, 1800);
+        }
+      }
+
+      btnOk   && btnOk.addEventListener('click',    dismiss);
+      btnClose && btnClose.addEventListener('click', dismiss);
+
+      maybeShow();
+    })();
   </script>
 </body>
 </html>
