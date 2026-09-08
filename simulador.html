@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Simulador Náutico de Viento y Maniobras 3D - Curso de Timonel (PNA)</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #060a14;
+      --panel-bg: rgba(10, 17, 32, 0.88);
+      --panel-border: rgba(56, 189, 248, 0.28);
+      --accent-cyan: #38bdf8;
+      --accent-gold: #f59e0b;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background-color: var(--bg-dark);
+      font-family: 'Outfit', sans-serif;
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #webgl-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* ── BARRA SUPERIOR ────────────────────────────────────────────── */
+    .sim-header {
+      position: fixed;
+      top: max(12px, env(safe-area-inset-top, 12px));
+      left: 16px;
+      right: 16px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      pointer-events: none;
+      gap: 12px;
+    }
+
+    .sim-brand {
+      pointer-events: auto;
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      border-radius: 14px;
+      padding: 8px 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    .sim-badge {
+      font-size: 0.64rem;
+      font-weight: 800;
+      color: var(--accent-cyan);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .sim-brand h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .sim-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: auto;
+    }
+
+    .sim-btn {
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      color: #ffffff;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: inherit;
+    }
+    .sim-btn:hover {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--accent-cyan);
+      transform: translateY(-1px);
+    }
+    .sim-btn-night.active {
+      background: #3b82f6;
+      color: #ffffff;
+      border-color: #60a5fa;
+      box-shadow: 0 0 14px rgba(59, 130, 246, 0.5);
+    }
+    .sim-btn-link {
+      color: var(--accent-gold);
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+    .sim-btn-link:hover {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: var(--accent-gold);
+    }
+
+    /* ── ROSA DE LOS VIENTOS (COMPASS) ────────────────────────────── */
+    .sim-compass-card {
+      position: fixed;
+      top: max(80px, calc(env(safe-area-inset-top, 0px) + 74px));
+      left: 16px;
+      z-index: 40;
+      background: var(--panel-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--panel-border);
+      border-radius: 18px;
+      padding: 12px;
+      width: 220px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    }
+    .compass-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .compass-legend-tws {
+      color: var(--accent-cyan);
+      background: rgba(56, 189, 248, 0.15);
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+    .compass-dial-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .compass-svg {
+      width: 170px;
+      height: 170px;
+      overflow: visible;
+    }
+    .compass-ring-outer {
+      fill: rgba(15, 23, 42, 0.6);
+      stroke: rgba(255, 255, 255, 0.15);
+      stroke-width: 1.5;
+    }
+    .compass-ring-inner {
+      fill: none;
+      stroke: rgba(56, 189, 248, 0.2);
+      stroke-width: 1;
+      stroke-dasharray: 4 4;
+    }
+    .compass-cardinal {
+      fill: #e2e8f0;
+      font-size: 13px;
+      font-weight: 800;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .wind-arrow-line {
+      stroke: #38bdf8;
+      stroke-width: 3.5;
+      stroke-linecap: round;
+    }
+    .wind-arrow-head {
+      fill: #38bdf8;
+    }
+    .wind-arrow-label {
+      fill: #38bdf8;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+    }
+    .boat-heading-line {
+      stroke: #f59e0b;
+      stroke-width: 3.5;
+      stroke-linecap: round;
+    }
+    .boat-heading-head {
+      fill: #f59e0b;
+    }
+    .boat-hull-icon {
+      fill: rgba(245, 158, 11, 0.45);
+      stroke: #f59e0b;
+      stroke-width: 1.2;
+    }
+    .compass-subtext {
+      font-size: 0.70rem;
+      color: #cbd5e1;
+      text-align: center;
+      margin-top: 6px;
+      line-height: 1.35;
+    }
+    .dot-wind { color: #38bdf8; }
+    .dot-boat { color: #f59e0b; }
+
+    /* ── TELEMETRÍA NÁUTICA ───────────────────────────────────────── */
+    .sim-telemetry-card {
+      position: fixed;
+      top: max(80px, calc(env(safe-area-inset-top, 0px) + 74px));
+      right: 16px;
+      z-index: 40;
+      background: var(--panel-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--panel-border);
+      border-radius: 18px;
+      padding: 14px 18px;
+      width: 320px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .tel-row-point {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding-bottom: 8px;
+    }
+    .tel-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .tel-point-badge {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 8px;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+    }
+    .tel-point-badge.danger {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border-color: rgba(239, 68, 68, 0.45);
+    }
+    .tel-metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .metric-box {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .m-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .m-unit {
+      font-size: 0.60rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
+    .tel-eval-box {
+      font-size: 0.76rem;
+      line-height: 1.4;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #6ee7b7;
+    }
+    .tel-eval-box.eval-warning {
+      background: rgba(245, 158, 11, 0.12);
+      border-color: rgba(245, 158, 11, 0.35);
+      color: #fde047;
+    }
+
+    /* ── PANEL INFERIOR DE MANIOBRAS ───────────────────────────────── */
+    .sim-controls-panel {
+      position: fixed;
+      bottom: max(14px, env(safe-area-inset-bottom, 14px));
+      left: 16px;
+      right: 16px;
+      z-index: 50;
+      background: var(--panel-bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--panel-border);
+      border-radius: 18px;
+      padding: 10px 14px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .ctrl-row-presets {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 2px;
+    }
+    .ctrl-row-presets::-webkit-scrollbar { display: none; }
+    .ctrl-group-title {
+      font-size: 0.70rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .preset-btn-group {
+      display: flex;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+    .btn-preset {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #cbd5e1;
+      padding: 5px 11px;
+      border-radius: 8px;
+      font-size: 0.73rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .btn-preset:hover {
+      border-color: var(--accent-cyan);
+      color: #ffffff;
+      background: rgba(56, 189, 248, 0.15);
+    }
+    .btn-preset.active {
+      background: var(--accent-cyan);
+      color: #030d1b;
+      border-color: var(--accent-cyan);
+      font-weight: 700;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+    }
+    .btn-auto-trim {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: var(--accent-gold);
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 0.73rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: inherit;
+      margin-left: auto;
+    }
+    .btn-auto-trim:hover {
+      background: var(--accent-gold);
+      color: #040914;
+    }
+    .btn-notes-toggle {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 0.73rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+    .btn-notes-toggle:hover {
+      background: #10b981;
+      color: #040914;
+    }
+
+    .ctrl-row-sliders {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      align-items: center;
+    }
+    .slider-card {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      padding: 6px 10px;
+      border-radius: 9px;
+    }
+    .slider-card label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+    .slider-card label strong {
+      color: #ffffff;
+    }
+    .slider-card input[type="range"] {
+      width: 100%;
+      height: 4px;
+      accent-color: var(--accent-cyan);
+      cursor: pointer;
+    }
+
+    /* ── CAJÓN DE APUNTES PNA ──────────────────────────────────────── */
+    .sim-notes-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 420px;
+      max-width: 90vw;
+      height: 100%;
+      background: rgba(8, 14, 28, 0.96);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border-left: 1px solid var(--panel-border);
+      z-index: 100;
+      padding: max(20px, env(safe-area-inset-top, 20px)) 22px max(20px, env(safe-area-inset-bottom, 20px)) 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transform: translateX(100%);
+      transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+      box-shadow: -10px 0 40px rgba(0,0,0,0.7);
+    }
+    .sim-notes-drawer.open {
+      transform: translateX(0);
+    }
+    .notes-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 12px;
+    }
+    .notes-header h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.05rem;
+      color: var(--accent-cyan);
+    }
+    .btn-notes-close {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    .notes-body {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding-right: 4px;
+    }
+    .note-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .note-card h4 {
+      font-size: 0.84rem;
+      color: var(--accent-gold);
+      margin-bottom: 8px;
+    }
+    .note-items {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .note-item strong {
+      font-size: 0.74rem;
+      color: #ffffff;
+      display: block;
+      margin-bottom: 2px;
+    }
+    .note-item p {
+      font-size: 0.74rem;
+      color: #cbd5e1;
+      line-height: 1.45;
+    }
+
+    /* ── ADAPTACIÓN RESPONSIVE (IPADS Y CELULARES) ─────────────────── */
+    @media (max-width: 1024px) {
+      .ctrl-row-sliders {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .sim-telemetry-card {
+        width: 270px;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .sim-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+      .sim-brand h1 {
+        font-size: 0.95rem;
+      }
+      .sim-compass-card {
+        top: auto;
+        bottom: 215px;
+        left: 10px;
+        width: 155px;
+        padding: 8px;
+      }
+      .compass-svg {
+        width: 110px;
+        height: 110px;
+      }
+      .compass-subtext {
+        font-size: 0.62rem;
+      }
+      .sim-telemetry-card {
+        top: auto;
+        bottom: 215px;
+        right: 10px;
+        width: 180px;
+        padding: 8px;
+        gap: 6px;
+      }
+      .tel-metrics-grid {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+      .m-val {
+        font-size: 0.95rem;
+      }
+      .tel-eval-box {
+        display: none;
+      }
+      .sim-controls-panel {
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+        padding: 8px;
+      }
+      .ctrl-row-sliders {
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="webgl-container"></div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

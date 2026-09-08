@@ -1,0 +1,99 @@
+import * as THREE from 'three';
+
+export class SceneEnvironment {
+  constructor(scene) {
+    this.scene = scene;
+    this.isNight = false;
+
+    this.initLights();
+    this.initWater();
+    this.initGrid();
+  }
+
+  initLights() {
+    this.hemiLight = new THREE.HemisphereLight(0xe0f2fe, 0x0c4a6e, 0.75);
+    this.hemiLight.position.set(0, 50, 0);
+    this.scene.add(this.hemiLight);
+
+    this.sunLight = new THREE.DirectionalLight(0xfffaed, 1.4);
+    this.sunLight.position.set(25, 35, 20);
+    this.sunLight.castShadow = true;
+    this.sunLight.shadow.mapSize.width = 2048;
+    this.sunLight.shadow.mapSize.height = 2048;
+    this.sunLight.shadow.camera.near = 0.5;
+    this.sunLight.shadow.camera.far = 100;
+    this.sunLight.shadow.camera.left = -15;
+    this.sunLight.shadow.camera.right = 15;
+    this.sunLight.shadow.camera.top = 15;
+    this.sunLight.shadow.camera.bottom = -15;
+    this.sunLight.shadow.bias = -0.0005;
+    this.scene.add(this.sunLight);
+
+    this.underwaterLight = new THREE.DirectionalLight(0x0284c7, 0.6);
+    this.underwaterLight.position.set(-10, -20, -10);
+    this.scene.add(this.underwaterLight);
+  }
+
+  initWater() {
+    const waterGeo = new THREE.PlaneGeometry(160, 160, 64, 64);
+    this.waterMat = new THREE.MeshStandardMaterial({
+      color: 0x0369a1,
+      roughness: 0.15,
+      metalness: 0.8,
+      transparent: true,
+      opacity: 0.82
+    });
+
+    this.waterMesh = new THREE.Mesh(waterGeo, this.waterMat);
+    this.waterMesh.rotation.x = -Math.PI / 2;
+    this.waterMesh.position.y = 0.28; // Nivel de la línea de flotación
+    this.waterMesh.receiveShadow = true;
+    this.scene.add(this.waterMesh);
+  }
+
+  initGrid() {
+    // Cuadrícula náutica sutil en el fondo marino para referencia visual
+    this.subGrid = new THREE.GridHelper(80, 40, 0x0284c7, 0x0f172a);
+    this.subGrid.position.y = -5.0;
+    this.scene.add(this.subGrid);
+  }
+
+  setNightMode(enabled) {
+    this.isNight = enabled;
+    if (enabled) {
+      this.scene.background.setHex(0x010409);
+      this.scene.fog.color.setHex(0x010409);
+      this.hemiLight.color.setHex(0x0e244d);
+      this.hemiLight.groundColor.setHex(0x020713);
+      this.hemiLight.intensity = 0.25;
+      this.sunLight.color.setHex(0x93c5fd);
+      this.sunLight.intensity = 0.35; // Luz de luna tenue
+      this.waterMat.color.setHex(0x021329);
+      this.waterMat.opacity = 0.92;
+    } else {
+      this.scene.background.setHex(0x060a14);
+      this.scene.fog.color.setHex(0x060a14);
+      this.hemiLight.color.setHex(0xe0f2fe);
+      this.hemiLight.groundColor.setHex(0x0c4a6e);
+      this.hemiLight.intensity = 0.75;
+      this.sunLight.color.setHex(0xfffaed);
+      this.sunLight.intensity = 1.4;
+      this.waterMat.color.setHex(0x0369a1);
+      this.waterMat.opacity = 0.82;
+    }
+  }
+
+  update(delta, time) {
+    // Animación suave de oleaje marino
+    if (this.waterMesh) {
+      const pos = this.waterMesh.geometry.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        const u = pos.getX(i);
+        const v = pos.getY(i);
+        const wave = Math.sin(u * 0.15 + time * 1.5) * 0.08 + Math.cos(v * 0.12 + time * 1.2) * 0.06;
+        pos.setZ(i, wave);
+      }
+      pos.needsUpdate = true;
+    }
+  }
+}
