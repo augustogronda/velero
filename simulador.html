@@ -90,6 +90,39 @@
       line-height: 1.2;
     }
 
+    .sim-mode-selector {
+      display: flex;
+      gap: 6px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 4px;
+      pointer-events: auto;
+    }
+    .mode-tab {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .mode-tab:hover {
+      color: #ffffff;
+      background: rgba(255,255,255,0.06);
+    }
+    .mode-tab.active {
+      background: var(--accent-cyan);
+      color: #030d1b;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+    }
+
     .sim-header-actions {
       display: flex;
       align-items: center;
@@ -317,6 +350,165 @@
       border-color: rgba(245, 158, 11, 0.35);
       color: #fde047;
     }
+
+    /* ── TARJETA RIPA ─────────────────────────────────────────────── */
+    .sim-ripa-card {
+      position: fixed;
+      top: max(80px, calc(env(safe-area-inset-top, 0px) + 74px));
+      right: 16px;
+      z-index: 40;
+      background: var(--panel-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--panel-border);
+      border-radius: 18px;
+      padding: 16px 18px;
+      width: 360px;
+      max-width: calc(100vw - 32px);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .ripa-header {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .ripa-badge {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: var(--accent-gold);
+      letter-spacing: 0.06em;
+    }
+    .ripa-select {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #ffffff;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      outline: none;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .ripa-desc {
+      font-size: 0.80rem;
+      color: #cbd5e1;
+      line-height: 1.45;
+    }
+    .ripa-quiz-box {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 10px;
+    }
+    .ripa-question {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+    }
+    .ripa-options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .ripa-opt-btn {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #f1f5f9;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .ripa-opt-btn:hover {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--accent-cyan);
+    }
+    .ripa-feedback {
+      font-size: 0.78rem;
+      line-height: 1.45;
+      padding: 9px 12px;
+      border-radius: 8px;
+      display: none;
+    }
+    .ripa-feedback.feedback-correct {
+      display: block;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #6ee7b7;
+    }
+    .ripa-feedback.feedback-wrong {
+      display: block;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+
+    /* ── TARJETA IALA B ───────────────────────────────────────────── */
+    .sim-iala-card {
+      position: fixed;
+      top: max(80px, calc(env(safe-area-inset-top, 0px) + 74px));
+      right: 16px;
+      z-index: 40;
+      background: var(--panel-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--panel-border);
+      border-radius: 18px;
+      padding: 16px 18px;
+      width: 360px;
+      max-width: calc(100vw - 32px);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .iala-badge {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: #34d399;
+      letter-spacing: 0.06em;
+    }
+    .iala-motto {
+      font-size: 0.78rem;
+      line-height: 1.45;
+      color: #cbd5e1;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding-bottom: 8px;
+    }
+    .iala-buoy-pills {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .buoy-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 0.74rem;
+      color: #e2e8f0;
+      line-height: 1.35;
+    }
+    .buoy-pill.green { border-color: rgba(34, 197, 94, 0.4); }
+    .buoy-pill.green .bp-icon { color: #22c55e; }
+    .buoy-pill.red { border-color: rgba(239, 68, 68, 0.4); }
+    .buoy-pill.red .bp-icon { color: #ef4444; }
+    .buoy-pill.black { border-color: rgba(245, 158, 11, 0.4); }
+    .buoy-pill.black .bp-icon { color: #fbbf24; }
+    .buoy-pill.safe { border-color: rgba(56, 189, 248, 0.4); }
+    .buoy-pill.safe .bp-icon { color: #38bdf8; }
 
     /* ── PANEL INFERIOR DE MANIOBRAS ───────────────────────────────── */
     .sim-controls-panel {

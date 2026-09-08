@@ -1,11 +1,17 @@
-import * as THREE from 'three';
+﻿import * as THREE from 'three';
 import { COURSE_NOTES } from './CourseNotes.js';
+import { RIPA_SCENARIOS } from '../simulation/RipaEngine.js';
 
 export class SimulatorHUD {
-  constructor(windSystem, boat, environment) {
+  constructor(windSystem, boat, environment, otherVessel, ripaEngine, ialaSystem) {
     this.wind = windSystem;
     this.boat = boat;
     this.env = environment;
+    this.otherVessel = otherVessel;
+    this.ripa = ripaEngine;
+    this.iala = ialaSystem;
+
+    this.currentMode = 'wind'; // 'wind', 'ripa', 'iala'
 
     this.initDOM();
     this.bindEvents();
@@ -13,22 +19,27 @@ export class SimulatorHUD {
   }
 
   initDOM() {
-    // 1. Barra superior de navegación y título
+    // 1. Barra superior
     this.header = document.createElement('header');
     this.header.className = 'sim-header';
     this.header.innerHTML = `
       <div class="sim-brand">
         <div class="sim-badge">⚓ CURSO DE TIMONEL PNA</div>
-        <h1>Simulador Náutico de Viento y Maniobras</h1>
+        <h1>Simulador Náutico 3D</h1>
+      </div>
+      <div class="sim-mode-selector">
+        <button class="mode-tab active" data-mode="wind">🧭 Viento & Rumbos</button>
+        <button class="mode-tab" data-mode="ripa">⚖️ Ejercicios RIPA (Cruces)</button>
+        <button class="mode-tab" data-mode="iala">📍 Boyado IALA B</button>
       </div>
       <div class="sim-header-actions">
         <button id="btn-night-toggle" class="sim-btn sim-btn-night" title="Alternar modo noche y luces reglamentarias de navegación">🌙 Modo Noche (RIPA)</button>
-        <a href="index.html" class="sim-btn sim-btn-link" title="Volver a la vista de partes y despiece 3D">⛵ Nomenclatura 3D ➔</a>
+        <a href="index.html" class="sim-btn sim-btn-link" title="Volver a la vista de partes y despiece 3D">⛵ Nomenclatura ➔</a>
       </div>
     `;
     document.body.appendChild(this.header);
 
-    // 2. Rosa de los vientos interactiva flotante (Cuadrante superior izquierdo)
+    // 2. Rosa de los vientos (Modo Viento)
     this.compassWidget = document.createElement('div');
     this.compassWidget.className = 'sim-compass-card';
     this.compassWidget.innerHTML = `
@@ -40,37 +51,32 @@ export class SimulatorHUD {
         <svg class="compass-svg" viewBox="0 0 200 200" id="compass-svg">
           <circle cx="100" cy="100" r="92" class="compass-ring-outer" />
           <circle cx="100" cy="100" r="76" class="compass-ring-inner" />
-          
-          <!-- Puntos cardinales -->
           <text x="100" y="24" class="compass-cardinal" text-anchor="middle">N</text>
           <text x="180" y="105" class="compass-cardinal" text-anchor="middle">E</text>
           <text x="100" y="186" class="compass-cardinal" text-anchor="middle">S</text>
           <text x="20" y="105" class="compass-cardinal" text-anchor="middle">W</text>
 
-          <!-- Flecha de Viento Real (Azul / Blanco) -->
           <g id="needle-wind" transform="rotate(0 100 100)">
             <line x1="100" y1="100" x2="100" y2="30" class="wind-arrow-line" />
             <polygon points="100,20 93,34 107,34" class="wind-arrow-head" />
             <text x="100" y="48" class="wind-arrow-label" text-anchor="middle">VIENTO</text>
           </g>
 
-          <!-- Flecha de Rumbo del Velero (Dorado / Amarillo) -->
           <g id="needle-boat" transform="rotate(45 100 100)">
             <line x1="100" y1="100" x2="100" y2="40" class="boat-heading-line" />
             <polygon points="100,28 94,44 106,44" class="boat-heading-head" />
-            <!-- Silueta de velero -->
             <path d="M100,70 L95,115 L105,115 Z" class="boat-hull-icon" />
           </g>
         </svg>
       </div>
       <div class="compass-subtext">
-        <span class="dot-wind">●</span> Viento Real: <strong id="val-twd">0° (N)</strong> |
-        <span class="dot-boat">▲</span> Proa: <strong id="val-hdg">45° (NE)</strong>
+        <span class="dot-wind">●</span> Viento: <strong id="val-twd">0° (N)</strong> |
+        <span class="dot-boat">▲</span> Proa: <strong id="val-hdg">45°</strong>
       </div>
     `;
     document.body.appendChild(this.compassWidget);
 
-    // 3. Tarjeta de Telemetría Náutica (Cuadrante superior derecho)
+    // 3. Tarjeta de Telemetría Náutica
     this.telemetryCard = document.createElement('div');
     this.telemetryCard.className = 'sim-telemetry-card';
     this.telemetryCard.innerHTML = `
@@ -85,11 +91,11 @@ export class SimulatorHUD {
         </div>
         <div class="metric-box">
           <span class="m-val" id="tel-heel">18°</span>
-          <span class="m-unit">ESCORA (INCLINACIÓN)</span>
+          <span class="m-unit">ESCORA</span>
         </div>
         <div class="metric-box">
           <span class="m-val" id="tel-app-wind">16.8</span>
-          <span class="m-unit">VIENTO APARENTE (KTS)</span>
+          <span class="m-unit">VIENTO APARENTE</span>
         </div>
         <div class="metric-box">
           <span class="m-val" id="tel-tack">Estribor</span>
@@ -102,11 +108,65 @@ export class SimulatorHUD {
     `;
     document.body.appendChild(this.telemetryCard);
 
-    // 4. Panel inferior de Controles de Maniobra
+    // 4. Tarjeta interactiva para ejercicios RIPA (Aparece en Modo RIPA)
+    this.ripaCard = document.createElement('div');
+    this.ripaCard.className = 'sim-ripa-card';
+    this.ripaCard.style.display = 'none';
+    this.ripaCard.innerHTML = `
+      <div class="ripa-header">
+        <span class="ripa-badge">⚖️ CASO DE EXAMEN RIPA</span>
+        <select id="select-ripa-scenario" class="ripa-select">
+          <option value="opposite_tacks">1. Distintas Amuras (Estribor vs Babor)</option>
+          <option value="same_tack">2. Misma Amura (Barlovento / Sotavento)</option>
+          <option value="overtaking">3. Buque que Alcanza</option>
+          <option value="channel_commercial">4. Velero vs. Buque en Canal</option>
+        </select>
+      </div>
+      <p class="ripa-desc" id="ripa-desc">Cargando situación...</p>
+      <div class="ripa-quiz-box">
+        <div class="ripa-question" id="ripa-question">¿Quién tiene derecho de paso?</div>
+        <div class="ripa-options-group" id="ripa-options"></div>
+        <div class="ripa-feedback" id="ripa-feedback"></div>
+      </div>
+    `;
+    document.body.appendChild(this.ripaCard);
+
+    // 5. Tarjeta informativa de Boyado IALA B (Aparece en Modo IALA)
+    this.ialaCard = document.createElement('div');
+    this.ialaCard.className = 'sim-iala-card';
+    this.ialaCard.style.display = 'none';
+    this.ialaCard.innerHTML = `
+      <div class="iala-header">
+        <span class="iala-badge">📍 SISTEMA IALA B (ARGENTINA)</span>
+      </div>
+      <div class="iala-rules-content">
+        <p class="iala-motto"><strong>Regla de Oro en Región B:</strong> Al ingresar de mar a puerto, se deja <span style="color:#ef4444;font-weight:700;">ROJO A BABOR</span> y <span style="color:#22c55e;font-weight:700;">VERDE A ESTRIBOR</span>.</p>
+        <div class="iala-buoy-pills">
+          <div class="buoy-pill green">
+            <span class="bp-icon">▲</span>
+            <div><strong>Canal Estribor</strong>: Verde, cónica, destello Fl G. Número impar.</div>
+          </div>
+          <div class="buoy-pill red">
+            <span class="bp-icon">■</span>
+            <div><strong>Canal Babor</strong>: Roja, cilíndrica, destello Fl R. Número par.</div>
+          </div>
+          <div class="buoy-pill black">
+            <span class="bp-icon">●●</span>
+            <div><strong>Peligro Aislado</strong>: Negra con franjas rojas, dos esferas. Fl(2) W 5s.</div>
+          </div>
+          <div class="buoy-pill safe">
+            <span class="bp-icon">⚪</span>
+            <div><strong>Aguas Seguras</strong>: Franjas rojas/blancas, una esfera. Recalada.</div>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(this.ialaCard);
+
+    // 6. Panel inferior de Controles de Maniobra
     this.controlsCard = document.createElement('div');
     this.controlsCard.className = 'sim-controls-panel';
     this.controlsCard.innerHTML = `
-      <!-- Fila 1: Botones rápidos de Rumbo oficial (Presets de Examen) -->
       <div class="ctrl-row-presets">
         <span class="ctrl-group-title">Rumbos Oficiales PNA:</span>
         <div class="preset-btn-group">
@@ -120,7 +180,6 @@ export class SimulatorHUD {
         <button id="btn-notes-toggle" class="btn-notes-toggle" title="Abrir apuntes didácticos para examen de timonel">📖 Apuntes PNA</button>
       </div>
 
-      <!-- Fila 2: Sliders precisos de Gobierno y Velamen -->
       <div class="ctrl-row-sliders">
         <div class="slider-card">
           <label>Rumbo de Proa: <strong id="lbl-hdg">45°</strong></label>
@@ -135,18 +194,18 @@ export class SimulatorHUD {
           <input type="range" id="slider-wind-spd" min="4" max="30" value="14">
         </div>
         <div class="slider-card">
-          <label>Escota Mayor: <strong id="lbl-main-sheet">25% (Cazada)</strong></label>
+          <label>Escota Mayor: <strong id="lbl-main-sheet">25%</strong></label>
           <input type="range" id="slider-main-sheet" min="0" max="100" value="25">
         </div>
         <div class="slider-card">
-          <label>Escota Foque: <strong id="lbl-jib-sheet">25% (Cazada)</strong></label>
+          <label>Escota Foque: <strong id="lbl-jib-sheet">25%</strong></label>
           <input type="range" id="slider-jib-sheet" min="0" max="100" value="25">
         </div>
       </div>
     `;
     document.body.appendChild(this.controlsCard);
 
-    // 5. Cajón de Apuntes Didácticos de Timonel (Off-canvas drawer)
+    // 7. Drawer de Apuntes
     this.notesDrawer = document.createElement('aside');
     this.notesDrawer.className = 'sim-notes-drawer';
     this.notesDrawer.innerHTML = `
@@ -154,9 +213,7 @@ export class SimulatorHUD {
         <h3>📖 Cuaderno de Estudio Náutico (PNA)</h3>
         <button id="btn-notes-close" class="btn-notes-close" aria-label="Cerrar apuntes">✕</button>
       </div>
-      <div class="notes-body" id="notes-content">
-        <!-- Rellenado dinámicamente -->
-      </div>
+      <div class="notes-body" id="notes-content"></div>
     `;
     document.body.appendChild(this.notesDrawer);
     this.populateNotes();
@@ -165,7 +222,6 @@ export class SimulatorHUD {
   populateNotes() {
     const container = document.getElementById('notes-content');
     if (!container) return;
-
     let html = '';
     for (const key in COURSE_NOTES) {
       const cat = COURSE_NOTES[key];
@@ -187,13 +243,24 @@ export class SimulatorHUD {
   }
 
   bindEvents() {
-    // Night Mode Toggle
+    // Mode switcher
+    const modeTabs = document.querySelectorAll('.mode-tab');
+    modeTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        modeTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        this.setMode(tab.getAttribute('data-mode'));
+      });
+    });
+
+    // Night mode
     const btnNight = document.getElementById('btn-night-toggle');
     if (btnNight) {
       btnNight.addEventListener('click', () => {
         const night = !this.env.isNight;
         this.env.setNightMode(night);
         this.boat.setNavigationLights(night, false);
+        if (this.otherVessel) this.otherVessel.setNightLights(night);
         btnNight.textContent = night ? '☀️ Modo Día' : '🌙 Modo Noche (RIPA)';
         btnNight.classList.toggle('active', night);
       });
@@ -206,36 +273,11 @@ export class SimulatorHUD {
     const sliderMain = document.getElementById('slider-main-sheet');
     const sliderJib = document.getElementById('slider-jib-sheet');
 
-    if (sliderHdg) {
-      sliderHdg.addEventListener('input', (e) => {
-        this.wind.setBoatHeading(+e.target.value);
-        this.update();
-      });
-    }
-    if (sliderWindDir) {
-      sliderWindDir.addEventListener('input', (e) => {
-        this.wind.setTrueWind(+e.target.value, this.wind.trueWindSpeed);
-        this.update();
-      });
-    }
-    if (sliderWindSpd) {
-      sliderWindSpd.addEventListener('input', (e) => {
-        this.wind.setTrueWind(this.wind.trueWindDirection, +e.target.value);
-        this.update();
-      });
-    }
-    if (sliderMain) {
-      sliderMain.addEventListener('input', (e) => {
-        this.wind.setSheetTrim(+e.target.value / 100, this.wind.jibSheetTrim);
-        this.update();
-      });
-    }
-    if (sliderJib) {
-      sliderJib.addEventListener('input', (e) => {
-        this.wind.setSheetTrim(this.wind.mainSheetTrim, +e.target.value / 100);
-        this.update();
-      });
-    }
+    if (sliderHdg) sliderHdg.addEventListener('input', (e) => { this.wind.setBoatHeading(+e.target.value); this.update(); });
+    if (sliderWindDir) sliderWindDir.addEventListener('input', (e) => { this.wind.setTrueWind(+e.target.value, this.wind.trueWindSpeed); this.update(); });
+    if (sliderWindSpd) sliderWindSpd.addEventListener('input', (e) => { this.wind.setTrueWind(this.wind.trueWindDirection, +e.target.value); this.update(); });
+    if (sliderMain) sliderMain.addEventListener('input', (e) => { this.wind.setSheetTrim(+e.target.value / 100, this.wind.jibSheetTrim); this.update(); });
+    if (sliderJib) sliderJib.addEventListener('input', (e) => { this.wind.setSheetTrim(this.wind.mainSheetTrim, +e.target.value / 100); this.update(); });
 
     // Presets
     const presetBtns = document.querySelectorAll('.btn-preset');
@@ -251,7 +293,7 @@ export class SimulatorHUD {
       });
     });
 
-    // Auto-Trim button
+    // Auto-trim
     const btnAutoTrim = document.getElementById('btn-auto-trim');
     if (btnAutoTrim) {
       btnAutoTrim.addEventListener('click', () => {
@@ -260,17 +302,80 @@ export class SimulatorHUD {
       });
     }
 
-    // Notes Drawer Toggle
+    // Notes drawer
     const btnNotesToggle = document.getElementById('btn-notes-toggle');
     const btnNotesClose = document.getElementById('btn-notes-close');
-    if (btnNotesToggle && this.notesDrawer) {
-      btnNotesToggle.addEventListener('click', () => {
-        this.notesDrawer.classList.toggle('open');
+    if (btnNotesToggle && this.notesDrawer) btnNotesToggle.addEventListener('click', () => this.notesDrawer.classList.toggle('open'));
+    if (btnNotesClose && this.notesDrawer) btnNotesClose.addEventListener('click', () => this.notesDrawer.classList.remove('open'));
+
+    // RIPA scenario selector
+    const selRipa = document.getElementById('select-ripa-scenario');
+    if (selRipa) {
+      selRipa.addEventListener('change', (e) => {
+        this.loadRipaScenario(e.target.value);
       });
     }
-    if (btnNotesClose && this.notesDrawer) {
-      btnNotesClose.addEventListener('click', () => {
-        this.notesDrawer.classList.remove('open');
+  }
+
+  setMode(mode) {
+    this.currentMode = mode;
+    if (mode === 'wind') {
+      this.compassWidget.style.display = 'block';
+      this.telemetryCard.style.display = 'flex';
+      this.ripaCard.style.display = 'none';
+      this.ialaCard.style.display = 'none';
+      this.controlsCard.style.display = 'flex';
+      this.otherVessel.setupScenario({ active: false });
+      this.iala.setActive(false);
+    } else if (mode === 'ripa') {
+      this.compassWidget.style.display = 'none';
+      this.telemetryCard.style.display = 'none';
+      this.ripaCard.style.display = 'flex';
+      this.ialaCard.style.display = 'none';
+      this.controlsCard.style.display = 'flex';
+      this.iala.setActive(false);
+      this.loadRipaScenario(document.getElementById('select-ripa-scenario').value);
+    } else if (mode === 'iala') {
+      this.compassWidget.style.display = 'none';
+      this.telemetryCard.style.display = 'none';
+      this.ripaCard.style.display = 'none';
+      this.ialaCard.style.display = 'flex';
+      this.controlsCard.style.display = 'flex';
+      this.otherVessel.setupScenario({ active: false });
+      this.iala.setActive(true);
+    }
+  }
+
+  loadRipaScenario(key) {
+    const scen = this.ripa.loadScenario(key);
+    if (!scen) return;
+
+    const desc = document.getElementById('ripa-desc');
+    const question = document.getElementById('ripa-question');
+    const optionsGroup = document.getElementById('ripa-options');
+    const feedback = document.getElementById('ripa-feedback');
+
+    if (desc) desc.textContent = scen.description;
+    if (question) question.textContent = scen.question;
+    if (feedback) { feedback.textContent = ''; feedback.className = 'ripa-feedback'; }
+
+    if (optionsGroup && scen.options) {
+      optionsGroup.innerHTML = scen.options.map((opt, idx) => `
+        <button class="ripa-opt-btn" data-idx="${idx}">${opt.text}</button>
+      `).join('');
+
+      optionsGroup.querySelectorAll('.ripa-opt-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = +btn.getAttribute('data-idx');
+          const opt = scen.options[idx];
+          if (opt.correct) {
+            feedback.textContent = opt.feedback;
+            feedback.className = 'ripa-feedback feedback-correct';
+          } else {
+            feedback.textContent = opt.feedback;
+            feedback.className = 'ripa-feedback feedback-wrong';
+          }
+        });
       });
     }
   }
@@ -285,12 +390,10 @@ export class SimulatorHUD {
   }
 
   update() {
-    // 1. Actualizar el modelo del velero en 3D
     const headingRad = THREE.MathUtils.degToRad(-this.wind.boatHeading);
     this.boat.setHeading(headingRad);
     this.boat.setHeel(this.wind.heelingAngle);
 
-    // Ajustar velas según la amura
     const side = this.wind.tackSide === 'estribor' ? 1 : -1;
     this.boat.sails.setSailTrim(
       this.wind.mainSheetTrim,
@@ -299,17 +402,11 @@ export class SimulatorHUD {
       this.wind.flutterIntensity
     );
 
-    // 2. Actualizar agujas de la Rosa de los Vientos
     const needleWind = document.getElementById('needle-wind');
     const needleBoat = document.getElementById('needle-boat');
-    if (needleWind) {
-      needleWind.setAttribute('transform', `rotate(${this.wind.trueWindDirection} 100 100)`);
-    }
-    if (needleBoat) {
-      needleBoat.setAttribute('transform', `rotate(${this.wind.boatHeading} 100 100)`);
-    }
+    if (needleWind) needleWind.setAttribute('transform', `rotate(${this.wind.trueWindDirection} 100 100)`);
+    if (needleBoat) needleBoat.setAttribute('transform', `rotate(${this.wind.boatHeading} 100 100)`);
 
-    // 3. Textos y etiquetas de la Rosa Náutica
     const valTwd = document.getElementById('val-twd');
     const valHdg = document.getElementById('val-hdg');
     const compassTws = document.getElementById('compass-tws');
@@ -317,7 +414,6 @@ export class SimulatorHUD {
     if (valHdg) valHdg.textContent = `${this.wind.boatHeading}°`;
     if (compassTws) compassTws.textContent = `${this.wind.trueWindSpeed} kts`;
 
-    // 4. Telemetría
     const telPoint = document.getElementById('tel-point');
     const telSpeed = document.getElementById('tel-speed');
     const telHeel = document.getElementById('tel-heel');
@@ -351,7 +447,6 @@ export class SimulatorHUD {
       telEval.className = `tel-eval-box ${this.wind.flutterIntensity > 0.3 ? 'eval-warning' : 'eval-good'}`;
     }
 
-    // 5. Sliders etiquetas
     const lblHdg = document.getElementById('lbl-hdg');
     const lblWindDir = document.getElementById('lbl-wind-dir');
     const lblWindSpd = document.getElementById('lbl-wind-spd');
