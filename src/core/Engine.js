@@ -9,8 +9,8 @@ export class Engine {
     }
 
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x0284c7);
-    this.scene.fog = new THREE.FogExp2(0x0284c7, 0.012);
+    this.scene.background = new THREE.Color(0x7dd3fc); // Cielo azul diurno luminoso
+    this.scene.fog = new THREE.FogExp2(0x7dd3fc, 0.006);
 
     this.camera = new THREE.PerspectiveCamera(
       45,
@@ -24,7 +24,7 @@ export class Engine {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.05;
+    this.renderer.toneMappingExposure = 1.3; // Exposición diurna radiante
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -34,7 +34,7 @@ export class Engine {
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.05;
     this.controls.minDistance = 3;
-    this.controls.maxDistance = 50;
+    this.controls.maxDistance = 65;
     this.controls.target.set(0, 1.8, 0);
 
     this.updatables = [];

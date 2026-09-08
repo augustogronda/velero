@@ -39,12 +39,57 @@ export class SimulatorHUD {
         <button class="mode-tab" data-mode="anchor">⚓ Fondeo & Borneo</button>
       </div>
       <div class="sim-header-actions">
+        <button id="btn-env-settings" class="sim-btn" title="Ajustar brillo del sol y transparencia/animación del agua">☀️ Luz & Agua</button>
         <button id="btn-night-toggle" class="sim-btn sim-btn-night" title="Alternar modo noche y luces reglamentarias de navegación">🌙 Modo Noche</button>
         <button id="btn-notes-toggle" class="sim-btn" title="Ver apuntes y glosario del curso">📖 Apuntes PNA</button>
         <a href="index.html" class="sim-btn sim-btn-link" title="Volver a la vista de partes y despiece 3D">⛵ Nomenclatura ➔</a>
       </div>
     `;
     document.body.appendChild(this.header);
+
+    // 1b. Panel de Ajustes de Luz y Agua (Brillo solar, posición y transparencia de oleaje)
+    this.envCard = document.createElement('div');
+    this.envCard.className = 'sim-env-card';
+    this.envCard.style.display = 'none';
+    this.envCard.innerHTML = `
+      <div class="env-card-header">
+        <span>☀️ Ajustes de Luz y Agua</span>
+        <button id="btn-env-close" class="btn-env-close" aria-label="Cerrar panel">✕</button>
+      </div>
+      <div class="env-card-body">
+        <div class="env-section">
+          <div class="env-section-title">☀️ Iluminación Solar Diurna</div>
+          <div class="env-row">
+            <label>Brillo Solar: <strong id="lbl-sun-brightness">1.6x</strong></label>
+            <input type="range" id="slider-sun-brightness" min="0.5" max="2.5" step="0.1" value="1.6">
+          </div>
+          <div class="env-row">
+            <label>Posición / Altura del Sol: <strong id="lbl-sun-elevation">42°</strong></label>
+            <input type="range" id="slider-sun-elevation" min="15" max="80" step="1" value="42">
+          </div>
+        </div>
+
+        <div class="env-section">
+          <div class="env-section-title">🌊 Simulación del Agua</div>
+          <div class="env-row">
+            <label>Transparencia / Opacidad: <strong id="lbl-water-opacity">65%</strong></label>
+            <input type="range" id="slider-water-opacity" min="0.15" max="0.95" step="0.05" value="0.65">
+          </div>
+          <div class="env-row">
+            <label>Animación de Oleaje:</label>
+            <div class="env-toggle-group">
+              <button id="btn-waves-on" class="env-toggle-btn active">🌊 Ondulante</button>
+              <button id="btn-waves-off" class="env-toggle-btn">🧊 Calma (0% CPU)</button>
+            </div>
+          </div>
+          <div class="env-row" id="row-wave-height">
+            <label>Altura de Olas: <strong id="lbl-wave-height">0.07 m</strong></label>
+            <input type="range" id="slider-wave-height" min="0.02" max="0.20" step="0.01" value="0.07">
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(this.envCard);
 
     // 2. Widget de Rosa Náutica y Viento (Modo Viento)
     this.compassWidget = document.createElement('div');
@@ -373,6 +418,83 @@ export class SimulatorHUD {
         this.setMode(tab.getAttribute('data-mode'));
       });
     });
+
+    // Panel de Ajustes de Luz y Agua
+    const btnEnvSettings = document.getElementById('btn-env-settings');
+    const btnEnvClose = document.getElementById('btn-env-close');
+    if (btnEnvSettings && this.envCard) {
+      btnEnvSettings.addEventListener('click', () => {
+        const isClosed = this.envCard.style.display === 'none';
+        this.envCard.style.display = isClosed ? 'flex' : 'none';
+      });
+    }
+    if (btnEnvClose && this.envCard) {
+      btnEnvClose.addEventListener('click', () => {
+        this.envCard.style.display = 'none';
+      });
+    }
+
+    // Sliders de Brillo Solar y Posición
+    const sliderSunBrt = document.getElementById('slider-sun-brightness');
+    const lblSunBrt = document.getElementById('lbl-sun-brightness');
+    if (sliderSunBrt) {
+      sliderSunBrt.addEventListener('input', (e) => {
+        const val = +e.target.value;
+        this.env.setSunBrightness(val);
+        if (lblSunBrt) lblSunBrt.textContent = val.toFixed(1) + 'x';
+      });
+    }
+
+    const sliderSunElev = document.getElementById('slider-sun-elevation');
+    const lblSunElev = document.getElementById('lbl-sun-elevation');
+    if (sliderSunElev) {
+      sliderSunElev.addEventListener('input', (e) => {
+        const val = +e.target.value;
+        this.env.setSunElevation(val);
+        if (lblSunElev) lblSunElev.textContent = val + '°';
+      });
+    }
+
+    // Slider de Transparencia del Agua
+    const sliderWaterOp = document.getElementById('slider-water-opacity');
+    const lblWaterOp = document.getElementById('lbl-water-opacity');
+    if (sliderWaterOp) {
+      sliderWaterOp.addEventListener('input', (e) => {
+        const val = +e.target.value;
+        this.env.setWaterTransparency(val);
+        if (lblWaterOp) lblWaterOp.textContent = Math.round(val * 100) + '%';
+      });
+    }
+
+    // Botones de Animación de Olas (Activar / Desactivar 0% CPU)
+    const btnWavesOn = document.getElementById('btn-waves-on');
+    const btnWavesOff = document.getElementById('btn-waves-off');
+    const rowWaveHeight = document.getElementById('row-wave-height');
+    if (btnWavesOn && btnWavesOff) {
+      btnWavesOn.addEventListener('click', () => {
+        btnWavesOn.classList.add('active');
+        btnWavesOff.classList.remove('active');
+        this.env.setWavesEnabled(true);
+        if (rowWaveHeight) rowWaveHeight.style.display = 'flex';
+      });
+      btnWavesOff.addEventListener('click', () => {
+        btnWavesOff.classList.add('active');
+        btnWavesOn.classList.remove('active');
+        this.env.setWavesEnabled(false);
+        if (rowWaveHeight) rowWaveHeight.style.display = 'none';
+      });
+    }
+
+    // Slider de Altura de Olas
+    const sliderWaveH = document.getElementById('slider-wave-height');
+    const lblWaveH = document.getElementById('lbl-wave-height');
+    if (sliderWaveH) {
+      sliderWaveH.addEventListener('input', (e) => {
+        const val = +e.target.value;
+        this.env.setWaveIntensity(val);
+        if (lblWaveH) lblWaveH.textContent = val.toFixed(2) + ' m';
+      });
+    }
 
     // Night mode
     const btnNight = document.getElementById('btn-night-toggle');

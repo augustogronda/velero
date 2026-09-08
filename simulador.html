@@ -11,7 +11,7 @@
 
   <style>
     :root {
-      --bg-dark: #0284c7;
+      --bg-dark: #7dd3fc;
       --panel-bg: rgba(10, 23, 44, 0.88);
       --panel-border: rgba(56, 189, 248, 0.32);
       --accent-cyan: #38bdf8;
@@ -1064,6 +1064,118 @@
       height: 4px;
       accent-color: var(--accent-cyan);
       cursor: pointer;
+    }
+
+    /* ── VENTANA FLOTANTE: AJUSTES DE LUZ Y AGUA ───────────────────── */
+    .sim-env-card {
+      position: fixed;
+      top: max(80px, calc(env(safe-area-inset-top, 0px) + 74px));
+      right: 16px;
+      z-index: 55;
+      background: var(--panel-bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--panel-border);
+      border-radius: 18px;
+      padding: 16px 18px;
+      width: 320px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      animation: envFadeIn 0.2s ease-out;
+    }
+    @keyframes envFadeIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .env-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 10px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+    }
+    .btn-env-close {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 0 4px;
+      line-height: 1;
+    }
+    .btn-env-close:hover {
+      color: #ffffff;
+    }
+    .env-card-body {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .env-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+    .env-section-title {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-gold);
+    }
+    .env-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .env-row label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      display: flex;
+      justify-content: space-between;
+    }
+    .env-row label strong {
+      color: var(--accent-cyan);
+    }
+    .env-row input[type="range"] {
+      width: 100%;
+      height: 4px;
+      accent-color: var(--accent-cyan);
+      cursor: pointer;
+    }
+    .env-toggle-group {
+      display: flex;
+      gap: 6px;
+      margin-top: 2px;
+    }
+    .env-toggle-btn {
+      flex: 1;
+      padding: 5px 8px;
+      font-size: 0.70rem;
+      font-weight: 700;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 7px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+    .env-toggle-btn.active {
+      background: var(--accent-cyan);
+      color: #030d1b;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
     }
 
     /* ── CAJÓN DE APUNTES PNA ──────────────────────────────────────── */
