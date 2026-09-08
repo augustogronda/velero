@@ -1284,7 +1284,104 @@
       line-height: 1.45;
     }
 
-    /* ── ADAPTACIÓN RESPONSIVE (IPADS Y CELULARES) ─────────────────── */
+    /* ── BOTÓN FLOTANTE OCULTAR/MOSTRAR HUD ────────────────────────── */
+    .sim-btn-hud-toggle {
+      position: fixed;
+      left: 12px;
+      bottom: max(68px, calc(env(safe-area-inset-bottom, 0px) + 64px));
+      z-index: 60;
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      color: var(--accent-cyan);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+    }
+    .sim-btn-hud-toggle:hover {
+      background: rgba(56, 189, 248, 0.25);
+      transform: scale(1.08);
+    }
+    .sim-btn-hud-toggle.hud-off {
+      background: rgba(239, 68, 68, 0.25);
+      border-color: #ef4444;
+      color: #fca5a5;
+    }
+
+    body.hud-hidden .sim-compass-card,
+    body.hud-hidden .sim-telemetry-card,
+    body.hud-hidden .sim-controls-panel .ctrl-drawer-content,
+    body.hud-hidden .sim-header .sim-mode-selector,
+    body.hud-hidden .sim-ripa-card,
+    body.hud-hidden .sim-anchor-card,
+    body.hud-hidden .sim-iala-card {
+      display: none !important;
+    }
+
+    /* ── MANIJA DEL DRAWER DE CONTROLES INFERIOR ────────────────────── */
+    .ctrl-drawer-handle {
+      display: none;
+      cursor: pointer;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 0 6px 0;
+      user-select: none;
+      touch-action: manipulation;
+    }
+    .drawer-pill {
+      width: 36px;
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(255,255,255,0.3);
+      transition: background 0.2s;
+    }
+    .ctrl-drawer-handle:active .drawer-pill {
+      background: var(--accent-cyan);
+    }
+    .drawer-bar-info {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.72rem;
+      padding: 0 4px;
+    }
+    .dbi-badge {
+      font-weight: 800;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .dbi-val {
+      color: #ffffff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 0.74rem;
+    }
+    .dbi-arrow {
+      color: var(--accent-cyan);
+      font-weight: 800;
+      font-size: 0.75rem;
+      transition: transform 0.25s ease;
+    }
+
+    .ctrl-drawer-content {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* ── ADAPTACIÓN RESPONSIVE (IPADS Y TABLETS) ───────────────────── */
     @media (max-width: 1024px) {
       .ctrl-row-sliders {
         grid-template-columns: repeat(3, 1fr);
@@ -1294,56 +1391,174 @@
       }
     }
 
+    /* ── ADAPTACIÓN RESPONSIVE MOBILE (SMARTPHONES < 768px) ────────── */
     @media (max-width: 767px) {
       .sim-header {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
         gap: 6px;
+        top: max(6px, env(safe-area-inset-top, 6px));
+        left: 8px;
+        right: 8px;
+      }
+      .sim-header-top-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+      }
+      .sim-brand {
+        padding: 5px 10px;
+        border-radius: 10px;
+      }
+      .sim-badge {
+        font-size: 0.52rem;
       }
       .sim-brand h1 {
-        font-size: 0.95rem;
+        font-size: 0.86rem;
       }
-      .sim-compass-card {
-        top: auto;
-        bottom: 215px;
-        left: 10px;
-        width: 155px;
-        padding: 8px;
-      }
-      .compass-svg {
-        width: 110px;
-        height: 110px;
-      }
-      .compass-subtext {
-        font-size: 0.62rem;
-      }
-      .sim-telemetry-card {
-        top: auto;
-        bottom: 215px;
-        right: 10px;
-        width: 180px;
-        padding: 8px;
-        gap: 6px;
-      }
-      .tel-metrics-grid {
-        grid-template-columns: 1fr;
+      .sim-header-actions {
         gap: 4px;
       }
+      .sim-btn {
+        padding: 5px 8px;
+        font-size: 0.70rem;
+        border-radius: 8px;
+      }
+      .sim-btn .btn-text {
+        display: none;
+      }
+      .sim-mode-selector {
+        width: 100%;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        gap: 4px;
+        padding: 3px;
+        border-radius: 10px;
+      }
+      .sim-mode-selector::-webkit-scrollbar { display: none; }
+      .mode-tab {
+        padding: 5px 9px;
+        font-size: 0.68rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      /* Widgets de rosa y telemetría compactos en esquinas superiores */
+      .sim-compass-card {
+        top: max(80px, calc(env(safe-area-inset-top, 0px) + 76px));
+        bottom: auto;
+        left: 8px;
+        width: 105px;
+        padding: 6px;
+        border-radius: 12px;
+      }
+      .compass-header {
+        font-size: 0.58rem;
+        margin-bottom: 2px;
+      }
+      .compass-legend-tws {
+        padding: 1px 4px;
+        font-size: 0.58rem;
+      }
+      .compass-svg {
+        width: 80px;
+        height: 80px;
+      }
+      .compass-footer, .compass-subtext {
+        display: none !important;
+      }
+
+      .sim-telemetry-card {
+        top: max(80px, calc(env(safe-area-inset-top, 0px) + 76px));
+        bottom: auto;
+        right: 8px;
+        width: 140px;
+        padding: 6px 8px;
+        border-radius: 12px;
+        gap: 4px;
+      }
+      .tel-row-point {
+        padding-bottom: 3px;
+      }
+      .tel-label {
+        font-size: 0.56rem;
+      }
+      .tel-point-badge {
+        font-size: 0.60rem;
+        padding: 2px 4px;
+      }
+      .tel-metrics-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 3px;
+      }
+      .metric-box {
+        padding: 3px;
+        border-radius: 6px;
+      }
       .m-val {
-        font-size: 0.95rem;
+        font-size: 0.82rem;
+      }
+      .m-unit {
+        font-size: 0.50rem;
       }
       .tel-eval-box {
-        display: none;
+        display: none !important;
+      }
+
+      /* Panel de control inferior: Bottom Sheet colapsable que deja libre el 3D */
+      .ctrl-drawer-handle {
+        display: flex;
       }
       .sim-controls-panel {
         left: 8px;
         right: 8px;
-        bottom: 8px;
-        padding: 8px;
+        bottom: max(8px, env(safe-area-inset-bottom, 8px));
+        padding: 6px 12px;
+        border-radius: 16px;
+        max-height: 48px;
+        overflow: hidden;
+        transition: max-height 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease;
       }
+      .sim-controls-panel.drawer-open {
+        max-height: 60vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        box-shadow: 0 -12px 45px rgba(0,0,0,0.85);
+      }
+      .sim-controls-panel.drawer-open #dbi-arrow {
+        transform: rotate(180deg);
+      }
+
       .ctrl-row-sliders {
         grid-template-columns: 1fr 1fr;
         gap: 6px;
+      }
+      .slider-card {
+        padding: 5px 8px;
+      }
+      .slider-card label {
+        font-size: 0.62rem;
+      }
+
+      /* Tarjetas de modos y configuración dentro del viewport */
+      .sim-ripa-card,
+      .sim-anchor-card,
+      .sim-iala-card,
+      .sim-env-card {
+        position: fixed;
+        top: max(80px, calc(env(safe-area-inset-top, 0px) + 76px));
+        left: 8px;
+        right: 8px;
+        width: calc(100% - 16px);
+        max-height: calc(100dvh - 145px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 12px 14px;
+        border-radius: 16px;
+        z-index: 55;
       }
     }
   </style>

@@ -29,9 +29,17 @@ export class SimulatorHUD {
     this.header = document.createElement('header');
     this.header.className = 'sim-header';
     this.header.innerHTML = `
-      <div class="sim-brand">
-        <div class="sim-badge">⚓ CURSO DE TIMONEL PNA</div>
-        <h1>Simulador Náutico 3D</h1>
+      <div class="sim-header-top-row">
+        <div class="sim-brand">
+          <div class="sim-badge">⚓ CURSO DE TIMONEL PNA</div>
+          <h1>Simulador Náutico 3D</h1>
+        </div>
+        <div class="sim-header-actions">
+          <button id="btn-env-settings" class="sim-btn" title="Ajustar brillo del sol, agua y viento 3D">☀️ <span class="btn-text">Luz & Agua</span></button>
+          <button id="btn-night-toggle" class="sim-btn sim-btn-night" title="Alternar modo noche y luces reglamentarias de navegación">🌙 <span class="btn-text">Modo Noche</span></button>
+          <button id="btn-notes-toggle" class="sim-btn" title="Ver apuntes y glosario del curso">📖 <span class="btn-text">Apuntes</span></button>
+          <a href="index.html" class="sim-btn sim-btn-link" title="Volver a la vista de partes y despiece 3D">⛵ <span class="btn-text">Nomenclatura</span></a>
+        </div>
       </div>
       <div class="sim-mode-selector">
         <button class="mode-tab active" data-mode="wind">🧭 Viento & Clima</button>
@@ -39,14 +47,17 @@ export class SimulatorHUD {
         <button class="mode-tab" data-mode="iala">📍 Boyado B</button>
         <button class="mode-tab" data-mode="anchor">⚓ Fondeo & Borneo</button>
       </div>
-      <div class="sim-header-actions">
-        <button id="btn-env-settings" class="sim-btn" title="Ajustar brillo del sol, agua y viento 3D">☀️ Luz & Agua</button>
-        <button id="btn-night-toggle" class="sim-btn sim-btn-night" title="Alternar modo noche y luces reglamentarias de navegación">🌙 Modo Noche</button>
-        <button id="btn-notes-toggle" class="sim-btn" title="Ver apuntes y glosario del curso">📖 Apuntes PNA</button>
-        <a href="index.html" class="sim-btn sim-btn-link" title="Volver a la vista de partes y despiece 3D">⛵ Nomenclatura ➔</a>
-      </div>
     `;
     document.body.appendChild(this.header);
+
+    // Botón flotante para ocultar/mostrar toda la interfaz (HUD)
+    this.hudToggleBtn = document.createElement('button');
+    this.hudToggleBtn.id = 'btn-toggle-hud';
+    this.hudToggleBtn.className = 'sim-btn-hud-toggle';
+    this.hudToggleBtn.setAttribute('title', 'Ocultar / Mostrar interfaz (HUD)');
+    this.hudToggleBtn.setAttribute('aria-label', 'Alternar interfaz visual');
+    this.hudToggleBtn.innerHTML = '👁️';
+    document.body.appendChild(this.hudToggleBtn);
 
     // 1b. Panel de Ajustes de Luz y Agua (Brillo solar, posición y transparencia de oleaje)
     this.envCard = document.createElement('div');
@@ -304,61 +315,73 @@ export class SimulatorHUD {
     // 7. Panel de Control Táctil Inferior: Rumbos, Clima Rioplatense, Rizos y Sliders
     this.controlsCard = document.createElement('div');
     this.controlsCard.className = 'sim-controls-panel';
+    this.controlsCard.id = 'sim-controls-panel';
     this.controlsCard.innerHTML = `
-      <div class="ctrl-row-presets">
-        <span class="ctrl-label">Rumbos de Examen:</span>
-        <div class="ctrl-preset-btns">
-          <button class="btn-preset active" data-heading="0">Proa Viento</button>
-          <button class="btn-preset" data-heading="45">Ceñida</button>
-          <button class="btn-preset" data-heading="90">Través</button>
-          <button class="btn-preset" data-heading="135">Un Largo</button>
-          <button class="btn-preset" data-heading="180">Popa</button>
-        </div>
-        <button id="btn-auto-trim" class="btn-auto-trim" title="Cazar/filar automáticamente para máximo rendimiento">🎯 Trimado Óptimo</button>
-        <button id="btn-toggle-wind-lines" class="btn-toggle-wind-lines active" title="Alternar líneas de flujo aerodinámico de viento 3D">💨 Viento 3D: ON</button>
-      </div>
-
-      <div class="ctrl-row-weather">
-        <span class="ctrl-label">Clima:</span>
-        <div class="ctrl-weather-btns">
-          <button class="btn-weather-quick active" data-preset="virazon">🌊 Virazón (E 15k)</button>
-          <button class="btn-weather-quick" data-preset="sudestada">🌪️ Sudestada (SE 26k)</button>
-          <button class="btn-weather-quick" data-preset="pampero">⚡ Pampero (SW 34k)</button>
-          <button class="btn-weather-quick" data-preset="calma_norte">☀️ Calma Norte</button>
-          <button class="btn-weather-quick" data-preset="custom" id="btn-weather-custom">⚙️ Personalizado</button>
-        </div>
-        <span class="ctrl-label" style="margin-left:6px;">Rizos:</span>
-        <div class="ctrl-reef-btns">
-          <button class="btn-reef-quick active" data-reef="0">100%</button>
-          <button class="btn-reef-quick" data-reef="1">1° Rizo</button>
-          <button class="btn-reef-quick" data-reef="2">2° Rizo</button>
+      <div class="ctrl-drawer-handle" id="ctrl-drawer-toggle">
+        <div class="drawer-pill"></div>
+        <div class="drawer-bar-info">
+          <span class="dbi-badge">🎮 Controles</span>
+          <span class="dbi-val" id="dbi-summary">0° · 15 kts · 0.0 kts</span>
+          <span class="dbi-arrow" id="dbi-arrow">▲</span>
         </div>
       </div>
 
-      <div class="weather-info-box" id="weather-info-box">
-        🌊 <strong>Virazón Costera:</strong> Brisa térmica regular de la tarde desde el Este (15 kts). Condiciones ideales con aparejo completo.
-      </div>
+      <div class="ctrl-drawer-content" id="ctrl-drawer-content">
+        <div class="ctrl-row-presets">
+          <span class="ctrl-label">Rumbos de Examen:</span>
+          <div class="ctrl-preset-btns">
+            <button class="btn-preset active" data-heading="0">Proa Viento</button>
+            <button class="btn-preset" data-heading="45">Ceñida</button>
+            <button class="btn-preset" data-heading="90">Través</button>
+            <button class="btn-preset" data-heading="135">Un Largo</button>
+            <button class="btn-preset" data-heading="180">Popa</button>
+          </div>
+          <button id="btn-auto-trim" class="btn-auto-trim" title="Cazar/filar automáticamente para máximo rendimiento">🎯 Trimado Óptimo</button>
+          <button id="btn-toggle-wind-lines" class="btn-toggle-wind-lines active" title="Alternar líneas de flujo aerodinámico de viento 3D">💨 Viento 3D: ON</button>
+        </div>
 
-      <div class="ctrl-row-sliders">
-        <div class="slider-card">
-          <label>Rumbo Barco: <strong id="lbl-hdg">0°</strong></label>
-          <input type="range" id="slider-hdg" min="0" max="359" value="0">
+        <div class="ctrl-row-weather">
+          <span class="ctrl-label">Clima:</span>
+          <div class="ctrl-weather-btns">
+            <button class="btn-weather-quick active" data-preset="virazon">🌊 Virazón (E 15k)</button>
+            <button class="btn-weather-quick" data-preset="sudestada">🌪️ Sudestada (SE 26k)</button>
+            <button class="btn-weather-quick" data-preset="pampero">⚡ Pampero (SW 34k)</button>
+            <button class="btn-weather-quick" data-preset="calma_norte">☀️ Calma Norte</button>
+            <button class="btn-weather-quick" data-preset="custom" id="btn-weather-custom">⚙️ Personalizado</button>
+          </div>
+          <span class="ctrl-label" style="margin-left:6px;">Rizos:</span>
+          <div class="ctrl-reef-btns">
+            <button class="btn-reef-quick active" data-reef="0">100%</button>
+            <button class="btn-reef-quick" data-reef="1">1° Rizo</button>
+            <button class="btn-reef-quick" data-reef="2">2° Rizo</button>
+          </div>
         </div>
-        <div class="slider-card">
-          <label>Dirección Viento: <strong id="lbl-wind-dir">90°</strong></label>
-          <input type="range" id="slider-wind-dir" min="0" max="359" value="90">
+
+        <div class="weather-info-box" id="weather-info-box">
+          🌊 <strong>Virazón Costera:</strong> Brisa térmica regular de la tarde desde el Este (15 kts). Condiciones ideales con aparejo completo.
         </div>
-        <div class="slider-card">
-          <label>Intensidad Viento: <strong id="lbl-wind-spd">15 kts</strong></label>
-          <input type="range" id="slider-wind-spd" min="4" max="35" value="15">
-        </div>
-        <div class="slider-card">
-          <label>Escota Mayor: <strong id="lbl-main-sheet">25%</strong></label>
-          <input type="range" id="slider-main-sheet" min="0" max="100" value="25">
-        </div>
-        <div class="slider-card">
-          <label>Escota Foque: <strong id="lbl-jib-sheet">25%</strong></label>
-          <input type="range" id="slider-jib-sheet" min="0" max="100" value="25">
+
+        <div class="ctrl-row-sliders">
+          <div class="slider-card">
+            <label>Rumbo Barco: <strong id="lbl-hdg">0°</strong></label>
+            <input type="range" id="slider-hdg" min="0" max="359" value="0">
+          </div>
+          <div class="slider-card">
+            <label>Dirección Viento: <strong id="lbl-wind-dir">90°</strong></label>
+            <input type="range" id="slider-wind-dir" min="0" max="359" value="90">
+          </div>
+          <div class="slider-card">
+            <label>Intensidad Viento: <strong id="lbl-wind-spd">15 kts</strong></label>
+            <input type="range" id="slider-wind-spd" min="4" max="35" value="15">
+          </div>
+          <div class="slider-card">
+            <label>Escota Mayor: <strong id="lbl-main-sheet">25%</strong></label>
+            <input type="range" id="slider-main-sheet" min="0" max="100" value="25">
+          </div>
+          <div class="slider-card">
+            <label>Escota Foque: <strong id="lbl-jib-sheet">25%</strong></label>
+            <input type="range" id="slider-jib-sheet" min="0" max="100" value="25">
+          </div>
         </div>
       </div>
     `;
@@ -435,6 +458,28 @@ export class SimulatorHUD {
         this.setMode(tab.getAttribute('data-mode'));
       });
     });
+
+    // Drawer colapsable inferior para móviles (Bottom Sheet)
+    const drawerToggle = document.getElementById('ctrl-drawer-toggle');
+    const drawerArrow = document.getElementById('dbi-arrow');
+    if (drawerToggle && this.controlsCard) {
+      drawerToggle.addEventListener('click', () => {
+        const isOpen = this.controlsCard.classList.toggle('drawer-open');
+        if (drawerArrow) {
+          drawerArrow.textContent = isOpen ? '▼' : '▲';
+        }
+      });
+    }
+
+    // Botón flotante para ocultar/mostrar toda la interfaz (HUD)
+    const btnToggleHud = document.getElementById('btn-toggle-hud');
+    if (btnToggleHud) {
+      btnToggleHud.addEventListener('click', () => {
+        const isHidden = document.body.classList.toggle('hud-hidden');
+        btnToggleHud.classList.toggle('hud-off', isHidden);
+        btnToggleHud.innerHTML = isHidden ? '👁️‍🗨️' : '👁️';
+      });
+    }
 
     // Panel de Ajustes de Luz y Agua
     const btnEnvSettings = document.getElementById('btn-env-settings');
@@ -1040,5 +1085,10 @@ export class SimulatorHUD {
 
     const sliderHdg = document.getElementById('slider-hdg');
     if (sliderHdg && document.activeElement !== sliderHdg) sliderHdg.value = this.wind.boatHeading;
+
+    const dbiSummary = document.getElementById('dbi-summary');
+    if (dbiSummary) {
+      dbiSummary.textContent = `${this.wind.boatHeading}° · ${this.wind.trueWindSpeed} kts · ${this.wind.boatSpeed.toFixed(1)} kts`;
+    }
   }
 }
