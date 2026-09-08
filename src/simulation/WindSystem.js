@@ -75,7 +75,19 @@ export class WindSystem {
       this.optimalMainTrim = 0.95; // Velas totalmente abiertas a 80-90°
     }
 
-    // 3. Diagrama Polar de Velocidad (nudos del barco)
+    // 3. Ángulo de Escora (Heeling)
+    // La fuerza de escora lateral depende del viento y la superficie vélica efectiva
+    const sideMultiplier = this.tackSide === 'estribor' ? 1 : -1; // Escora a sotavento
+    let baseHeel = 0;
+    if (this.relativeWindAngle >= 38) {
+      const lateralForce = Math.sin(THREE.MathUtils.degToRad(this.relativeWindAngle));
+      baseHeel = (this.trueWindSpeed / 25) * lateralForce * (1.1 - this.mainSheetTrim * 0.4) * 0.38;
+    }
+    // Modulación dinámica por rizado de velas (PNA)
+    baseHeel *= this.reefingFactor;
+    this.heelingAngle = baseHeel * sideMultiplier; // Radianes
+
+    // 4. Diagrama Polar y Velocidad del Barco (Speed over Water)
     let polarFactor = 0;
     if (this.relativeWindAngle >= 38) {
       // Curva polar típica de velero crucero-regata de 30 pies
@@ -86,20 +98,38 @@ export class WindSystem {
       }
     }
 
-    // Penalización por trimado incorrecto
+    // Penalización por trimado incorrecto de escotas
     const trimDiff = Math.abs(this.mainSheetTrim - this.optimalMainTrim);
     const trimEfficiency = Math.max(0.15, 1.0 - trimDiff * 1.5);
+
+    // Influencia del Rizado: Menor paño = menor potencia vélica propulsiva
+    // En hidrodinámica de desplazamiento, velocidad ~ (Superficie)^0.45
+    const sailPower = Math.pow(this.reefingFactor, 0.45);
+
+    // Resistencia hidrodinámica por sobre-escora (>18°):
+    // El timón debe cruzarse para contrarrestar la orzada y la regala se hunde frenando el avance
+    const heelDeg = Math.abs(this.heelingAngle) * (180 / Math.PI);
+    const excessiveHeel = Math.max(0, heelDeg - 18);
+    const heelDragEfficiency = Math.max(0.70, 1.0 - excessiveHeel * 0.022);
 
     if (this.relativeWindAngle < 38) {
       this.boatSpeed = 0;
       this.flutterIntensity = 0.85; // Flameo en zona muerta
       this.trimEvaluation = 'En facha / Sin gobierno: velas flameando sin sustentación.';
     } else {
-      this.boatSpeed = +(this.trueWindSpeed * 0.45 * polarFactor * trimEfficiency).toFixed(1);
+      const rawSpeed = this.trueWindSpeed * 0.45 * polarFactor * trimEfficiency * sailPower * heelDragEfficiency;
+      // Límite de velocidad de casco para velero monocasco de ~30 pies (~7.8 - 8.0 kts)
+      this.boatSpeed = +Math.min(8.0, rawSpeed).toFixed(1);
       this.flutterIntensity = Math.max(0, (trimDiff - 0.25) * 1.8);
 
       if (trimDiff < 0.12) {
-        this.trimEvaluation = '¡Excelente trimado! Flujo laminar aerodinámico y velocidad óptima.';
+        if (excessiveHeel > 6) {
+          this.trimEvaluation = 'Barco sobrevelado: La excesiva escora frena el casco por resistencia de timón. ¡Tomar rizos!';
+        } else if (this.reefingFactor < 0.7) {
+          this.trimEvaluation = 'Aparejo rizado: Menor superficie vélica, menor escora y navegación controlada.';
+        } else {
+          this.trimEvaluation = '¡Excelente trimado! Flujo laminar aerodinámico y velocidad óptima.';
+        }
       } else if (this.mainSheetTrim > this.optimalMainTrim) {
         this.trimEvaluation = 'Velas desventeando (filadas de más): Cazar escotas para ceñir.';
       } else {
@@ -107,7 +137,7 @@ export class WindSystem {
       }
     }
 
-    // 4. Viento Aparente (Vectorial)
+    // 5. Viento Aparente (Vectorial)
     // El barco genera un viento propio hacia atrás igual a su velocidad
     const twRad = THREE.MathUtils.degToRad(deltaAngle);
     const vTrueX = -this.trueWindSpeed * Math.sin(twRad);
@@ -118,17 +148,5 @@ export class WindSystem {
 
     this.apparentWindSpeed = +(Math.hypot(vAppX, vAppY)).toFixed(1);
     this.apparentWindDirection = +THREE.MathUtils.radToDeg(Math.atan2(-vAppX, -vAppY)).toFixed(0);
-
-    // 5. Ángulo de Escora (Heeling)
-    // La fuerza de escora es perpendicular a crujía: F = Viento^2 * sin(AnguloViento)
-    const sideMultiplier = this.tackSide === 'estribor' ? 1 : -1; // Escora a sotavento
-    let baseHeel = 0;
-    if (this.relativeWindAngle >= 38) {
-      const lateralForce = Math.sin(THREE.MathUtils.degToRad(this.relativeWindAngle));
-      baseHeel = (this.trueWindSpeed / 25) * lateralForce * (1.1 - this.mainSheetTrim * 0.4) * 0.38;
-    }
-    // Modulación dinámica por rizado de velas (PNA)
-    baseHeel *= this.reefingFactor;
-    this.heelingAngle = baseHeel * sideMultiplier; // Radianes
   }
 }
