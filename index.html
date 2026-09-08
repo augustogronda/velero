@@ -1097,11 +1097,6 @@
     <!-- Cabecera Superior Izquierda -->
     <header class="header">
       <div class="badge-bar">
-        <div class="badge">
-          <span class="badge-dot"></span>
-          1/ Nomenclatura Náutica
-        </div>
-        <div class="badge-sub">2/ Velas y Aparejos</div>
         <div class="badge-water">
           <span>🌊</span> Órbita Submarina Activa
         </div>
@@ -1112,12 +1107,12 @@
       <!-- Selector de vistas temáticas -->
       <nav class="tabs-nav">
         <button class="tab-btn active" id="tab-all" data-category="all">Todos</button>
-        <button class="tab-btn" id="tab-hull" data-category="casco">1/ Casco & Cubierta</button>
+        <button class="tab-btn" id="tab-hull" data-category="casco">Casco & Cubierta</button>
         <button class="tab-btn" id="tab-sub" data-category="submarino">⚓ Obra Viva & Quilla</button>
-        <button class="tab-btn" id="tab-rigging" data-category="jarcia">1/ Arboladura & Jarcia</button>
-        <button class="tab-btn" id="tab-sails" data-category="velas">⛵ 2/ Velas & Maniobra</button>
+        <button class="tab-btn" id="tab-rigging" data-category="jarcia">Arboladura & Jarcia</button>
+        <button class="tab-btn" id="tab-sails" data-category="velas">⛵ Velas & Maniobra</button>
         <button class="tab-btn" id="tab-dims" data-category="dimensiones">📏 Cotas Navales</button>
-        <button class="tab-btn" id="tab-rigs" data-category="aparejos">📐 Aparejos (6 Tipos)</button>
+        <button class="tab-btn" id="tab-rigs" data-category="aparejos">📐 Tipos de Aparejos</button>
         <button class="tab-btn" id="tab-sheets" data-category="laminas">📋 Láminas Técnicas</button>
         <button class="tab-btn" id="tab-explode" data-category="despiece">💥 Despiece 3D</button>
       </nav>
@@ -1213,7 +1208,7 @@
       <!-- Vista de Aparejos Náuticos (Lámina 2) -->
       <div class="rigs-section" id="rigs-section">
         <div style="border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px; margin-bottom:4px;">
-          <h3 style="font-size:1.2rem; color:#fff; font-family:'Space Grotesk';">2/ Tipos de Aparejos Náuticos</h3>
+          <h3 style="font-size:1.2rem; color:#fff; font-family:'Space Grotesk';">Tipos de Aparejos Náuticos</h3>
           <p style="font-size:0.82rem; color:var(--text-muted); margin-top:2px;">Haz clic en cualquier tarjeta o botón superior para <b style="color:var(--accent-gold);">transformar el modelo 3D en tiempo real</b>:</p>
         </div>
 
@@ -3002,7 +2997,7 @@
           if (sheetsSection) sheetsSection.style.display = 'none';
           rigSelectorBar.style.display = 'flex';
           dimensionsGroup.visible = false;
-          if (handleTitle) handleTitle.textContent = "📐 2/ Tipos de Aparejos";
+          if (handleTitle) handleTitle.textContent = "📐 Tipos de Aparejos";
           if (window.innerWidth <= 860) setSheetExpanded(true);
         } else if (cat === "laminas") {
           partDetailView.style.display = 'none';
