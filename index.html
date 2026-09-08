@@ -1870,6 +1870,8 @@
     scene.add(boatGroup);
 
     let interactiveMeshes = [];
+    let isolateMode = true;
+    let wireframeMode = false;
 
     // Materiales comunes PBR
     const hullDeadMat = new THREE.MeshStandardMaterial({
@@ -3279,9 +3281,6 @@
       focusPartView(partName);
       highlightSelectedPart(partName);
     }
-
-    let isolateMode = true;
-    let wireframeMode = false;
 
     function setWireframeMode(enabled) {
       wireframeMode = enabled;
