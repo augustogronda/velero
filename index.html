@@ -1,0 +1,2338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Partes de un Velero - Nomenclatura, Velas y Aparejos 3D</title>
+  
+  <!-- Tipografía moderna Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #060a14;
+      --panel-bg: rgba(10, 17, 32, 0.85);
+      --panel-border: rgba(56, 189, 248, 0.28);
+      --accent-cyan: #38bdf8;
+      --accent-blue: #2563eb;
+      --accent-gold: #f59e0b;
+      --accent-emerald: #10b981;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --tag-bg: rgba(56, 189, 248, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-dark);
+      font-family: 'Outfit', sans-serif;
+      color: var(--text-main);
+    }
+
+    /* Lienzo WebGL 3D */
+    #webgl-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* Capa de interfaz de usuario flotante */
+    .ui-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 22px 28px;
+    }
+
+    /* Encabezado Superior Izquierdo */
+    .header {
+      pointer-events: auto;
+      max-width: 520px;
+      animation: fadeInDown 0.6s ease-out;
+    }
+
+    .badge-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 13px;
+      border-radius: 9999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: var(--tag-bg);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      backdrop-filter: blur(8px);
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      box-shadow: 0 0 10px var(--accent-cyan);
+    }
+
+    .badge-sub {
+      font-size: 0.72rem;
+      color: #cbd5e1;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 4px 11px;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .badge-water {
+      font-size: 0.72rem;
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.12);
+      padding: 4px 11px;
+      border-radius: 9999px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2.1rem;
+      font-weight: 700;
+      line-height: 1.15;
+      background: linear-gradient(135deg, #ffffff 25%, var(--accent-cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Pestañas de categorías superiores */
+    .tabs-nav {
+      display: flex;
+      gap: 7px;
+      margin-top: 12px;
+      pointer-events: auto;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      padding: 6px 13px;
+      border-radius: 9px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .tab-btn:hover {
+      color: #ffffff;
+      border-color: var(--accent-cyan);
+      background: rgba(56, 189, 248, 0.12);
+    }
+
+    .tab-btn.active {
+      color: #030d1b;
+      background: var(--accent-cyan);
+      border-color: var(--accent-cyan);
+      font-weight: 700;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.45);
+    }
+
+    /* Selector de Aparejos en vivo (Lámina 2) */
+    .rig-selector-bar {
+      display: none;
+      gap: 6px;
+      margin-top: 10px;
+      pointer-events: auto;
+      flex-wrap: wrap;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 6px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      width: fit-content;
+    }
+
+    .rig-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #cbd5e1;
+      padding: 5px 11px;
+      border-radius: 8px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .rig-btn:hover {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: var(--accent-gold);
+      color: #ffffff;
+    }
+
+    .rig-btn.active {
+      background: var(--accent-gold);
+      color: #040914;
+      border-color: var(--accent-gold);
+      font-weight: 700;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+    }
+
+    /* Panel Flotante Derecho con Glassmorphism */
+    .info-panel {
+      pointer-events: auto;
+      position: absolute;
+      top: 22px;
+      right: 28px;
+      width: 420px;
+      max-width: calc(100vw - 56px);
+      max-height: calc(100vh - 44px);
+      background: var(--panel-bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--panel-border);
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7),
+                  0 0 30px rgba(56, 189, 248, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      overflow-y: auto;
+      animation: fadeInRight 0.6s ease-out;
+    }
+
+    .info-panel::-webkit-scrollbar {
+      width: 5px;
+    }
+    .info-panel::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+    }
+
+    .part-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+      padding-bottom: 14px;
+    }
+
+    .part-title-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .number-tag-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .number-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: var(--accent-cyan);
+      color: #030d1b;
+      font-weight: 800;
+      font-size: 0.76rem;
+    }
+
+    .part-tag {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      color: var(--accent-cyan);
+    }
+
+    .part-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .part-icon {
+      font-size: 2.1rem;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 8px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      line-height: 1;
+    }
+
+    .part-description {
+      font-size: 0.93rem;
+      line-height: 1.6;
+      color: #cbd5e1;
+    }
+
+    /* Tarjeta de Apuntes Náuticos (extraído del cuaderno) */
+    .feature-card {
+      background: rgba(245, 158, 11, 0.07);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .feature-title {
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent-gold);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .feature-text {
+      font-size: 0.88rem;
+      color: #fed7aa;
+      line-height: 1.5;
+      font-style: italic;
+    }
+
+    /* Lista rápida de piezas seleccionables */
+    .quick-list-title {
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .quick-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .part-chip {
+      padding: 6px 11px;
+      border-radius: 8px;
+      font-size: 0.76rem;
+      font-weight: 500;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #e2e8f0;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .part-chip .chip-num {
+      color: var(--accent-cyan);
+      font-weight: 700;
+      font-size: 0.7rem;
+    }
+
+    .part-chip:hover {
+      background: rgba(56, 189, 248, 0.16);
+      border-color: var(--accent-cyan);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .part-chip.active {
+      background: var(--accent-cyan);
+      border-color: var(--accent-cyan);
+      color: #030d1b;
+      font-weight: 700;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.45);
+    }
+    .part-chip.active .chip-num {
+      color: #030d1b;
+    }
+
+    /* Sección de Aparejos Náuticos (Lámina 2) */
+    .rigs-section {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .rig-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 12px;
+      padding: 12px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .rig-card:hover, .rig-card.active-card {
+      border-color: var(--accent-gold);
+      background: rgba(245, 158, 11, 0.08);
+    }
+    .rig-card-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--accent-gold);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .rig-card-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* Barra inferior de controles 3D y cámaras */
+    .bottom-bar {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(10, 17, 32, 0.8);
+      backdrop-filter: blur(14px);
+      padding: 8px 18px;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      width: fit-content;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      animation: fadeInUp 0.6s ease-out;
+      flex-wrap: wrap;
+    }
+
+    .control-hint {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .control-icon {
+      color: var(--accent-cyan);
+      font-size: 0.95rem;
+    }
+
+    .btn-cam {
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: var(--accent-cyan);
+      padding: 4px 11px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-size: 0.74rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-cam:hover {
+      background: var(--accent-cyan);
+      color: #040914;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
+    }
+
+    .btn-water-toggle {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
+    }
+    .btn-water-toggle:hover {
+      background: #10b981;
+      color: #040914;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.35);
+    }
+
+    /* Tooltip dinámico que sigue al ratón */
+    #hover-tooltip {
+      position: absolute;
+      pointer-events: none;
+      z-index: 30;
+      background: rgba(7, 12, 24, 0.95);
+      border: 1px solid var(--accent-cyan);
+      color: #ffffff;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+      transform: translate(-50%, -150%);
+      white-space: nowrap;
+      display: none;
+      backdrop-filter: blur(10px);
+    }
+
+    /* Indicador de Vista Submarina en pantalla */
+    #underwater-indicator {
+      position: absolute;
+      bottom: 80px;
+      left: 30px;
+      z-index: 15;
+      background: rgba(8, 47, 73, 0.85);
+      border: 1px solid #0284c7;
+      color: #7dd3fc;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      display: none;
+      align-items: center;
+      gap: 7px;
+      box-shadow: 0 0 16px rgba(2, 132, 199, 0.4);
+      pointer-events: none;
+      backdrop-filter: blur(8px);
+    }
+
+    .btn-explode {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: var(--accent-gold);
+    }
+    .btn-explode:hover {
+      background: var(--accent-gold);
+      color: #040914;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.45);
+    }
+    .btn-explode.active-explode {
+      background: var(--accent-gold);
+      color: #040914;
+      font-weight: 700;
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.5);
+    }
+
+    /* Indicador de Despiece en pantalla */
+    #explode-indicator {
+      position: absolute;
+      bottom: 80px;
+      right: 30px;
+      z-index: 15;
+      background: rgba(45, 26, 3, 0.88);
+      border: 1px solid var(--accent-gold);
+      color: #fef08a;
+      padding: 6px 15px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      display: none;
+      align-items: center;
+      gap: 7px;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.45);
+      pointer-events: none;
+      backdrop-filter: blur(8px);
+    }
+
+    /* Animaciones */
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInRight {
+      from { opacity: 0; transform: translateX(18px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 900px) {
+      .ui-layer {
+        padding: 14px;
+      }
+      .header {
+        max-width: 100%;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+      .info-panel {
+        top: auto;
+        bottom: 14px;
+        right: 14px;
+        left: 14px;
+        width: auto;
+        max-width: none;
+        max-height: 48vh;
+        padding: 16px;
+        border-radius: 18px;
+      }
+      .bottom-bar {
+        display: none;
+      }
+    }
+  </style>
+
+  <!-- LIBRERÍAS CLÁSICAS UMD (Compatibles 100% al abrir con doble clic sin problemas de CORS) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+  <!-- Contenedor Lienzo 3D WebGL -->
+  <div id="webgl-container"></div>
+
+  <!-- Tooltip flotante en cursor -->
+  <div id="hover-tooltip">Componente</div>
+
+  <!-- Indicador visual cuando la cámara está bajo el agua -->
+  <div id="underwater-indicator">
+    <span>🤿</span> VISTA SUBMARINA: Obra Viva, Quillote & Timón
+  </div>
+
+  <!-- Indicador visual cuando el modo despiece está activo -->
+  <div id="explode-indicator">
+    <span>💥</span> VISTA DE DESPIECE ACTIVA (Componentes Separados)
+  </div>
+
+  <!-- Interfaz de Usuario HUD -->
+  <div class="ui-layer">
+    <!-- Cabecera Superior Izquierda -->
+    <header class="header">
+      <div class="badge-bar">
+        <div class="badge">
+          <span class="badge-dot"></span>
+          1/ Nomenclatura Náutica
+        </div>
+        <div class="badge-sub">2/ Velas y Aparejos</div>
+        <div class="badge-water">
+          <span>🌊</span> Órbita Submarina Activa
+        </div>
+      </div>
+      <h1>Partes de un Velero</h1>
+      <p class="subtitle">Inspección 3D completa: navega sobre el agua o sumérgete bajo el casco.</p>
+
+      <!-- Selector de vistas temáticas -->
+      <nav class="tabs-nav">
+        <button class="tab-btn active" id="tab-all" data-category="all">Todos</button>
+        <button class="tab-btn" id="tab-hull" data-category="casco">Casco & Cubierta</button>
+        <button class="tab-btn" id="tab-sub" data-category="submarino">⚓ Obra Viva & Quilla</button>
+        <button class="tab-btn" id="tab-rigging" data-category="jarcia">Arboladura & Jarcia</button>
+        <button class="tab-btn" id="tab-sails" data-category="velas">⛵ 2/ Velas & Puños</button>
+        <button class="tab-btn" id="tab-rigs" data-category="aparejos">📐 2/ Aparejos (6 Tipos)</button>
+        <button class="tab-btn" id="tab-explode" data-category="despiece">💥 Despiece 3D</button>
+      </nav>
+
+      <!-- Botonera interactiva para cambiar de Aparejo en 3D en vivo -->
+      <div class="rig-selector-bar" id="rig-selector-bar">
+        <span style="font-size:0.73rem; color:var(--accent-gold); font-weight:700; align-self:center; margin-right:4px;">CAMBIAR APAREJO 3D:</span>
+        <button class="rig-btn active" data-rig="sloop">Sloop</button>
+        <button class="rig-btn" data-rig="cat">Cat</button>
+        <button class="rig-btn" data-rig="cutter">Cutter</button>
+        <button class="rig-btn" data-rig="queche">Queche</button>
+        <button class="rig-btn" data-rig="yawl">Yawl</button>
+        <button class="rig-btn" data-rig="goleta">Goleta</button>
+      </div>
+    </header>
+
+    <!-- Barra Inferior de Cámaras y Controles -->
+    <div class="bottom-bar">
+      <div class="control-hint"><span class="control-icon">🖱️</span> Rueda apretada o Clic: Rotar | Rueda: Zoom | Clic Der: Panear</div>
+      <button class="btn-cam btn-explode" id="btn-toggle-explode" title="Activar/Desactivar separación de piezas 3D">💥 Despiece: OFF</button>
+      <div style="display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.06); padding:2px 10px; border-radius:9999px; border:1px solid rgba(255,255,255,0.12);">
+        <span style="font-size:0.72rem; color:var(--accent-gold); font-weight:600;">Separar:</span>
+        <input type="range" id="slider-explode" min="0" max="100" value="0" style="width:65px; accent-color:var(--accent-gold); cursor:pointer;">
+      </div>
+      <button class="btn-cam" id="btn-toggle-middle-drag" title="Alternar función de apretar la rueda del mouse">🖱️ Rueda: Rotar</button>
+      <button class="btn-cam" id="btn-cam-general">⛵ General</button>
+      <button class="btn-cam" id="btn-cam-underwater">🤿 Quilla</button>
+      <button class="btn-cam" id="btn-cam-sails">📐 Velas</button>
+      <button class="btn-cam btn-water-toggle" id="btn-toggle-water">🌊 Agua: Visible</button>
+      <button class="btn-cam" id="btn-reset-view">Restablecer</button>
+    </div>
+
+    <!-- Panel Flotante Derecho con Glassmorphism -->
+    <aside class="info-panel" id="info-panel">
+      <!-- Vista de información de piezas -->
+      <div id="part-detail-view">
+        <div class="part-header">
+          <div class="part-title-wrapper">
+            <div class="number-tag-row">
+              <span class="number-badge" id="panel-num">1</span>
+              <span class="part-tag" id="panel-tag">Estructura Náutica</span>
+            </div>
+            <h2 class="part-title" id="panel-title">Casco</h2>
+          </div>
+          <div class="part-icon" id="panel-icon">🛶</div>
+        </div>
+
+        <p class="part-description" id="panel-desc">
+          Cuerpo impermeable de la embarcación. Se divide por la línea de flotación en obra viva (sumergida) y obra muerta (emergida). Presenta la roda a proa y el espejo a popa.
+        </p>
+
+        <div class="feature-card" id="panel-feature-card">
+          <span class="feature-title">
+            <span>📝</span> Apunte Náutico del Cuaderno:
+          </span>
+          <p class="feature-text" id="panel-feature-text">
+            "El francobordo es la distancia entre la línea de flotación y la cubierta. La quilla o quillote aporta estabilidad evitando el abatimiento lateral."
+          </p>
+        </div>
+
+        <div class="quick-list-title">Componentes interactivos:</div>
+        <div class="quick-list" id="quick-list">
+          <!-- Chips generados dinámicamente con JavaScript -->
+        </div>
+      </div>
+
+      <!-- Vista de Aparejos Náuticos (Lámina 2) -->
+      <div class="rigs-section" id="rigs-section">
+        <div style="border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px; margin-bottom:4px;">
+          <h3 style="font-size:1.2rem; color:#fff; font-family:'Space Grotesk';">2/ Tipos de Aparejos Náuticos</h3>
+          <p style="font-size:0.82rem; color:var(--text-muted); margin-top:2px;">Haz clic en cualquier tarjeta o botón superior para <b style="color:var(--accent-gold);">transformar el modelo 3D en tiempo real</b>:</p>
+        </div>
+
+        <div class="rig-card active-card" data-rig-card="sloop">
+          <div class="rig-card-title"><span>SLOOP (Balandro)</span> <span style="font-size:0.75rem; color:var(--accent-gold);">★ En 3D</span></div>
+          <div class="rig-card-desc">1 solo palo mayor, 1 vela mayor y 1 vela de proa (foque o génova). Es el aparejo más eficiente para ceñir y el más extendido en la náutica moderna.</div>
+        </div>
+
+        <div class="rig-card" data-rig-card="cat">
+          <div class="rig-card-title"><span>CAT (Aparejo Cat)</span> <span style="font-size:0.75rem; color:var(--accent-cyan);">Click para ver 3D</span></div>
+          <div class="rig-card-desc">Un único palo situado bien a proa y una sola vela mayor de gran superficie. Sin estay proel ni foque. Muy ágil y sencillo de maniobrar (típico en Laser y Optimist).</div>
+        </div>
+
+        <div class="rig-card" data-rig-card="cutter">
+          <div class="rig-card-title"><span>SLOOP CUTTER (Cúter)</span> <span style="font-size:0.75rem; color:var(--accent-cyan);">Click para ver 3D</span></div>
+          <div class="rig-card-desc">Un solo palo con vela mayor y dos velas de proa simultáneas: foque en el estay proel principal y trinquetilla en el estay volante interior.</div>
+        </div>
+
+        <div class="rig-card" data-rig-card="queche">
+          <div class="rig-card-title"><span>QUECHE (Ketch)</span> <span style="font-size:0.75rem; color:var(--accent-cyan);">Click para ver 3D</span></div>
+          <div class="rig-card-desc">Dos palos: el palo mayor a proa y el palo de mesana a popa (más bajo que el mayor, pero situado <b style="color:#fff;">A PROA</b> de la mecha del timón).</div>
+        </div>
+
+        <div class="rig-card" data-rig-card="yawl">
+          <div class="rig-card-title"><span>YAWL</span> <span style="font-size:0.75rem; color:var(--accent-cyan);">Click para ver 3D</span></div>
+          <div class="rig-card-desc">Dos palos: palo mayor y un pequeño palo de mesana situado <b style="color:#fff;">A POPA</b> de la mecha de la pala del timón. La mesana sirve para equilibrar el timón y el rumbo.</div>
+        </div>
+
+        <div class="rig-card" data-rig-card="goleta">
+          <div class="rig-card-title"><span>GOLETA (Schooner)</span> <span style="font-size:0.75rem; color:var(--accent-cyan);">Click para ver 3D</span></div>
+          <div class="rig-card-desc">Dos o más palos donde el palo de popa (mayor) es igual o más alto que el de proa (trinquete). Ambos con grandes velas áuricas o bermudianas para travesías oceánicas.</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- CÓDIGO JAVASCRIPT DIRECTO SIN MÓDULO (COMPATIBLE AL DOBLE CLIC) -->
+  <script>
+    // ----------------------------------------------------
+    // BASE DE DATOS EXTENDIDA (LÁMINA 1 Y LÁMINA 2)
+    // ----------------------------------------------------
+    const BOAT_PARTS_INFO = {
+      // 1/ NOMENCLATURA - CASCO & SUBMARINO
+      "Casco": {
+        num: "1",
+        category: "casco",
+        tag: "1/ Nomenclatura - Estructura",
+        icon: "🛶",
+        title: "Casco y Roda / Espejo",
+        desc: "Cuerpo estanco principal del barco. Se compone de Obra Viva (sumergida) y Obra Muerta (emergida), separadas por la línea de flotación. Al frente se ubica la Roda y atrás el Espejo de popa.",
+        note: "El francobordo es la altura vertical entre la línea de flotación y la cubierta. Define la reserva de flotabilidad contra el oleaje."
+      },
+      "Obra Viva": {
+        num: "1",
+        category: "submarino",
+        tag: "1/ Nomenclatura - Casco Sumergido",
+        icon: "🔴",
+        title: "Obra Viva (Carena)",
+        desc: "Parte del casco sumergida permanentemente bajo la línea de flotación. Su forma hidrodinámica determina el calado, el desplazamiento y la resistencia al avance del barco.",
+        note: "Se recubre periódicamente con pintura 'antifouling' (roja o negra) que impide que se adhieran caracolillos, moluscos y algas."
+      },
+      "Quillote": {
+        num: "3",
+        category: "submarino",
+        tag: "1/ Nomenclatura - Apéndice Sumergido",
+        icon: "⚓",
+        title: "Quillote con Bulbo de Plomo",
+        desc: "Aleta pesada vertical fijada bajo el casco. Su enorme peso de plomo inferior crea el par adrizante para evitar que el velero zozobre, y su plano lateral contrarresta el abatimiento por el viento.",
+        note: "En los apuntes se detalla: 'El quillote aporta estabilidad evitando el abatimiento lateral y permitiendo la ceñida'."
+      },
+      "Pala de Timón": {
+        num: "19",
+        category: "submarino",
+        tag: "1/ Nomenclatura - Gobierno",
+        icon: "🧭",
+        title: "Pala de Timón (Rudder)",
+        desc: "Placa hidrodinámica sumergida bajo el espejo de popa que gira sobre su mecha para desviar el flujo de agua y dirigir el rumbo del barco.",
+        note: "Para gobernar requiere 'arrancada' (velocidad del agua pasando sobre la pala). Sin flujo relativo de agua no responde."
+      },
+      "Línea de Flotación": {
+        num: "LF",
+        category: "submarino",
+        tag: "1/ Nomenclatura - Nivel de Mar",
+        icon: "〰️",
+        title: "Línea de Flotación",
+        desc: "Línea perimetral donde la superficie del mar corta el casco. Separa estrictamente la Obra Viva (sumergida) de la Obra Muerta (emergida).",
+        note: "La 'eslora en flotación' y 'manga en flotación' medidas sobre esta línea determinan la velocidad teórica de desplazamiento del casco."
+      },
+      "Roda": {
+        num: "R",
+        category: "casco",
+        tag: "1/ Nomenclatura - Proa",
+        icon: "🔪",
+        title: "Roda (Proa)",
+        desc: "Pieza estructural afilada que forma la proa de la embarcación y corta las olas de frente. En su parte superior se enverga el arraigo del Estay Proel.",
+        note: "En la lámina 1 se dibuja en la sección de proa como el borde frontal vertical de ataque del barco."
+      },
+      "Espejo de Popa": {
+        num: "E",
+        category: "casco",
+        tag: "1/ Nomenclatura - Popa",
+        icon: "🛡️",
+        title: "Espejo de Popa",
+        desc: "Plano transversal vertical o inclinado que cierra el casco por la popa. En él se fija el arraigo del Estay Popel (baquestay) y la mecha del timón.",
+        note: "Un espejo ancho y plano favorece el planeo en popa redonda y proporciona una amplia bañera para la tripulación."
+      },
+      "Cubierta": {
+        num: "11",
+        category: "casco",
+        tag: "1/ Nomenclatura - Plano Superior",
+        icon: "🛹",
+        title: "Cubierta (Deck)",
+        desc: "Piso horizontal estanco superior. Brinda espacio de trabajo para las maniobras de proa, pasillos laterales y alberga las escotillas.",
+        note: "La línea imaginaria que divide el barco longitudinalmente de proa a popa por la mitad de la cubierta se llama 'Línea de Crujía'."
+      },
+      "Cockpit": {
+        num: "12",
+        category: "casco",
+        tag: "1/ Nomenclatura - Puesto de Mando",
+        icon: "🪑",
+        title: "Cockpit (Bañera)",
+        desc: "Zona rebajada situada a popa sobre la cubierta donde se ubica la tripulación y el timonel para gobernar el barco protegidos del viento y olas.",
+        note: "Dispone de desagües automáticos ('imbornales') para desalojar rápidamente el agua de mar que pueda embarcarse."
+      },
+      "Fogonadura": {
+        num: "13",
+        category: "casco",
+        tag: "1/ Nomenclatura - Paso Estructural",
+        icon: "⭕",
+        title: "Fogonadura",
+        desc: "Abertura circular reforzada en la cubierta por donde el mástil pasa hacia el interior del casco para asentarse sobre la carlinga.",
+        note: "Lleva una funda flexible de goma o lona sellada que impide la entrada de agua al interior de la cabina."
+      },
+      "Bancada": {
+        num: "14",
+        category: "casco",
+        tag: "1/ Nomenclatura - Cockpit",
+        icon: "🛋️",
+        title: "Bancadas del Cockpit",
+        desc: "Asientos longitudinales situados a las bandas del cockpit. Permiten que la tripulación se siente o haga contrapeso ('hacer banda') a barlovento.",
+        note: "Debajo de las bancadas se encuentran grandes cofres estancos para guardar cabos, defensas y el depósito de combustible."
+      },
+      "Escotilla": {
+        num: "15",
+        category: "casco",
+        tag: "1/ Nomenclatura - Accesos",
+        icon: "🚪",
+        title: "Escotilla de Cabina",
+        desc: "Abertura con tapa corrediza sobre la carroza que permite bajar al interior de la cabina y camarotes de la embarcación.",
+        note: "Cuenta con guías y tablillas verticales para cerrarla herméticamente en caso de temporal o mala mar."
+      },
+      "Carroza": {
+        num: "16",
+        category: "casco",
+        tag: "1/ Nomenclatura - Cabina",
+        icon: "🏠",
+        title: "Carroza (Roof)",
+        desc: "Estructura elevada sobre la cubierta central que proporciona altura interior de pie para la habitabilidad del camarote y cocina.",
+        note: "Sobre el techo de la carroza corren los cabos de maniobra (drizas, rizos y contras) hacia los pianos de mordazas."
+      },
+      "Tambucho": {
+        num: "17",
+        category: "casco",
+        tag: "1/ Nomenclatura - Proa",
+        icon: "🪟",
+        title: "Tambucho de Proa",
+        desc: "Escotilla hermética situada en la cubierta de proa. Sirve para iluminación y ventilación del camarote de proa y salida de emergencia o izado rápido de velas.",
+        note: "Debe asegurarse con pestillos de seguridad antes de zarpar para resistir el impacto de olas en la proa."
+      },
+
+      // 1/ NOMENCLATURA - ARBOLADURA & JARCIA
+      "Palo": {
+        num: "2",
+        category: "jarcia",
+        tag: "1/ Nomenclatura - Arboladura",
+        icon: "🌲",
+        title: "Palo (Mástil)",
+        desc: "Gran mástil vertical de aluminio o carbono que sostiene las velas y la jarcia firme. Pasa a través de la cubierta por la fogonadura.",
+        note: "Soporta una compresión gigantesca ejercida por el tiro de los estayes, obenques y el empuje aerodinámico de las velas."
+      },
+      "Crucetas": {
+        num: "4/9",
+        category: "jarcia",
+        tag: "1/ Nomenclatura - Arboladura",
+        icon: "⚔️",
+        title: "Crucetas (Spreaders)",
+        desc: "Brazos transversales metálicos montados a los lados del palo. Su función es abrir el ángulo con el que los obenques altos tiran del mástil, aumentando la firmeza.",
+        note: "Distribuyen el esfuerzo del obenque para evitar que el mástil flexione o pandee lateralmente ante rachas fuertes."
+      },
+      "Estay Proel": {
+        num: "5",
+        category: "jarcia",
+        tag: "1/ Nomenclatura - Jarcia Firme",
+        icon: "📏",
+        title: "Estay Proel (Forestay)",
+        desc: "Cable de acero tensor que une la roda de proa con la parte superior del mástil. Evita que el mástil caiga hacia popa y sirve para envergar la vela de proa mediante garruchos.",
+        note: "En la lámina 2 se destaca: 'El gratil de la vela de proa se afirma al estay proel mediante los garruchos'."
+      },
+      "Botavara": {
+        num: "7",
+        category: "jarcia",
+        tag: "1/ Nomenclatura - Arboladura Móvil",
+        icon: "📐",
+        title: "Botavara (Boom)",
+        desc: "Palo horizontal articulado a la base del mástil mediante el herraje tintero. Sujeta el pujamen de la vela mayor y permite abrir o cerrar su ángulo con la escota.",
+        note: "En el puño de escota de la vela mayor se afirma el cabo de repique para estirar el pujamen a lo largo de la botavara."
+      },
+      "Estay Popel": {
+        num: "8",
+        category: "jarcia",
+        tag: "1/ Nomenclatura - Jarcia Firme",
+        icon: "⚓",
+        title: "Estay Popel (Baquestay)",
+        desc: "Cable de acero firme que va desde el espejo de popa hasta el tope del mástil. Contrarresta la tensión del estay proel e impide que el palo caiga hacia proa.",
+        note: "Tensar el estay popel permite flexionar levemente el mástil para aplanar la vela mayor cuando el viento aumenta."
+      },
+      "Tope": {
+        num: "10",
+        category: "jarcia",
+        tag: "1/ Nomenclatura - Mástil",
+        icon: "🔝",
+        title: "Tope del Palo",
+        desc: "Punto más alto del mástil. Allí se ubica la arraigada de los estayes, las poleas de drizas para izar las velas, la veleta y la luz de navegación.",
+        note: "En el tope se iza el Puño de Driza de la vela mayor mediante la driza correspondiente."
+      },
+      "Obenques": {
+        num: "4",
+        category: "jarcia",
+        tag: "1/ Nomenclatura - Jarcia Firme Lateral",
+        icon: "🕸️",
+        title: "Obenques Altos y Bajos",
+        desc: "Cables de acero laterales a babor y estribor. Los altos van al tope del mástil pasando por las puntas de las crucetas; los bajos van directos a la altura de las crucetas.",
+        note: "Impiden la inclinación y flexión lateral del mástil cuando el viento llena las velas y ejerce palanca lateral."
+      },
+      "Herraje Tintero": {
+        num: "T",
+        category: "jarcia",
+        tag: "2/ Velas - Herraje Articulado",
+        icon: "⚙️",
+        title: "Herraje Tintero (Ganso)",
+        desc: "Herraje articulado metálico ubicado en el mástil donde se conecta la botavara. Permite que la botavara gire libremente de banda a banda y suba o baje.",
+        note: "Apunte textual del cuaderno: 'La vela mayor se amura en un herraje llamado tintero que articula el movimiento de la botavara con el palo'."
+      },
+
+      // 2/ VELAS Y PUÑOS (LÁMINA 2 COMPLETA)
+      "Vela Mayor": {
+        num: "M",
+        category: "velas",
+        tag: "2/ Velas - Vela Principal",
+        icon: "⛵",
+        title: "Vela Mayor (Mainsail)",
+        desc: "La vela principal izada a popa del mástil y cazada sobre la botavara. Es el ala aerodinámica impulsora que genera empuje por sustentación.",
+        note: "Consta de tres puños (Driza, Amura, Escota), tres lados (Gratil, Baluma, Pujamen), battens y fajas de rizos para acortar trapo."
+      },
+      "Vela de Proa": {
+        num: "F",
+        category: "velas",
+        tag: "2/ Velas - Vela de Proa",
+        icon: "📐",
+        title: "Vela de Proa (Foque / Génova)",
+        desc: "Vela triangular envergada al estay proel con garruchos. Canaliza y acelera el viento hacia la cara de sotavento de la mayor (efecto vénturi).",
+        note: "Esencial para lograr ángulos de ceñida cerrados contra el viento y mantener el velero balanceado sobre su centro de deriva."
+      },
+      "Puño de Driza": {
+        num: "①",
+        category: "velas",
+        tag: "2/ Velas - Puños (Vértices)",
+        icon: "1️⃣",
+        title: "① Puño de Driza",
+        desc: "El vértice superior de la vela (tanto de la mayor como del foque). En él se hace firme la driza para izar la vela hasta el tope del mástil.",
+        note: "Apunte textual del cuaderno: 'Las drizas son los cabos que izan las velas'."
+      },
+      "Puño de Amura": {
+        num: "②",
+        category: "velas",
+        tag: "2/ Velas - Puños (Vértices)",
+        icon: "2️⃣",
+        title: "② Puño de Amura",
+        desc: "Vértice inferior delantero de la vela. Fija la vela al barco: en el foque va a la roda de proa y en la mayor al herraje tintero.",
+        note: "Apunte textual del cuaderno: 'La amura se hace fija a las velas al barco. La vela mayor se amura en el tintero'."
+      },
+      "Puño de Escota": {
+        num: "③",
+        category: "velas",
+        tag: "2/ Velas - Puños (Vértices)",
+        icon: "3️⃣",
+        title: "③ Puño de Escota",
+        desc: "Vértice inferior trasero de la vela. En él se afirman las escotas o el repique para abrir o cazar la vela y regular su potencia.",
+        note: "Apunte textual del cuaderno: 'Las escotas son los cabos que controlan las velas. En el puño de escota se afirma el repique que permite ajustar el pujamen'."
+      },
+      "Gratil": {
+        num: "G",
+        category: "velas",
+        tag: "2/ Velas - Bordes de la Vela",
+        icon: "📏",
+        title: "Gratil (Borde de Ataque)",
+        desc: "Borde delantero de la vela. En la vela mayor va introducido en la relinga o patines del mástil; en el foque va afirmado con garruchos al estay proel.",
+        note: "Es el borde de ataque aerodinámico que primero corta el flujo de viento."
+      },
+      "Baluma con Battens": {
+        num: "B",
+        category: "velas",
+        tag: "2/ Velas - Bordes y Sables",
+        icon: "🪶",
+        title: "Baluma con Battens (Sables) & Alunamiento",
+        desc: "Borde posterior libre de la vela que va del puño de driza al de escota. Incorpora battens (sables flexibles) dentro de fundas horizontales.",
+        note: "Apunte textual del cuaderno: 'Los battens, ubicados en la baluma, permiten evitar el pliegue del alunamiento'."
+      },
+      "Pujamen y Repique": {
+        num: "P",
+        category: "velas",
+        tag: "2/ Velas - Borde Inferior",
+        icon: "➖",
+        title: "Pujamen y Cabo de Repique",
+        desc: "Borde inferior horizontal de la vela mayor que descansa a lo largo de la botavara entre el puño de amura y el puño de escota.",
+        note: "Apunte textual del cuaderno: 'En el puño de escota se hace firme un cabo que se llama repique que permite ajustar el estiramiento del pujamen'."
+      },
+      "Fajas de Rizos": {
+        num: "R",
+        category: "velas",
+        tag: "2/ Velas - Reducción de Trapo",
+        icon: "✂️",
+        title: "Fajas de Rizos (Matafiones)",
+        desc: "Líneas horizontales reforzadas con ollados a través de las cuales se atan los matafiones para recoger la parte baja de la vela mayor con vientos fuertes.",
+        note: "Apunte textual del cuaderno: 'La faja de rizos es la línea donde se ubica la nueva geometría de la mayor y sirve para achicar la superficie de la vela'."
+      },
+      "Garruchos": {
+        num: "Gk",
+        category: "velas",
+        tag: "2/ Velas - Sujeción de Proa",
+        icon: "🧷",
+        title: "Garruchos del Estay Proel",
+        desc: "Mosquetones metálicos o aros cosidos al gratil del foque que se enganchan a lo largo del estay proel, guiando la vela de proa al subir y bajar.",
+        note: "En la lámina 2 se señalan explícitamente como 'Garruchos' fijados al Estay Proel."
+      }
+    };
+
+    // ----------------------------------------------------
+    // INICIALIZACIÓN DE ESCENA THREE.JS
+    // ----------------------------------------------------
+    const container = document.getElementById('webgl-container');
+    
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x060a14);
+    scene.fog = new THREE.FogExp2(0x060a14, 0.018);
+
+    const camera = new THREE.PerspectiveCamera(
+      45,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+    // Posición inicial amplia que abarca el barco completo
+    camera.position.set(13, 7.5, 14);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
+    container.appendChild(renderer.domElement);
+
+    // CONTROLES ORBITALES ESTILO CAD / PROGRAMAS DE DISEÑO 3D
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.minPolarAngle = 0.05;
+    controls.maxPolarAngle = Math.PI - 0.05; // Órbita 360° incluyendo bajo el agua
+    controls.minDistance = 2.5;
+    controls.maxDistance = 45;
+    controls.target.set(0, 1.8, 0);
+
+    // Zoom con la rueda del mouse (suave y sensible como en diseño 3D)
+    controls.enableZoom = true;
+    controls.zoomSpeed = 1.25;
+
+    // Desplazamiento lateral y rotación (AutoCAD / Blender)
+    controls.enablePan = true;
+    controls.screenSpacePanning = true;
+    controls.panSpeed = 1.0;
+
+    // Asignación de botones de mouse:
+    // LEFT: Rotar (clic y arrastrar)
+    // MIDDLE: Rotar (¡apretar la rueda del ratón mueve y rota exactamente como el clic!)
+    // RIGHT: Panear (desplazar el encuadre)
+    controls.mouseButtons = {
+      LEFT: THREE.MOUSE.ROTATE,
+      MIDDLE: THREE.MOUSE.ROTATE,
+      RIGHT: THREE.MOUSE.PAN
+    };
+
+    // ----------------------------------------------------
+    // ILUMINACIÓN MULTI-FUENTE (CIELO + FONDO SUBMARINO)
+    // ----------------------------------------------------
+    const ambientLight = new THREE.AmbientLight(0xdbeafe, 0.7);
+    scene.add(ambientLight);
+
+    const hemiLight = new THREE.HemisphereLight(0x7dd3fc, 0x051329, 0.75);
+    hemiLight.position.set(0, 50, 0);
+    scene.add(hemiLight);
+
+    // Luz del sol principal
+    const sunLight = new THREE.DirectionalLight(0xfffbeb, 1.85);
+    sunLight.position.set(16, 28, 14);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.width = 2048;
+    sunLight.shadow.mapSize.height = 2048;
+    sunLight.shadow.camera.near = 0.5;
+    sunLight.shadow.camera.far = 60;
+    const sDist = 14;
+    sunLight.shadow.camera.left = -sDist;
+    sunLight.shadow.camera.right = sDist;
+    sunLight.shadow.camera.top = sDist;
+    sunLight.shadow.camera.bottom = -sDist;
+    sunLight.shadow.bias = -0.0005;
+    scene.add(sunLight);
+
+    // Luz marina de relleno
+    const fillLight = new THREE.DirectionalLight(0x38bdf8, 0.7);
+    fillLight.position.set(-16, 10, -12);
+    scene.add(fillLight);
+
+    // LUZ SUBMARINA: Ilumina el Quillote, Bulbo y Pala de Timón desde abajo
+    const underwaterLight = new THREE.DirectionalLight(0x0284c7, 1.2);
+    underwaterLight.position.set(0, -25, 0);
+    scene.add(underwaterLight);
+
+    // ----------------------------------------------------
+    // PLANO DEL OCÉANO TRANSLÚCIDO (DOBLE CARA PARA SUBMARINO)
+    // ----------------------------------------------------
+    const oceanGeo = new THREE.PlaneGeometry(160, 160, 48, 48);
+    const oceanMat = new THREE.MeshStandardMaterial({
+      color: 0x082e54,
+      roughness: 0.12,
+      metalness: 0.8,
+      transparent: true,
+      opacity: 0.55,           // Suficientemente translúcido para ver la quilla desde arriba y abajo
+      side: THREE.DoubleSide,   // ¡Visible tanto desde arriba como desde debajo del agua!
+      depthWrite: false,        // Evita artefactos de ordenamiento alfa con la quilla sumergida
+      flatShading: true
+    });
+    const oceanMesh = new THREE.Mesh(oceanGeo, oceanMat);
+    oceanMesh.rotation.x = -Math.PI / 2;
+    oceanMesh.position.y = 0.28; // Nivel exacto de la línea de flotación
+    oceanMesh.receiveShadow = true;
+    scene.add(oceanMesh);
+
+    // Retícula polar marina
+    const seaGrid = new THREE.PolarGridHelper(36, 18, 8, 64, 0x0284c7, 0x082e54);
+    seaGrid.position.y = 0.29;
+    scene.add(seaGrid);
+
+    // ----------------------------------------------------
+    // CONSTRUCCIÓN DEL VELERO Y SISTEMA DINÁMICO DE APAREJOS
+    // ----------------------------------------------------
+    const boatGroup = new THREE.Group();
+    scene.add(boatGroup);
+
+    let interactiveMeshes = [];
+
+    // Materiales comunes PBR
+    const hullDeadMat = new THREE.MeshStandardMaterial({
+      color: 0x1e293b, // Obra muerta: Azul oscuro pizarra
+      roughness: 0.35,
+      metalness: 0.25
+    });
+
+    const hullAliveMat = new THREE.MeshStandardMaterial({
+      color: 0x991b1b, // Obra viva: Rojo náutico antifouling
+      roughness: 0.45,
+      metalness: 0.2
+    });
+
+    const deckMat = new THREE.MeshStandardMaterial({
+      color: 0xc89666, // Teca náutica refinada
+      roughness: 0.6,
+      metalness: 0.05
+    });
+
+    const cabinMat = new THREE.MeshStandardMaterial({
+      color: 0xf8fafc, // Gelcoat marfil
+      roughness: 0.25,
+      metalness: 0.1
+    });
+
+    const mastMat = new THREE.MeshStandardMaterial({
+      color: 0x94a3b8, // Aluminio anodizado
+      roughness: 0.2,
+      metalness: 0.85
+    });
+
+    const boomMat = new THREE.MeshStandardMaterial({
+      color: 0x64748b,
+      roughness: 0.3,
+      metalness: 0.7
+    });
+
+    const sailMat = new THREE.MeshStandardMaterial({
+      color: 0xfef9c3, // Dacrón crema de alta visibilidad
+      roughness: 0.5,
+      metalness: 0.02,
+      side: THREE.DoubleSide
+    });
+
+    const jibMat = new THREE.MeshStandardMaterial({
+      color: 0xfef08a,
+      roughness: 0.5,
+      metalness: 0.02,
+      side: THREE.DoubleSide
+    });
+
+    const staysailMat = new THREE.MeshStandardMaterial({
+      color: 0xfde047,
+      roughness: 0.5,
+      metalness: 0.02,
+      side: THREE.DoubleSide
+    });
+
+    const keelMat = new THREE.MeshStandardMaterial({
+      color: 0x0f172a, // Plomo de quillote
+      roughness: 0.35,
+      metalness: 0.3
+    });
+
+    const bulbMat = new THREE.MeshStandardMaterial({
+      color: 0xe11d48, // Bulbo de carreras llamativo
+      roughness: 0.35,
+      metalness: 0.4
+    });
+
+    const rudderMat = new THREE.MeshStandardMaterial({
+      color: 0x334155,
+      roughness: 0.35,
+      metalness: 0.25
+    });
+
+    const metalFitMat = new THREE.MeshStandardMaterial({
+      color: 0xf59e0b, // Bronce náutico dorado para puños y herrajes
+      roughness: 0.25,
+      metalness: 0.9
+    });
+
+    const cableMat = new THREE.LineBasicMaterial({
+      color: 0x93c5fd,
+      linewidth: 1,
+      transparent: true,
+      opacity: 0.85
+    });
+
+    // ----------------------------------------------------
+    // SISTEMA DE VISTA DE DESPIECE (EXPLODED VIEW)
+    // ----------------------------------------------------
+    let allExplodableObjects = [];
+    let explodeFactor = 0.0;
+    let targetExplodeFactor = 0.0;
+
+    function getPartExplodeOffset(name) {
+      switch (name) {
+        case "Quillote":
+          return new THREE.Vector3(0, -3.2, 0); // Desciende al fondo del mar
+        case "Pala de Timón":
+          return new THREE.Vector3(0, -1.8, -2.5); // Desciende y se aleja hacia popa
+        case "Obra Viva":
+          return new THREE.Vector3(0, -1.4, 0); // Se separa del casco hacia abajo
+        case "Casco":
+          return new THREE.Vector3(0, 0, 0); // Eje central de referencia
+        case "Roda":
+          return new THREE.Vector3(0, 0, 1.8); // Se proyecta hacia proa
+        case "Espejo de Popa":
+          return new THREE.Vector3(0, 0, -1.8); // Se proyecta hacia popa
+        case "Línea de Flotación":
+          return new THREE.Vector3(0, 0.4, 0);
+        case "Cubierta":
+          return new THREE.Vector3(0, 1.2, 0); // Se eleva sobre el casco
+        case "Carroza":
+          return new THREE.Vector3(0, 2.5, 0); // Se eleva sobre la cubierta
+        case "Escotilla":
+          return new THREE.Vector3(0, 3.6, 0); // Se eleva sobre la carroza
+        case "Tambucho":
+          return new THREE.Vector3(0, 2.4, 1.2); // Se eleva sobre la proa
+        case "Cockpit":
+          return new THREE.Vector3(0, 0.7, -0.8);
+        case "Bancada":
+          return new THREE.Vector3(0, 1.3, -0.6);
+        case "Fogonadura":
+          return new THREE.Vector3(0, 2.0, 0.3);
+        case "Palo":
+          return new THREE.Vector3(0, 4.8, 0); // El mástil asciende al cielo
+        case "Tope":
+          return new THREE.Vector3(0, 5.8, 0);
+        case "Crucetas":
+          return new THREE.Vector3(0, 4.8, 0);
+        case "Herraje Tintero":
+          return new THREE.Vector3(0, 2.6, 0.2);
+        case "Botavara":
+          return new THREE.Vector3(0, 1.0, -3.0); // Se desplaza hacia popa
+        case "Vela Mayor":
+          return new THREE.Vector3(-2.2, 2.4, -1.8); // Flota a babor
+        case "Baluma con Battens":
+          return new THREE.Vector3(-2.6, 2.4, -2.2);
+        case "Fajas de Rizos":
+          return new THREE.Vector3(-2.3, 2.4, -1.9);
+        case "Pujamen y Repique":
+          return new THREE.Vector3(-1.0, 1.0, -3.0);
+        case "Vela de Proa":
+          return new THREE.Vector3(2.0, 2.0, 3.0); // Flota a estribor y proa
+        case "Garruchos":
+          return new THREE.Vector3(1.5, 2.0, 2.6);
+        case "Puño de Driza":
+          return new THREE.Vector3(0, 5.2, 0);
+        case "Puño de Amura":
+          return new THREE.Vector3(0, 2.6, 0.2);
+        case "Puño de Escota":
+          return new THREE.Vector3(-2.2, 1.8, -3.8);
+        case "Estay Proel":
+          return new THREE.Vector3(0.6, 2.2, 2.0);
+        case "Estay Popel":
+          return new THREE.Vector3(0, 2.2, -2.0);
+        case "Obenques":
+          return new THREE.Vector3(0, 3.0, 0);
+        default:
+          return new THREE.Vector3(0, 1.0, 0);
+      }
+    }
+
+    // Función de registro de mallas interactivas y despiece
+    function registerInteractive(mesh, partName, customOffset = null) {
+      mesh.name = partName;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      if (mesh.material) {
+        mesh.material = mesh.material.clone();
+      }
+      const offset = customOffset || getPartExplodeOffset(partName);
+      mesh.userData = {
+        partName: partName,
+        originalEmissive: mesh.material && mesh.material.emissive ? mesh.material.emissive.getHex() : 0x000000,
+        originalColor: mesh.material && mesh.material.color ? mesh.material.color.getHex() : 0xffffff,
+        basePos: mesh.position.clone(),
+        explodeOffset: offset,
+        targetPos: mesh.position.clone().add(offset)
+      };
+      interactiveMeshes.push(mesh);
+      allExplodableObjects.push(mesh);
+    }
+
+    function registerDecorativeExplodable(obj, partName, customOffset = null) {
+      const offset = customOffset || getPartExplodeOffset(partName);
+      obj.userData = {
+        basePos: obj.position.clone(),
+        explodeOffset: offset,
+        targetPos: obj.position.clone().add(offset)
+      };
+      allExplodableObjects.push(obj);
+    }
+
+    // ----------------------------------------------------
+    // CONSTRUCCIÓN FIJA: CASCO, APÉNDICES Y CUBIERTA
+    // ----------------------------------------------------
+    const fixedHullGroup = new THREE.Group();
+    boatGroup.add(fixedHullGroup);
+
+    // 1. CASCO - OBRA MUERTA (Emergida)
+    const hullShape = new THREE.Shape();
+    hullShape.moveTo(0, 4.8);                                    // Roda
+    hullShape.bezierCurveTo(1.75, 3.0, 1.8, -1.5, 1.45, -3.9);   // Estribor
+    hullShape.lineTo(-1.45, -3.9);                               // Espejo
+    hullShape.bezierCurveTo(-1.8, -1.5, -1.75, 3.0, 0, 4.8);     // Babor
+
+    const hullGeo = new THREE.ExtrudeGeometry(hullShape, {
+      steps: 2,
+      depth: 0.95,
+      bevelEnabled: true,
+      bevelThickness: 0.35,
+      bevelSize: 0.3,
+      bevelSegments: 4
+    });
+    hullGeo.center();
+    const hullMesh = new THREE.Mesh(hullGeo, hullDeadMat);
+    hullMesh.rotation.x = Math.PI / 2;
+    hullMesh.position.set(0, 0.76, 0);
+    fixedHullGroup.add(hullMesh);
+    registerInteractive(hullMesh, "Casco");
+
+    // 2. OBRA VIVA (Carena sumergida en rojo)
+    const liveShape = new THREE.Shape();
+    liveShape.moveTo(0, 4.4);
+    liveShape.bezierCurveTo(1.45, 2.6, 1.45, -1.2, 1.15, -3.4);
+    liveShape.lineTo(-1.15, -3.4);
+    liveShape.bezierCurveTo(-1.45, -1.2, -1.45, 2.6, 0, 4.4);
+
+    const liveGeo = new THREE.ExtrudeGeometry(liveShape, {
+      steps: 2,
+      depth: 0.8,
+      bevelEnabled: true,
+      bevelThickness: 0.3,
+      bevelSize: 0.25,
+      bevelSegments: 4
+    });
+    liveGeo.center();
+    const liveMesh = new THREE.Mesh(liveGeo, hullAliveMat);
+    liveMesh.rotation.x = Math.PI / 2;
+    liveMesh.position.set(0, -0.08, 0);
+    fixedHullGroup.add(liveMesh);
+    registerInteractive(liveMesh, "Obra Viva");
+
+    // LÍNEA DE FLOTACIÓN (Cinta visible de flotación)
+    const wlGeo = new THREE.BoxGeometry(2.38, 0.07, 7.4);
+    const wlMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const wlMesh = new THREE.Mesh(wlGeo, wlMat);
+    wlMesh.position.set(0, 0.28, 0.1);
+    fixedHullGroup.add(wlMesh);
+    registerInteractive(wlMesh, "Línea de Flotación");
+
+    // RODA (Proa destacada)
+    const rodaGeo = new THREE.BoxGeometry(0.18, 1.4, 0.6);
+    const rodaMesh = new THREE.Mesh(rodaGeo, metalFitMat);
+    rodaMesh.position.set(0, 0.7, 4.5);
+    fixedHullGroup.add(rodaMesh);
+    registerInteractive(rodaMesh, "Roda");
+
+    // ESPEJO DE POPA
+    const transomGeo = new THREE.BoxGeometry(2.4, 1.2, 0.15);
+    const transomMesh = new THREE.Mesh(transomGeo, hullDeadMat.clone());
+    transomMesh.position.set(0, 0.7, -3.85);
+    fixedHullGroup.add(transomMesh);
+    registerInteractive(transomMesh, "Espejo de Popa");
+
+    // CUBIERTA (11)
+    const deckGeo = new THREE.BoxGeometry(2.36, 0.15, 7.3);
+    const deckMesh = new THREE.Mesh(deckGeo, deckMat);
+    deckMesh.position.set(0, 1.25, -0.15);
+    fixedHullGroup.add(deckMesh);
+    registerInteractive(deckMesh, "Cubierta");
+
+    // CARROZA (16)
+    const cabinGeo = new THREE.BoxGeometry(1.55, 0.48, 3.1);
+    const cabinMesh = new THREE.Mesh(cabinGeo, cabinMat);
+    cabinMesh.position.set(0, 1.54, 0.5);
+    fixedHullGroup.add(cabinMesh);
+    registerInteractive(cabinMesh, "Carroza");
+
+    // ESCOTILLA (15)
+    const hatchGeo = new THREE.BoxGeometry(0.85, 0.12, 0.85);
+    const hatchMesh = new THREE.Mesh(hatchGeo, new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4 }));
+    hatchMesh.position.set(0, 1.8, 0.4);
+    fixedHullGroup.add(hatchMesh);
+    registerInteractive(hatchMesh, "Escotilla");
+
+    // TAMBUCHO (17)
+    const foreHatchGeo = new THREE.BoxGeometry(0.7, 0.1, 0.7);
+    const foreHatchMesh = new THREE.Mesh(foreHatchGeo, new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4 }));
+    foreHatchMesh.position.set(0, 1.34, 2.9);
+    fixedHullGroup.add(foreHatchMesh);
+    registerInteractive(foreHatchMesh, "Tambucho");
+
+    // COCKPIT (12) Y BANCADAS (14)
+    const cockpitGeo = new THREE.BoxGeometry(1.4, 0.35, 2.2);
+    const cockpitMesh = new THREE.Mesh(cockpitGeo, new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.5 }));
+    cockpitMesh.position.set(0, 1.15, -2.4);
+    fixedHullGroup.add(cockpitMesh);
+    registerInteractive(cockpitMesh, "Cockpit");
+
+    const benchGeo = new THREE.BoxGeometry(0.35, 0.15, 2.1);
+    const benchL = new THREE.Mesh(benchGeo, deckMat);
+    benchL.position.set(-0.9, 1.3, -2.4);
+    const benchR = new THREE.Mesh(benchGeo, deckMat);
+    benchR.position.set(0.9, 1.3, -2.4);
+    fixedHullGroup.add(benchL);
+    fixedHullGroup.add(benchR);
+    registerInteractive(benchL, "Bancada");
+    registerInteractive(benchR, "Bancada");
+
+    // FOGONADURA (13)
+    const fogonaduraGeo = new THREE.CylinderGeometry(0.24, 0.28, 0.22, 16);
+    const fogonaduraMesh = new THREE.Mesh(fogonaduraGeo, metalFitMat);
+    fogonaduraMesh.position.set(0, 1.8, 0.95);
+    fixedHullGroup.add(fogonaduraMesh);
+    registerInteractive(fogonaduraMesh, "Fogonadura");
+
+    // 3. QUILLOTE CON BULBO (3) (SUBMARINO)
+    const keelFinGeo = new THREE.BoxGeometry(0.18, 2.6, 1.7);
+    const keelFinMesh = new THREE.Mesh(keelFinGeo, keelMat);
+    keelFinMesh.position.set(0, -1.35, 0.3);
+    fixedHullGroup.add(keelFinMesh);
+    registerInteractive(keelFinMesh, "Quillote");
+
+    const bulbGeo = new THREE.CylinderGeometry(0.32, 0.35, 2.7, 16);
+    const bulbMesh = new THREE.Mesh(bulbGeo, bulbMat);
+    bulbMesh.rotation.x = Math.PI / 2;
+    bulbMesh.position.set(0, -2.7, 0.35);
+    fixedHullGroup.add(bulbMesh);
+    registerInteractive(bulbMesh, "Quillote");
+
+    // 19. PALA DE TIMÓN (SUBMARINA)
+    const rudderGeo = new THREE.BoxGeometry(0.12, 1.9, 0.95);
+    const rudderMesh = new THREE.Mesh(rudderGeo, rudderMat);
+    rudderMesh.position.set(0, -0.65, -3.75);
+    fixedHullGroup.add(rudderMesh);
+    registerInteractive(rudderMesh, "Pala de Timón");
+
+    // ----------------------------------------------------
+    // GRUPO DINÁMICO DE APAREJOS (CAMBIA EN VIVO EN 3D)
+    // ----------------------------------------------------
+    const rigDynamicGroup = new THREE.Group();
+    boatGroup.add(rigDynamicGroup);
+
+    let currentRig = "sloop";
+
+    // Función auxiliar para cables tensores
+    function createLine(p1, p2) {
+      const geo = new THREE.BufferGeometry().setFromPoints([p1, p2]);
+      return new THREE.Line(geo, cableMat);
+    }
+
+    // Constructor de los 6 tipos de Aparejos de la Lámina 2
+    function buildRig(rigType) {
+      currentRig = rigType;
+
+      // Limpiar mallas dinámicas previas
+      while (rigDynamicGroup.children.length > 0) {
+        const obj = rigDynamicGroup.children[0];
+        rigDynamicGroup.remove(obj);
+      }
+
+      // Eliminar mallas de aparejo de la lista interactiva, conservando las fijas
+      interactiveMeshes = interactiveMeshes.filter(m => fixedHullGroup.children.includes(m) || m.parent === fixedHullGroup);
+      allExplodableObjects = allExplodableObjects.filter(m => fixedHullGroup.children.includes(m) || m.parent === fixedHullGroup);
+
+      if (rigType === "sloop") {
+        buildSloopRig();
+      } else if (rigType === "cat") {
+        buildCatRig();
+      } else if (rigType === "cutter") {
+        buildCutterRig();
+      } else if (rigType === "queche") {
+        buildQuecheRig();
+      } else if (rigType === "yawl") {
+        buildYawlRig();
+      } else if (rigType === "goleta") {
+        buildGoletaRig();
+      }
+
+      // Actualizar chips de la interfaz si el DOM ya está listo
+      if (typeof renderChips === 'function' && typeof quickListContainer !== 'undefined' && quickListContainer) {
+        const activeTab = document.querySelector('.tab-btn.active');
+        const cat = activeTab ? activeTab.getAttribute('data-category') : 'all';
+        renderChips(cat);
+      }
+    }
+
+    // 1. SLOOP (Aparejo principal detallado de Lámina 1 y Lámina 2)
+    function buildSloopRig() {
+      // Palo (2) y Tope (10)
+      const mastGeo = new THREE.CylinderGeometry(0.08, 0.13, 10.8, 16);
+      const mastMesh = new THREE.Mesh(mastGeo, mastMat);
+      mastMesh.position.set(0, 6.7, 0.95);
+      rigDynamicGroup.add(mastMesh);
+      registerInteractive(mastMesh, "Palo");
+
+      const topeMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.09, 0.3, 12), metalFitMat);
+      topeMesh.position.set(0, 12.15, 0.95);
+      rigDynamicGroup.add(topeMesh);
+      registerInteractive(topeMesh, "Tope");
+
+      // Crucetas (4 y 9)
+      const spreaderMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.8, 12), metalFitMat);
+      spreaderMesh.rotation.z = Math.PI / 2;
+      spreaderMesh.position.set(0, 7.6, 0.95);
+      rigDynamicGroup.add(spreaderMesh);
+      registerInteractive(spreaderMesh, "Crucetas");
+
+      // Herraje Tintero (T)
+      const tinteroMesh = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.24, 0.25), metalFitMat);
+      tinteroMesh.position.set(0, 2.5, 0.85);
+      rigDynamicGroup.add(tinteroMesh);
+      registerInteractive(tinteroMesh, "Herraje Tintero");
+
+      // Botavara (7)
+      const boomMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, 5.0, 12), boomMat);
+      boomMesh.rotation.x = Math.PI / 2;
+      boomMesh.position.set(0, 2.5, -1.6);
+      rigDynamicGroup.add(boomMesh);
+      registerInteractive(boomMesh, "Botavara");
+
+      // VELA MAYOR DETALLADA
+      const mainSailGeo = new THREE.BufferGeometry();
+      const mainSailVerts = new Float32Array([
+        0.0, 2.55, 0.95,   // Puño de Amura (2)
+        0.0, 11.9, 0.9,    // Puño de Driza (1)
+        -0.3, 2.55, -4.05  // Puño de Escota (3)
+      ]);
+      mainSailGeo.setAttribute('position', new THREE.BufferAttribute(mainSailVerts, 3));
+      mainSailGeo.computeVertexNormals();
+      const mainSailMesh = new THREE.Mesh(mainSailGeo, sailMat);
+      rigDynamicGroup.add(mainSailMesh);
+      registerInteractive(mainSailMesh, "Vela Mayor");
+
+      // BATTENS / SABLES EN LA BALUMA (Lámina 2)
+      for (let b = 1; b <= 4; b++) {
+        const t = b / 5;
+        const yB = 11.9 * (1 - t) + 2.55 * t;
+        const zB = 0.9 * (1 - t) + (-4.05) * t;
+        const battenMesh = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.05, 0.95), metalFitMat);
+        battenMesh.position.set(-0.15 * t, yB, zB + 0.45);
+        rigDynamicGroup.add(battenMesh);
+        registerInteractive(battenMesh, "Baluma con Battens");
+      }
+
+      // FAJAS DE RIZOS (Lámina 2)
+      for (let r = 1; r <= 2; r++) {
+        const yR = 2.55 + r * 1.0;
+        const reefLine = new THREE.Line(
+          new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(0.0, yR, 0.95),
+            new THREE.Vector3(-0.1, yR, -3.2 + r * 0.5)
+          ]),
+          new THREE.LineDashedMaterial({ color: 0xd97706, linewidth: 2, dashSize: 0.2, gapSize: 0.1 })
+        );
+        reefLine.computeLineDistances();
+        rigDynamicGroup.add(reefLine);
+        registerDecorativeExplodable(reefLine, "Fajas de Rizos");
+      }
+
+      const reefHit = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.4, 3.6), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }));
+      reefHit.position.set(0, 4.0, -0.7);
+      rigDynamicGroup.add(reefHit);
+      registerInteractive(reefHit, "Fajas de Rizos");
+
+      // REPIQUE DE PUJAMEN (Lámina 2)
+      const repiqueMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.7, 8), metalFitMat);
+      repiqueMesh.rotation.x = Math.PI / 2;
+      repiqueMesh.position.set(-0.15, 2.5, -4.0);
+      rigDynamicGroup.add(repiqueMesh);
+      registerInteractive(repiqueMesh, "Pujamen y Repique");
+
+      // VELA DE PROA (FOQUE)
+      const jibGeo = new THREE.BufferGeometry();
+      const jibVerts = new Float32Array([
+        0.0, 1.4, 4.65,    // Puño de Amura (2)
+        0.0, 10.5, 0.95,   // Puño de Driza (1)
+        0.25, 2.0, 0.85    // Puño de Escota (3)
+      ]);
+      jibGeo.setAttribute('position', new THREE.BufferAttribute(jibVerts, 3));
+      jibGeo.computeVertexNormals();
+      const jibMesh = new THREE.Mesh(jibGeo, jibMat);
+      rigDynamicGroup.add(jibMesh);
+      registerInteractive(jibMesh, "Vela de Proa");
+
+      // GARRUCHOS A LO LARGO DEL ESTAY PROEL (Lámina 2)
+      for (let g = 1; g <= 6; g++) {
+        const t = g / 7;
+        const yG = 1.4 * (1 - t) + 10.5 * t;
+        const zG = 4.65 * (1 - t) + 0.95 * t;
+        const garruchoMesh = new THREE.Mesh(new THREE.TorusGeometry(0.08, 0.02, 8, 12), metalFitMat);
+        garruchoMesh.position.set(0, yG, zG);
+        rigDynamicGroup.add(garruchoMesh);
+        registerInteractive(garruchoMesh, "Garruchos");
+      }
+
+      // PUÑOS SEÑALIZADOS EN 3D
+      function addHandle(pos, name) {
+        const h = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 16), metalFitMat);
+        h.position.copy(pos);
+        rigDynamicGroup.add(h);
+        registerInteractive(h, name);
+      }
+      addHandle(new THREE.Vector3(0.0, 11.9, 0.9), "Puño de Driza");
+      addHandle(new THREE.Vector3(0.0, 2.55, 0.95), "Puño de Amura");
+      addHandle(new THREE.Vector3(-0.3, 2.55, -4.05), "Puño de Escota");
+
+      // JARCIA FIRME (ESTAYES Y OBENQUES)
+      function addRigCable(p1, p2, name) {
+        const line = createLine(p1, p2);
+        rigDynamicGroup.add(line);
+        registerDecorativeExplodable(line, name);
+      }
+      addRigCable(new THREE.Vector3(0, 1.4, 4.7), new THREE.Vector3(0, 11.2, 0.95), "Estay Proel");
+      addRigCable(new THREE.Vector3(0, 1.35, -3.9), new THREE.Vector3(0, 12.15, 0.95), "Estay Popel");
+      addRigCable(new THREE.Vector3(0.9, 7.6, 0.95), new THREE.Vector3(0, 11.2, 0.95), "Obenques");
+      addRigCable(new THREE.Vector3(1.2, 1.3, 0.95), new THREE.Vector3(0.9, 7.6, 0.95), "Obenques");
+      addRigCable(new THREE.Vector3(-0.9, 7.6, 0.95), new THREE.Vector3(0, 11.2, 0.95), "Obenques");
+      addRigCable(new THREE.Vector3(-1.2, 1.3, 0.95), new THREE.Vector3(-0.9, 7.6, 0.95), "Obenques");
+
+      // Hitboxes para selección rápida
+      const stayHitGeo = new THREE.CylinderGeometry(0.14, 0.14, 10.2, 8);
+      const stayHitMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 });
+      
+      const forestayHit = new THREE.Mesh(stayHitGeo, stayHitMat);
+      forestayHit.position.set(0, 6.3, 2.8);
+      forestayHit.rotation.x = 0.36;
+      rigDynamicGroup.add(forestayHit);
+      registerInteractive(forestayHit, "Estay Proel");
+
+      const backstayHit = new THREE.Mesh(stayHitGeo, stayHitMat);
+      backstayHit.position.set(0, 6.7, -1.45);
+      backstayHit.rotation.x = -0.42;
+      rigDynamicGroup.add(backstayHit);
+      registerInteractive(backstayHit, "Estay Popel");
+
+      const shroudsHit = new THREE.Mesh(new THREE.BoxGeometry(2.5, 9.5, 0.5), stayHitMat);
+      shroudsHit.position.set(0, 6.5, 0.95);
+      rigDynamicGroup.add(shroudsHit);
+      registerInteractive(shroudsHit, "Obenques");
+    }
+
+    // 2. CAT (Única vela mayor, mástil bien adelantado, sin foque)
+    function buildCatRig() {
+      const mastMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.14, 10.5, 16), mastMat);
+      mastMesh.position.set(0, 6.4, 3.2); // Mástil muy a proa
+      rigDynamicGroup.add(mastMesh);
+      registerInteractive(mastMesh, "Palo");
+
+      const boomMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 6.2, 12), boomMat);
+      boomMesh.rotation.x = Math.PI / 2;
+      boomMesh.position.set(0, 2.4, 0.1);
+      rigDynamicGroup.add(boomMesh);
+      registerInteractive(boomMesh, "Botavara");
+
+      const sailGeo = new THREE.BufferGeometry();
+      const sailVerts = new Float32Array([
+        0.0, 2.4, 3.2,
+        0.0, 11.5, 3.1,
+        -0.3, 2.4, -3.0
+      ]);
+      sailGeo.setAttribute('position', new THREE.BufferAttribute(sailVerts, 3));
+      sailGeo.computeVertexNormals();
+      const sailMesh = new THREE.Mesh(sailGeo, sailMat);
+      rigDynamicGroup.add(sailMesh);
+      registerInteractive(sailMesh, "Vela Mayor");
+    }
+
+    // 3. CUTTER (Mayor + Foque + Trinquetilla intermedia)
+    function buildCutterRig() {
+      buildSloopRig(); // Mástil y velas principales
+
+      // Segunda vela de proa: TRINQUETILLA en estay interior
+      const staysailGeo = new THREE.BufferGeometry();
+      const staysailVerts = new Float32Array([
+        0.0, 1.4, 2.6,    // Amura en cubierta intermedia
+        0.0, 8.2, 0.95,   // Driza a media altura
+        0.18, 1.8, 0.9    // Escota
+      ]);
+      staysailGeo.setAttribute('position', new THREE.BufferAttribute(staysailVerts, 3));
+      staysailGeo.computeVertexNormals();
+      const staysailMesh = new THREE.Mesh(staysailGeo, staysailMat);
+      rigDynamicGroup.add(staysailMesh);
+      registerInteractive(staysailMesh, "Vela de Proa");
+
+      // Estay volante interior
+      rigDynamicGroup.add(createLine(new THREE.Vector3(0, 1.4, 2.6), new THREE.Vector3(0, 8.2, 0.95)));
+    }
+
+    // 4. QUECHE (Palo Mayor + Palo de Mesana a proa del timón)
+    function buildQuecheRig() {
+      buildSloopRig();
+
+      // Segundo mástil: PALO DE MESANA (a proa del timón, z = -2.2)
+      const mizzenMast = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.09, 6.8, 16), mastMat);
+      mizzenMast.position.set(0, 4.6, -2.0);
+      rigDynamicGroup.add(mizzenMast);
+      registerInteractive(mizzenMast, "Palo");
+
+      const mizzenBoom = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 2.2, 12), boomMat);
+      mizzenBoom.rotation.x = Math.PI / 2;
+      mizzenBoom.position.set(0, 2.2, -3.1);
+      rigDynamicGroup.add(mizzenBoom);
+      registerInteractive(mizzenBoom, "Botavara");
+
+      // Vela de mesana
+      const mizzenSailGeo = new THREE.BufferGeometry();
+      const mizzenSailVerts = new Float32Array([
+        0.0, 2.2, -2.0,
+        0.0, 7.8, -2.0,
+        -0.2, 2.2, -4.2
+      ]);
+      mizzenSailGeo.setAttribute('position', new THREE.BufferAttribute(mizzenSailVerts, 3));
+      mizzenSailGeo.computeVertexNormals();
+      const mizzenSailMesh = new THREE.Mesh(mizzenSailGeo, staysailMat);
+      rigDynamicGroup.add(mizzenSailMesh);
+      registerInteractive(mizzenSailMesh, "Vela Mayor");
+    }
+
+    // 5. YAWL (Palo Mayor + Palo de Mesana pequeño a POPA del timón)
+    function buildYawlRig() {
+      buildSloopRig();
+
+      // Segundo mástil: Pequeño palo de mesana A POPA DEL TIMÓN (z = -3.8)
+      const yawlMast = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 4.5, 16), mastMat);
+      yawlMast.position.set(0, 3.4, -3.7);
+      rigDynamicGroup.add(yawlMast);
+      registerInteractive(yawlMast, "Palo");
+
+      const yawlBoom = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.6, 12), boomMat);
+      yawlBoom.rotation.x = Math.PI / 2;
+      yawlBoom.position.set(0, 1.8, -4.5);
+      rigDynamicGroup.add(yawlBoom);
+      registerInteractive(yawlBoom, "Botavara");
+
+      const yawlSailGeo = new THREE.BufferGeometry();
+      const yawlSailVerts = new Float32Array([
+        0.0, 1.8, -3.7,
+        0.0, 5.5, -3.7,
+        -0.15, 1.8, -5.3
+      ]);
+      yawlSailGeo.setAttribute('position', new THREE.BufferAttribute(yawlSailVerts, 3));
+      yawlSailGeo.computeVertexNormals();
+      const yawlSailMesh = new THREE.Mesh(yawlSailGeo, staysailMat);
+      rigDynamicGroup.add(yawlSailMesh);
+      registerInteractive(yawlSailMesh, "Vela Mayor");
+    }
+
+    // 6. GOLETA (Palo trinquete proel + Palo mayor más alto a popa)
+    function buildGoletaRig() {
+      // 1. Palo de proa (Trinquete)
+      const foreMast = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.12, 9.2, 16), mastMat);
+      foreMast.position.set(0, 5.8, 2.0);
+      rigDynamicGroup.add(foreMast);
+      registerInteractive(foreMast, "Palo");
+
+      const foreBoom = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 3.2, 12), boomMat);
+      foreBoom.rotation.x = Math.PI / 2;
+      foreBoom.position.set(0, 2.4, 0.4);
+      rigDynamicGroup.add(foreBoom);
+      registerInteractive(foreBoom, "Botavara");
+
+      const foreSailGeo = new THREE.BufferGeometry();
+      const foreSailVerts = new Float32Array([
+        0.0, 2.4, 2.0,
+        0.0, 10.2, 2.0,
+        -0.2, 2.4, -1.2
+      ]);
+      foreSailGeo.setAttribute('position', new THREE.BufferAttribute(foreSailVerts, 3));
+      foreSailGeo.computeVertexNormals();
+      const foreSailMesh = new THREE.Mesh(foreSailGeo, staysailMat);
+      rigDynamicGroup.add(foreSailMesh);
+      registerInteractive(foreSailMesh, "Vela Mayor");
+
+      // 2. Palo de popa (Mayor, más alto)
+      const mainMast = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.13, 10.8, 16), mastMat);
+      mainMast.position.set(0, 6.7, -1.2);
+      rigDynamicGroup.add(mainMast);
+      registerInteractive(mainMast, "Palo");
+
+      const mainBoom = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, 4.0, 12), boomMat);
+      mainBoom.rotation.x = Math.PI / 2;
+      mainBoom.position.set(0, 2.4, -3.2);
+      rigDynamicGroup.add(mainBoom);
+      registerInteractive(mainBoom, "Botavara");
+
+      const mainSailGeo = new THREE.BufferGeometry();
+      const mainSailVerts = new Float32Array([
+        0.0, 2.4, -1.2,
+        0.0, 11.9, -1.2,
+        -0.25, 2.4, -5.2
+      ]);
+      mainSailGeo.setAttribute('position', new THREE.BufferAttribute(mainSailVerts, 3));
+      mainSailGeo.computeVertexNormals();
+      const mainSailMesh = new THREE.Mesh(mainSailGeo, sailMat);
+      rigDynamicGroup.add(mainSailMesh);
+      registerInteractive(mainSailMesh, "Vela Mayor");
+
+      // Foque de proa
+      const jibGeo = new THREE.BufferGeometry();
+      const jibVerts = new Float32Array([
+        0.0, 1.4, 4.65,
+        0.0, 9.5, 2.0,
+        0.2, 2.0, 2.0
+      ]);
+      jibGeo.setAttribute('position', new THREE.BufferAttribute(jibVerts, 3));
+      jibGeo.computeVertexNormals();
+      const jibMesh = new THREE.Mesh(jibGeo, jibMat);
+      rigDynamicGroup.add(jibMesh);
+      registerInteractive(jibMesh, "Vela de Proa");
+    }
+
+    // ----------------------------------------------------
+    // RAYCASTING E INTERACTIVIDAD DE USUARIO
+    // ----------------------------------------------------
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2(-999, -999);
+    let hoveredMesh = null;
+    let selectedPartName = "Casco";
+
+    const tooltip = document.getElementById('hover-tooltip');
+    const panelNum = document.getElementById('panel-num');
+    const panelTitle = document.getElementById('panel-title');
+    const panelTag = document.getElementById('panel-tag');
+    const panelIcon = document.getElementById('panel-icon');
+    const panelDesc = document.getElementById('panel-desc');
+    const panelFeatureText = document.getElementById('panel-feature-text');
+    const quickListContainer = document.getElementById('quick-list');
+
+    const partDetailView = document.getElementById('part-detail-view');
+    const rigsSection = document.getElementById('rigs-section');
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const rigSelectorBar = document.getElementById('rig-selector-bar');
+    const rigButtons = document.querySelectorAll('.rig-btn');
+    const rigCards = document.querySelectorAll('.rig-card');
+    const underwaterIndicator = document.getElementById('underwater-indicator');
+    const explodeIndicator = document.getElementById('explode-indicator');
+    const btnToggleExplode = document.getElementById('btn-toggle-explode');
+    const sliderExplode = document.getElementById('slider-explode');
+
+    // Renderizado de chips clasificados
+    function renderChips(categoryFilter = "all") {
+      quickListContainer.innerHTML = '';
+      Object.keys(BOAT_PARTS_INFO).forEach(partName => {
+        const info = BOAT_PARTS_INFO[partName];
+        if (categoryFilter !== "all" && info.category !== categoryFilter) {
+          return;
+        }
+
+        const chip = document.createElement('button');
+        chip.className = `part-chip ${partName === selectedPartName ? 'active' : ''}`;
+        chip.setAttribute('data-part', partName);
+        chip.innerHTML = `<span class="chip-num">${info.num}</span> ${partName}`;
+        chip.addEventListener('click', (e) => {
+          e.stopPropagation();
+          selectPart(partName);
+        });
+        quickListContainer.appendChild(chip);
+      });
+    }
+
+    // Manejador de pestañas temáticas
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const cat = btn.getAttribute('data-category');
+        if (cat === "aparejos") {
+          partDetailView.style.display = 'none';
+          rigsSection.style.display = 'flex';
+          rigSelectorBar.style.display = 'flex';
+        } else if (cat === "despiece") {
+          partDetailView.style.display = 'block';
+          rigsSection.style.display = 'none';
+          rigSelectorBar.style.display = 'none';
+          setExplodeFactor(1.0);
+          renderChips('all');
+        } else {
+          partDetailView.style.display = 'block';
+          rigsSection.style.display = 'none';
+          rigSelectorBar.style.display = 'none';
+
+          if (cat === "submarino") {
+            // Si el usuario hace clic en "⚓ Obra Viva & Quilla", mover suavemente la cámara bajo el agua
+            moveCameraUnderwater();
+          }
+
+          renderChips(cat);
+        }
+      });
+    });
+
+    // Cambio de Aparejo 3D interactivo (Lámina 2)
+    function switchRig(rigName) {
+      buildRig(rigName);
+
+      // Actualizar botones de aparejos
+      rigButtons.forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-rig') === rigName);
+      });
+
+      // Actualizar tarjetas de aparejos
+      rigCards.forEach(c => {
+        c.classList.toggle('active-card', c.getAttribute('data-rig-card') === rigName);
+      });
+    }
+
+    rigButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        switchRig(btn.getAttribute('data-rig'));
+      });
+    });
+
+    rigCards.forEach(card => {
+      card.addEventListener('click', () => {
+        switchRig(card.getAttribute('data-rig-card'));
+      });
+    });
+
+    // Detección de arrastre vs clic (evita seleccionar piezas por error al orbitar con mouse o rueda)
+    let isDragging = false;
+    let startX = 0, startY = 0;
+
+    window.addEventListener('pointerdown', (event) => {
+      startX = event.clientX;
+      startY = event.clientY;
+      isDragging = false;
+    });
+
+    // Seguimiento del ratón
+    window.addEventListener('pointermove', (event) => {
+      if (Math.hypot(event.clientX - startX, event.clientY - startY) > 5) {
+        isDragging = true;
+      }
+
+      if (event.target.closest('.info-panel') || event.target.closest('.header') || event.target.closest('.bottom-bar')) {
+        mouse.x = -999;
+        mouse.y = -999;
+        tooltip.style.display = 'none';
+        return;
+      }
+
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      tooltip.style.left = `${event.clientX}px`;
+      tooltip.style.top = `${event.clientY}px`;
+    });
+
+    // Clic en la escena 3D (solo actúa si fue un clic directo, no tras arrastrar con el mouse o la rueda)
+    window.addEventListener('click', (event) => {
+      if (isDragging) return;
+      if (event.button !== 0) return; // Solo clic izquierdo principal
+      if (event.target.closest('.info-panel') || event.target.closest('.header') || event.target.closest('.bottom-bar')) {
+        return;
+      }
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(interactiveMeshes, false);
+
+      if (intersects.length > 0) {
+        const clickedMesh = intersects[0].object;
+        const partName = clickedMesh.userData.partName;
+        selectPart(partName);
+      }
+    });
+
+    // Función de selección
+    function selectPart(partName) {
+      if (!BOAT_PARTS_INFO[partName]) return;
+
+      selectedPartName = partName;
+      const info = BOAT_PARTS_INFO[partName];
+
+      partDetailView.style.display = 'block';
+      rigsSection.style.display = 'none';
+
+      panelNum.textContent = info.num;
+      panelTitle.textContent = info.title;
+      panelTag.textContent = info.tag;
+      panelIcon.textContent = info.icon;
+      panelDesc.textContent = info.desc;
+      panelFeatureText.textContent = info.note;
+
+      // Actualizar botones chips
+      document.querySelectorAll('.part-chip').forEach(chip => {
+        if (chip.getAttribute('data-part') === partName) {
+          chip.classList.add('active');
+        } else {
+          chip.classList.remove('active');
+        }
+      });
+
+      highlightSelectedPart(partName);
+    }
+
+    function highlightSelectedPart(targetPartName) {
+      interactiveMeshes.forEach(mesh => {
+        if (!mesh.material || !mesh.material.emissive) return;
+
+        if (mesh.userData.partName === targetPartName) {
+          mesh.material.emissive.setHex(0x0284c7); // Cyan brillante
+          mesh.material.emissiveIntensity = 0.8;
+        } else {
+          mesh.material.emissive.setHex(mesh.userData.originalEmissive || 0x000000);
+          mesh.material.emissiveIntensity = 0.0;
+        }
+      });
+    }
+
+    // ----------------------------------------------------
+    // CONTROLADORES DE CÁMARA Y ÓRBITA SUBMARINA
+    // ----------------------------------------------------
+    function moveCameraUnderwater() {
+      // Posición orientada desde abajo del agua mirando hacia el quillote y timón
+      camera.position.set(9, -6.5, 9);
+      controls.target.set(0, -1.2, 0);
+      controls.update();
+      selectPart("Quillote");
+    }
+
+    document.getElementById('btn-cam-underwater').addEventListener('click', moveCameraUnderwater);
+
+    document.getElementById('btn-cam-general').addEventListener('click', () => {
+      camera.position.set(13, 7.5, 14);
+      controls.target.set(0, 1.8, 0);
+      controls.update();
+      selectPart("Casco");
+    });
+
+    document.getElementById('btn-cam-sails').addEventListener('click', () => {
+      camera.position.set(7, 7.5, 8);
+      controls.target.set(0, 6.0, 0);
+      controls.update();
+      selectPart("Vela Mayor");
+    });
+
+    // Botón para alternar visibilidad del agua
+    let waterVisible = true;
+    const btnToggleWater = document.getElementById('btn-toggle-water');
+    btnToggleWater.addEventListener('click', () => {
+      waterVisible = !waterVisible;
+      oceanMesh.visible = waterVisible;
+      seaGrid.visible = waterVisible;
+      btnToggleWater.textContent = waterVisible ? "🌊 Agua: Visible" : "🚫 Agua: Oculta";
+    });
+
+    document.getElementById('btn-reset-view').addEventListener('click', () => {
+      controls.reset();
+      camera.position.set(13, 7.5, 14);
+      controls.target.set(0, 1.8, 0);
+      controls.update();
+    });
+
+    // Botón para alternar el comportamiento de apretar la rueda (Rotar o Panear)
+    let middleDragMode = 'rotate';
+    const btnToggleMiddle = document.getElementById('btn-toggle-middle-drag');
+    if (btnToggleMiddle) {
+      btnToggleMiddle.addEventListener('click', () => {
+        if (middleDragMode === 'rotate') {
+          middleDragMode = 'pan';
+          controls.mouseButtons.MIDDLE = THREE.MOUSE.PAN;
+          btnToggleMiddle.textContent = '🖱️ Rueda: Panear (CAD)';
+          btnToggleMiddle.style.borderColor = 'var(--accent-gold)';
+          btnToggleMiddle.style.color = 'var(--accent-gold)';
+        } else {
+          middleDragMode = 'rotate';
+          controls.mouseButtons.MIDDLE = THREE.MOUSE.ROTATE;
+          btnToggleMiddle.textContent = '🖱️ Rueda: Rotar';
+          btnToggleMiddle.style.borderColor = 'rgba(56, 189, 248, 0.4)';
+          btnToggleMiddle.style.color = 'var(--accent-cyan)';
+        }
+      });
+    }
+
+    // ----------------------------------------------------
+    // CONTROLADORES DE VISTA DE DESPIECE (EXPLODED VIEW)
+    // ----------------------------------------------------
+    function setExplodeFactor(val) {
+      targetExplodeFactor = Math.max(0, Math.min(1, val));
+      if (sliderExplode) {
+        sliderExplode.value = Math.round(targetExplodeFactor * 100);
+      }
+      updateExplodeUI();
+    }
+
+    function toggleExplodedView() {
+      if (targetExplodeFactor > 0.1) {
+        setExplodeFactor(0.0);
+      } else {
+        setExplodeFactor(1.0);
+      }
+    }
+
+    function updateExplodeUI() {
+      const isActive = targetExplodeFactor > 0.05;
+      if (btnToggleExplode) {
+        btnToggleExplode.classList.toggle('active-explode', isActive);
+        btnToggleExplode.textContent = isActive
+          ? `💥 Despiece: ${Math.round(targetExplodeFactor * 100)}%`
+          : "💥 Despiece: OFF";
+      }
+      if (explodeIndicator) {
+        explodeIndicator.style.display = isActive ? 'flex' : 'none';
+      }
+    }
+
+    if (btnToggleExplode) {
+      btnToggleExplode.addEventListener('click', toggleExplodedView);
+    }
+    if (sliderExplode) {
+      sliderExplode.addEventListener('input', (e) => {
+        setExplodeFactor(parseFloat(e.target.value) / 100);
+      });
+    }
+
+    // ----------------------------------------------------
+    // LOOP DE ANIMACIÓN Y RENDERIZADO
+    // ----------------------------------------------------
+    const clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      const elapsedTime = clock.getElapsedTime();
+
+      // Interpolación fluida de la vista de despiece
+      explodeFactor += (targetExplodeFactor - explodeFactor) * 0.08;
+
+      if (Math.abs(targetExplodeFactor - explodeFactor) > 0.0005 || explodeFactor > 0.001) {
+        for (let i = 0; i < allExplodableObjects.length; i++) {
+          const obj = allExplodableObjects[i];
+          if (obj.userData && obj.userData.basePos && obj.userData.targetPos) {
+            obj.position.lerpVectors(obj.userData.basePos, obj.userData.targetPos, explodeFactor);
+          }
+        }
+      }
+
+      // Suave balanceo y cabeceo sobre las olas (se calma en despiece para examen técnico)
+      const calmMultiplier = 1.0 - explodeFactor * 0.65;
+      const pitch = Math.sin(elapsedTime * 1.2) * 0.03 * calmMultiplier;
+      const roll = Math.cos(elapsedTime * 0.9) * 0.045 * calmMultiplier;
+      const heave = Math.sin(elapsedTime * 1.6) * 0.06 * calmMultiplier;
+
+      boatGroup.position.y = heave;
+      boatGroup.rotation.x = pitch;
+      boatGroup.rotation.z = roll;
+
+      // Ondas en la superficie del agua
+      const pos = oceanGeo.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        const u = pos.getX(i);
+        const v = pos.getY(i);
+        const wave = Math.sin(u * 0.28 + elapsedTime * 1.1) * 0.12 +
+                     Math.cos(v * 0.28 + elapsedTime * 0.9) * 0.12;
+        pos.setZ(i, wave);
+      }
+      pos.needsUpdate = true;
+
+      // Detectar si la cámara está bajo el nivel del agua
+      if (camera.position.y < 0.28) {
+        underwaterIndicator.style.display = 'flex';
+        scene.fog.density = 0.035; // Niebla marina más densa bajo el agua
+      } else {
+        underwaterIndicator.style.display = 'none';
+        scene.fog.density = 0.018;
+      }
+
+      // Raycasting para Hover
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(interactiveMeshes, false);
+
+      if (intersects.length > 0) {
+        const hitMesh = intersects[0].object;
+        const partName = hitMesh.userData.partName;
+
+        document.body.style.cursor = 'pointer';
+        const info = BOAT_PARTS_INFO[partName];
+        tooltip.textContent = `${info ? info.num + ' - ' : ''}${partName}`;
+        tooltip.style.display = 'block';
+
+        if (hoveredMesh !== hitMesh) {
+          if (hoveredMesh && hoveredMesh.material && hoveredMesh.material.emissive) {
+            if (hoveredMesh.userData.partName !== selectedPartName) {
+              hoveredMesh.material.emissive.setHex(hoveredMesh.userData.originalEmissive || 0x000000);
+              hoveredMesh.material.emissiveIntensity = 0.0;
+            }
+          }
+
+          hoveredMesh = hitMesh;
+
+          if (hoveredMesh.material && hoveredMesh.material.emissive) {
+            hoveredMesh.material.emissive.setHex(0x38bdf8);
+            hoveredMesh.material.emissiveIntensity = 0.55;
+          }
+        }
+      } else {
+        document.body.style.cursor = 'default';
+        tooltip.style.display = 'none';
+
+        if (hoveredMesh) {
+          if (hoveredMesh.material && hoveredMesh.material.emissive) {
+            if (hoveredMesh.userData.partName !== selectedPartName) {
+              hoveredMesh.material.emissive.setHex(hoveredMesh.userData.originalEmissive || 0x000000);
+              hoveredMesh.material.emissiveIntensity = 0.0;
+            } else {
+              hoveredMesh.material.emissive.setHex(0x0284c7);
+              hoveredMesh.material.emissiveIntensity = 0.8;
+            }
+          }
+          hoveredMesh = null;
+        }
+      }
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // Redimensionamiento responsive
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    });
+
+    // Iniciar con aparejo Sloop y seleccionar Casco por defecto
+    buildRig("sloop");
+    selectPart("Casco");
+  </script>
+</body>
+</html>
