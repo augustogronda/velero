@@ -32,7 +32,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const ripaEngine = new RipaEngine(otherVessel);
   const weatherSystem = new WeatherSystem(environment, windSystem, boat);
 
-  const windVisualizer = new WindVisualizer(engine.scene, windSystem);
+  const windVisualizer = new WindVisualizer(engine.scene, windSystem, boat);
   engine.addUpdatable(windVisualizer);
 
   const hud = new SimulatorHUD(

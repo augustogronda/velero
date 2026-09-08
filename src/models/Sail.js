@@ -73,8 +73,8 @@ export class SailManager {
     this.jibPivot.add(this.jibMesh);
   }
 
-  updateMainGeometry(flutter = 0) {
-    // Subdivisión de la vela mayor con curvatura aerodinámica (bolsa)
+  updateMainGeometry(flutter = 0, side = 1) {
+    // Subdivisión de la vela mayor con curvatura aerodinámica (bolsa hacia sotavento)
     const verts = [];
     const uvs = [];
     const segmentsY = 8;
@@ -88,8 +88,8 @@ export class SailManager {
       for (let j = 0; j <= segmentsZ; j++) {
         const tz = j / segmentsZ;
         const z = tz * maxZ;
-        // Curvatura transversal (camber aerodinámico de la vela)
-        const camber = Math.sin(tz * Math.PI) * (1 - ty * 0.4) * 0.28;
+        // Curvatura transversal (bolsa orientada hacia sotavento según la banda)
+        const camber = -side * Math.sin(tz * Math.PI) * (1 - ty * 0.4) * 0.28;
         // Deformación de flameo
         const fl = flutter * Math.sin(ty * 10 + tz * 8) * 0.15;
         const x = camber + fl;
@@ -117,12 +117,13 @@ export class SailManager {
     this.mainGeo.computeVertexNormals();
   }
 
-  updateJibGeometry(flutter = 0) {
-    // Foque triangular desde amura (0,0,0) hacia driza (0, 7.8, -3.35) y escota (-0.3, 0.4, -3.1)
+  updateJibGeometry(flutter = 0, side = 1) {
+    // Foque triangular orientado a sotavento según la amura
+    const escotaX = -side * 0.25;
     const verts = new Float32Array([
       0.0, 0.0, 0.0,                              // Amura
       0.0, 7.8, -3.35,                            // Driza
-      0.25 + flutter * 0.1, 0.4, -3.1             // Escota
+      escotaX + flutter * 0.1, 0.4, -3.1          // Escota orientada a sotavento
     ]);
     this.jibGeo.setAttribute('position', new THREE.BufferAttribute(verts, 3));
     this.jibGeo.computeVertexNormals();
@@ -134,6 +135,12 @@ export class SailManager {
     this.mainSheetTrim = THREE.MathUtils.clamp(mainTrim, 0, 1);
     this.jibSheetTrim = THREE.MathUtils.clamp(jibTrim, 0, 1);
     this.flutterIntensity = flutter;
+
+    if (this.currentSide !== side) {
+      this.currentSide = side;
+      this.updateMainGeometry(flutter, side);
+      this.updateJibGeometry(flutter, side);
+    }
 
     const targetBoomAngle = side * (0.05 + this.mainSheetTrim * 1.35); // 3° a 78°
     const targetJibAngle = side * (0.08 + this.jibSheetTrim * 1.25);
@@ -152,8 +159,8 @@ export class SailManager {
   update(delta, time) {
     if (this.flutterIntensity > 0.05) {
       const flutterOffset = Math.sin(time * 25) * this.flutterIntensity;
-      this.updateMainGeometry(flutterOffset);
-      this.updateJibGeometry(flutterOffset);
+      this.updateMainGeometry(flutterOffset, this.currentSide || 1);
+      this.updateJibGeometry(flutterOffset, this.currentSide || 1);
     }
   }
 }

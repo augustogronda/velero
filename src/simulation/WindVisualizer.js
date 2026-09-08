@@ -1,9 +1,10 @@
-﻿import * as THREE from 'three';
+import * as THREE from 'three';
 
 export class WindVisualizer {
-  constructor(scene, windSystem) {
+  constructor(scene, windSystem, boat = null) {
     this.scene = scene;
     this.wind = windSystem;
+    this.boat = boat;
     this.enabled = true;
 
     this.numLines = 90;
@@ -73,25 +74,54 @@ export class WindVisualizer {
   update(delta) {
     if (!this.enabled || !this.lineMesh) return;
 
-    const twdRad = THREE.MathUtils.degToRad(this.wind.trueWindDirection);
-    // Vector unitario de avance del flujo de viento
-    // TWD 0° (Norte) fluye hacia -Z, TWD 90° (Este) fluye hacia -X
-    const flowDirX = -Math.sin(twdRad);
-    const flowDirZ = -Math.cos(twdRad);
+    // Acompañar la posición del barco en escena (ej. fondeo o navegación)
+    if (this.boat && this.boat.group) {
+      this.group.position.copy(this.boat.group.position);
+    }
 
-    // Vector perpendicular al flujo para distribuir las líneas a babor/estribor
+    // Calcular el ángulo relativo del viento respecto a la proa del velero (-180° a +180°)
+    let deltaAngle = this.wind.trueWindDirection - this.wind.boatHeading;
+    while (deltaAngle > 180) deltaAngle -= 360;
+    while (deltaAngle < -180) deltaAngle += 360;
+    const deltaRad = THREE.MathUtils.degToRad(deltaAngle);
+
+    // Vector de flujo en el sistema de coordenadas local del barco:
+    // Proa = +Z, Popa = -Z, Estribor = +X, Babor = -X
+    // Si deltaAngle = 0° (proa), el viento sopla hacia popa (-Z)
+    // Si deltaAngle = +90° (estribor), el viento sopla hacia babor (-X)
+    const localFlow = new THREE.Vector3(
+      -Math.sin(deltaRad),
+      0,
+      -Math.cos(deltaRad)
+    );
+
+    // Rotar el vector de flujo a coordenadas de mundo según la orientación actual del barco
+    let flowDirX = localFlow.x;
+    let flowDirZ = localFlow.z;
+    if (this.boat && this.boat.group) {
+      const worldFlow = localFlow.clone().applyEuler(this.boat.group.rotation);
+      flowDirX = worldFlow.x;
+      flowDirZ = worldFlow.z;
+    }
+
+    // Normalizar vector director
+    const lenF = Math.hypot(flowDirX, flowDirZ) || 1;
+    flowDirX /= lenF;
+    flowDirZ /= lenF;
+
+    // Vector perpendicular al flujo para distribuir las líneas lateralmente
     const perpX = -flowDirZ;
     const perpZ = flowDirX;
 
-    // Velocidad de avance de las trazas en m/s proporcional a los nudos reales
+    // Velocidad de avance de las trazas proporcional a los nudos reales
     const speedKts = Math.max(3, this.wind.trueWindSpeed);
-    const flowSpeed = (speedKts * 0.514) * 0.85; // Factor de escala para lectura visual óptima
+    const flowSpeed = (speedKts * 0.514) * 0.85;
 
     const posAttr = this.geometry.attributes.position;
     const posArray = posAttr.array;
 
-    const maxDist = 24; // Distancia límite a sotavento
-    const minDist = -24; // Distancia límite a barlovento
+    const maxDist = 24; // Límite a sotavento
+    const minDist = -24; // Límite a barlovento
 
     for (let i = 0; i < this.numLines; i++) {
       const p = this.particles[i];
