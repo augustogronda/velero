@@ -700,6 +700,27 @@
       box-shadow: 0 0 10px rgba(16, 185, 129, 0.35);
     }
 
+    .btn-motion-toggle {
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: var(--accent-cyan);
+    }
+    .btn-motion-toggle:hover {
+      background: var(--accent-cyan);
+      color: #040914;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
+    }
+    .btn-motion-toggle.motion-paused {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.45);
+      color: #f87171;
+    }
+    .btn-motion-toggle.motion-paused:hover {
+      background: #ef4444;
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+    }
+
     /* Tooltip dinámico que sigue al ratón */
     #hover-tooltip {
       position: absolute;
@@ -1148,6 +1169,7 @@
       <button class="btn-cam" id="btn-cam-sails">📐 Velas</button>
       <button class="btn-cam" id="btn-cam-dims" title="Activar o desactivar visualización de cotas 3D">📏 Cotas 3D</button>
       <button class="btn-cam btn-water-toggle" id="btn-toggle-water">🌊 Agua: Visible</button>
+      <button class="btn-cam btn-motion-toggle" id="btn-toggle-motion" title="Pausar o activar el balanceo y movimiento del velero (Atajo: M)">⚓ Movimiento: ON</button>
       <button class="btn-cam" id="btn-reset-view" title="Restablecer vista y cámara (Atajo: Esc)">Restablecer</button>
     </div>
 
@@ -1867,6 +1889,7 @@
     let interactiveMeshes = [];
     let isolateMode = false;
     let wireframeMode = false;
+    let boatMotionEnabled = true;
 
     // Materiales comunes PBR
     const hullDeadMat = new THREE.MeshStandardMaterial({
@@ -2244,6 +2267,91 @@
       return new THREE.Line(geo, cableMat);
     }
 
+    // ──────────────────────────────────────────────────────────────────────
+    // LÍNEAS DE PANEL DE VELA (solo visibles en modo wireframe CAD)
+    // Simula las costuras horizontales de paneles de dacron y líneas de carga
+    // ──────────────────────────────────────────────────────────────────────
+    const sailPanelMat = new THREE.LineBasicMaterial({
+      color: 0x00e5ff,
+      transparent: true,
+      opacity: 0.75,
+      linewidth: 1
+    });
+    const sailPanelMatJib = new THREE.LineBasicMaterial({
+      color: 0x00b4d8,
+      transparent: true,
+      opacity: 0.70,
+      linewidth: 1
+    });
+
+    /**
+     * Genera líneas de panel (costuras) para una vela triangular.
+     * @param {THREE.Vector3} p0  – Puño de Amura (halyard/driza base)
+     * @param {THREE.Vector3} p1  – Puño de Driza (tope / head)
+     * @param {THREE.Vector3} p2  – Puño de Escota (clew / escota)
+     * @param {number} panels     – Número de paneles horizontales
+     * @param {THREE.Material} mat – Material de línea
+     * @returns {THREE.Group} grupo con todas las líneas, marcado como isSailPanel
+     */
+    function buildSailPanelLines(p0, p1, p2, panels, mat) {
+      const group = new THREE.Group();
+      group.userData.isSailPanel = true;
+      group.visible = false; // Oculto por defecto, solo en wireframe
+
+      // 1. BORDE del triángulo (gratil, baluma, pujamen) – líneas más gruesas
+      const edgeMat = new THREE.LineBasicMaterial({
+        color: mat.color.getHex(),
+        transparent: true,
+        opacity: 0.95,
+        linewidth: 1
+      });
+      const outline = new THREE.LineLoop(
+        new THREE.BufferGeometry().setFromPoints([p0, p1, p2]),
+        edgeMat
+      );
+      outline.userData.isSailPanel = true;
+      group.add(outline);
+
+      // 2. PANELES HORIZONTALES (costuras de dacron)
+      // Cada panel = línea que va de la baluma (p1→p2) al gratil (p1→p0)
+      for (let i = 1; i < panels; i++) {
+        const t = i / panels;
+        // Punto en el lado izquierdo (gratil p1 → p0)
+        const lA = new THREE.Vector3().lerpVectors(p1, p0, t);
+        // Punto en el lado derecho (baluma p1 → p2)
+        const lB = new THREE.Vector3().lerpVectors(p1, p2, t);
+        const seam = new THREE.Line(
+          new THREE.BufferGeometry().setFromPoints([lA, lB]),
+          mat
+        );
+        seam.userData.isSailPanel = true;
+        group.add(seam);
+      }
+
+      // 3. LÍNEAS DE CARGA RADIAL (bias cut) – diagonales desde escota hacia los otros puños
+      const radialCount = Math.floor(panels * 0.6);
+      const radialMat = new THREE.LineBasicMaterial({
+        color: mat.color.getHex(),
+        transparent: true,
+        opacity: 0.35,
+        linewidth: 1
+      });
+      for (let i = 1; i <= radialCount; i++) {
+        const t = i / (radialCount + 1);
+        // Desde Puño de Escota (p2) hacia un punto en el gratil (p1→p0)
+        const target = new THREE.Vector3().lerpVectors(p1, p0, t);
+        const radial = new THREE.Line(
+          new THREE.BufferGeometry().setFromPoints([p2, target]),
+          radialMat
+        );
+        radial.userData.isSailPanel = true;
+        group.add(radial);
+      }
+
+      return group;
+    }
+
+
     // Constructor de los 6 tipos de Aparejos de la Lámina 2
     function buildRig(rigType) {
       currentRig = rigType;
@@ -2333,6 +2441,17 @@
       rigDynamicGroup.add(mainSailMesh);
       registerInteractive(mainSailMesh, "Vela Mayor");
 
+      // PANELES WIREFRAME: líneas de costuras de dacron + radiales (Vela Mayor)
+      {
+        const p_amura  = new THREE.Vector3(0.0, 2.55, 0.95);
+        const p_driza  = new THREE.Vector3(0.0, 11.9, 0.9);
+        const p_escota = new THREE.Vector3(-0.3, 2.55, -4.05);
+        const mainPanels = buildSailPanelLines(p_amura, p_driza, p_escota, 12, sailPanelMat);
+        rigDynamicGroup.add(mainPanels);
+        // Si wireframe ya activo al re-construir, mostrar inmediatamente
+        if (wireframeMode) mainPanels.visible = true;
+      }
+
       // BATTENS / SABLES EN LA BALUMA (Lámina 2)
       for (let b = 1; b <= 4; b++) {
         const t = b / 5;
@@ -2396,6 +2515,16 @@
       const jibMesh = new THREE.Mesh(jibGeo, jibMat);
       rigDynamicGroup.add(jibMesh);
       registerInteractive(jibMesh, "Vela de Proa");
+
+      // PANELES WIREFRAME: líneas de costuras de dacron + radiales (Foque)
+      {
+        const j_amura  = new THREE.Vector3(0.0, 1.4, 4.65);
+        const j_driza  = new THREE.Vector3(0.0, 10.5, 0.95);
+        const j_escota = new THREE.Vector3(0.25, 2.0, 0.85);
+        const jibPanels = buildSailPanelLines(j_amura, j_driza, j_escota, 9, sailPanelMatJib);
+        rigDynamicGroup.add(jibPanels);
+        if (wireframeMode) jibPanels.visible = true;
+      }
 
       // GARRUCHOS A LO LARGO DEL ESTAY PROEL (Lámina 2)
       for (let g = 1; g <= 6; g++) {
@@ -2504,6 +2633,16 @@
       const sailMesh = new THREE.Mesh(sailGeo, sailMat);
       rigDynamicGroup.add(sailMesh);
       registerInteractive(sailMesh, "Vela Mayor");
+
+      // PANELES WIREFRAME (Cat Rig - vela única)
+      {
+        const cp0 = new THREE.Vector3(0.0, 2.4, 3.2);
+        const cp1 = new THREE.Vector3(0.0, 11.5, 3.1);
+        const cp2 = new THREE.Vector3(-0.3, 2.4, -3.0);
+        const catPanels = buildSailPanelLines(cp0, cp1, cp2, 12, sailPanelMat);
+        rigDynamicGroup.add(catPanels);
+        if (wireframeMode) catPanels.visible = true;
+      }
     }
 
     // 3. CUTTER (Mayor + Foque + Trinquetilla intermedia)
@@ -2522,6 +2661,16 @@
       const staysailMesh = new THREE.Mesh(staysailGeo, staysailMat);
       rigDynamicGroup.add(staysailMesh);
       registerInteractive(staysailMesh, "Vela de Proa");
+
+      // PANELES WIREFRAME (Cutter - Trinquetilla)
+      {
+        const s0 = new THREE.Vector3(0.0, 1.4, 2.6);
+        const s1 = new THREE.Vector3(0.0, 8.2, 0.95);
+        const s2 = new THREE.Vector3(0.18, 1.8, 0.9);
+        const stayPanels = buildSailPanelLines(s0, s1, s2, 7, sailPanelMatJib);
+        rigDynamicGroup.add(stayPanels);
+        if (wireframeMode) stayPanels.visible = true;
+      }
 
       // Estay volante interior
       rigDynamicGroup.add(createLine(new THREE.Vector3(0, 1.4, 2.6), new THREE.Vector3(0, 8.2, 0.95)));
@@ -3277,15 +3426,117 @@
       highlightSelectedPart(partName);
     }
 
+    // ──────────────────────────────────────────────────────────────────
+    // SISTEMA WIREFRAME CAD MEJORADO
+    // ──────────────────────────────────────────────────────────────────
+
+    // Colores originales de fondo/niebla para restaurar
+    const BG_NORMAL   = new THREE.Color(0x060a14);
+    const FOG_NORMAL  = 0x060a14;
+    const BG_WIRE     = new THREE.Color(0x000810);
+    const FOG_WIRE    = 0x000810;
+
+    // Mapa de colores wire por categoría de material
+    const WIRE_COLORS = {
+      sail:   0x00e5ff,   // Cian eléctrico — velas (dacron panels)
+      jib:    0x00b4d8,   // Cian aguamarina — foque
+      hull:   0x39ff14,   // Verde neón — casco
+      deck:   0x76ff03,   // Lima brillante — cubierta
+      cabin:  0xb0ff60,   // Lima claro — cabina
+      mast:   0xff9100,   // Naranja — mástil / botavara
+      keel:   0xff4444,   // Rojo — quillote / bulbo / timón
+      metal:  0xffd700,   // Dorado — herrajes y puños
+      cable:  0x7eb8f7,   // Azul cielo — cables (sin cambio)
+      other:  0x40cfff,   // Azul claro — resto
+    };
+
+    // Función de clasificación de material → categoría
+    function classifyMaterial(mat) {
+      if (!mat || !mat.color) return 'other';
+      const c = mat.color.getHex();
+      // Velas
+      if (c === 0xfef9c3 || c === 0xfef9c3) return 'sail';
+      if (c === 0xfef08a) return 'jib';
+      if (c === 0xfde047) return 'sail';
+      // Casco
+      if (c === 0x1e293b || c === 0x991b1b) return 'hull';
+      if (c === 0xc89666) return 'deck';
+      if (c === 0xf8fafc) return 'cabin';
+      // Mástil / Botavara / Boom
+      if (c === 0x94a3b8 || c === 0x64748b) return 'mast';
+      // Quillote / bulbo / timón
+      if (c === 0x0f172a || c === 0xe11d48 || c === 0x334155) return 'keel';
+      // Herrajes
+      if (c === 0xf59e0b) return 'metal';
+      return 'other';
+    }
+
+    // Cache de colores originales de wireframe de cada material
+    const wireColorCache = new Map();
+
     function setWireframeMode(enabled) {
       wireframeMode = enabled;
+
       boatGroup.traverse((obj) => {
         if (obj.isMesh && obj.material) {
-          if (obj.material.opacity === 0 && obj.material.transparent === true) return;
-          obj.material.wireframe = wireframeMode;
+          const mat = obj.material;
+          if (mat.opacity === 0 && mat.transparent === true) return;
+          mat.wireframe = wireframeMode;
+
+          if (wireframeMode) {
+            // Guardar color original
+            if (!wireColorCache.has(mat.uuid)) {
+              wireColorCache.set(mat.uuid, mat.color ? mat.color.getHex() : 0xffffff);
+            }
+            // Aplicar color wire por categoría
+            const cat = classifyMaterial(mat);
+            if (mat.color) mat.color.setHex(WIRE_COLORS[cat] || WIRE_COLORS.other);
+          } else {
+            // Restaurar color original
+            const orig = wireColorCache.get(mat.uuid);
+            if (orig !== undefined && mat.color) mat.color.setHex(orig);
+          }
+        }
+        // Mostrar / ocultar líneas de panel de vela
+        if (obj.isLine && obj.userData.isSailPanel) {
+          obj.visible = wireframeMode;
         }
       });
 
+      // ── Fondo y niebla ──────────────────────────────────────────────
+      scene.background = wireframeMode ? BG_WIRE : BG_NORMAL;
+      scene.fog.color.set(wireframeMode ? FOG_WIRE : FOG_NORMAL);
+      scene.fog.density = wireframeMode ? 0.008 : 0.018;
+
+      // ── Océano y Grid ───────────────────────────────────────────────
+      if (oceanMesh) {
+        oceanMesh.visible = !wireframeMode;
+      }
+      if (seaGrid) {
+        seaGrid.visible = wireframeMode;
+        // En wireframe mostrar un grid extra de cuadrícula azul
+        if (wireframeMode) {
+          seaGrid.material && (seaGrid.material.opacity = 1.0);
+        }
+      }
+
+      // ── Overlay CAD grid si no existe ────────────────────────────────
+      if (wireframeMode && !scene.getObjectByName('cadGrid')) {
+        const cadGrid = new THREE.GridHelper(80, 80, 0x003d66, 0x001828);
+        cadGrid.position.y = 0.3;
+        cadGrid.name = 'cadGrid';
+        scene.add(cadGrid);
+      } else if (!wireframeMode) {
+        const cadGrid = scene.getObjectByName('cadGrid');
+        if (cadGrid) scene.remove(cadGrid);
+      }
+
+      // ── Luz ambiente wireframe (más fría y tenue) ────────────────────
+      ambientLight.intensity = wireframeMode ? 0.25 : 0.7;
+      hemiLight.intensity    = wireframeMode ? 0.35 : 0.75;
+      sunLight.intensity     = wireframeMode ? 0.6  : 1.85;
+
+      // ── Botón UI ─────────────────────────────────────────────────────
       const btnWireframe = document.getElementById('btn-toggle-wireframe');
       if (btnWireframe) {
         btnWireframe.classList.toggle('active-wireframe', wireframeMode);
@@ -3380,6 +3631,8 @@
         toggleWireframeMode();
       } else if (key === 'a' || key === 'i') {
         toggleIsolateMode();
+      } else if (key === 'm') {
+        toggleBoatMotion();
       } else if (key === 'x') {
         toggleExplodedView();
       } else if (key === 'escape') {
@@ -3427,6 +3680,26 @@
       seaGrid.visible = waterVisible;
       btnToggleWater.textContent = waterVisible ? "🌊 Agua: Visible" : "🚫 Agua: Oculta";
     });
+
+    // Botón para alternar movimiento / balanceo del velero
+    function toggleBoatMotion() {
+      boatMotionEnabled = !boatMotionEnabled;
+      const btnMotion = document.getElementById('btn-toggle-motion');
+      if (btnMotion) {
+        btnMotion.classList.toggle('motion-paused', !boatMotionEnabled);
+        btnMotion.textContent = boatMotionEnabled ? "⚓ Movimiento: ON" : "⚓ Movimiento: OFF";
+      }
+      if (!boatMotionEnabled) {
+        boatGroup.position.y = 0;
+        boatGroup.rotation.x = 0;
+        boatGroup.rotation.z = 0;
+      }
+    }
+
+    const btnToggleMotion = document.getElementById('btn-toggle-motion');
+    if (btnToggleMotion) {
+      btnToggleMotion.addEventListener('click', toggleBoatMotion);
+    }
 
     document.getElementById('btn-reset-view').addEventListener('click', () => {
       controls.reset();
@@ -3519,15 +3792,22 @@
         }
       }
 
-      // Suave balanceo y cabeceo sobre las olas (se calma en despiece para examen técnico)
-      const calmMultiplier = 1.0 - explodeFactor * 0.65;
-      const pitch = Math.sin(elapsedTime * 1.2) * 0.03 * calmMultiplier;
-      const roll = Math.cos(elapsedTime * 0.9) * 0.045 * calmMultiplier;
-      const heave = Math.sin(elapsedTime * 1.6) * 0.06 * calmMultiplier;
+      // Suave balanceo y cabeceo sobre las olas (se calma en despiece o se desactiva si boatMotionEnabled es false)
+      if (boatMotionEnabled) {
+        const calmMultiplier = 1.0 - explodeFactor * 0.65;
+        const pitch = Math.sin(elapsedTime * 1.2) * 0.03 * calmMultiplier;
+        const roll = Math.cos(elapsedTime * 0.9) * 0.045 * calmMultiplier;
+        const heave = Math.sin(elapsedTime * 1.6) * 0.06 * calmMultiplier;
 
-      boatGroup.position.y = heave;
-      boatGroup.rotation.x = pitch;
-      boatGroup.rotation.z = roll;
+        boatGroup.position.y = heave;
+        boatGroup.rotation.x = pitch;
+        boatGroup.rotation.z = roll;
+      } else {
+        // En reposo estático
+        boatGroup.position.y += (0 - boatGroup.position.y) * 0.1;
+        boatGroup.rotation.x += (0 - boatGroup.rotation.x) * 0.1;
+        boatGroup.rotation.z += (0 - boatGroup.rotation.z) * 0.1;
+      }
 
       // Ondas en la superficie del agua
       const pos = oceanGeo.attributes.position;
