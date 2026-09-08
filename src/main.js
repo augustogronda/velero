@@ -1,4 +1,4 @@
-﻿import { Engine } from './core/Engine.js';
+import { Engine } from './core/Engine.js';
 import { SceneEnvironment } from './core/SceneEnvironment.js';
 import { Boat } from './models/Boat.js';
 import { OtherVessel } from './models/OtherVessel.js';
@@ -25,7 +25,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const windSystem = new WindSystem();
   const ripaEngine = new RipaEngine(otherVessel);
 
-  const hud = new SimulatorHUD(windSystem, boat, environment, otherVessel, ripaEngine, ialaSystem);
+  const hud = new SimulatorHUD(windSystem, boat, environment, otherVessel, ripaEngine, ialaSystem, engine);
 
   engine.start();
 

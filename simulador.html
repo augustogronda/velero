@@ -362,17 +362,26 @@
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--panel-border);
       border-radius: 18px;
-      padding: 16px 18px;
-      width: 360px;
+      padding: 14px 16px;
+      width: 380px;
       max-width: calc(100vw - 32px);
+      max-height: calc(100dvh - 110px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       box-shadow: 0 15px 35px rgba(0,0,0,0.5);
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
     .ripa-header {
       display: flex;
       flex-direction: column;
+      gap: 8px;
+    }
+    .ripa-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 6px;
     }
     .ripa-badge {
@@ -380,20 +389,114 @@
       font-weight: 800;
       color: var(--accent-gold);
       letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .ripa-nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .ripa-nav-btn {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #cbd5e1;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.70rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .ripa-nav-btn:hover {
+      background: rgba(56, 189, 248, 0.2);
+      color: #ffffff;
+      border-color: var(--accent-cyan);
+    }
+    .ripa-pills-bar {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: thin;
+    }
+    .ripa-pill {
+      flex: 0 0 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #94a3b8;
+      border-radius: 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .ripa-pill:hover {
+      background: rgba(255,255,255,0.12);
+      color: #ffffff;
+    }
+    .ripa-pill.active {
+      background: var(--accent-cyan);
+      color: #030d1b;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+    }
+    .ripa-pill.completed {
+      border-color: #10b981;
+      color: #34d399;
+    }
+    .ripa-pill.completed.active {
+      background: #10b981;
+      color: #030d1b;
+    }
+    .ripa-tactical-banner {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 8px;
+      line-height: 1.35;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ripa-tactical-banner.role-privilegiado {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
+    }
+    .ripa-tactical-banner.role-cede_paso {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #f87171;
+    }
+    .ripa-tactical-banner.role-ambos_maniobran {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #fbbf24;
     }
     .ripa-select {
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.15);
       color: #ffffff;
-      padding: 8px 10px;
+      padding: 7px 10px;
       border-radius: 8px;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       outline: none;
       font-family: inherit;
       cursor: pointer;
     }
+    .ripa-select option {
+      background: #0f172a;
+      color: #ffffff;
+    }
     .ripa-desc {
-      font-size: 0.80rem;
+      font-size: 0.78rem;
       color: #cbd5e1;
       line-height: 1.45;
     }
@@ -402,13 +505,14 @@
       flex-direction: column;
       gap: 8px;
       border-top: 1px solid rgba(255,255,255,0.08);
-      padding-top: 10px;
+      padding-top: 8px;
     }
     .ripa-question {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       font-weight: 700;
       color: var(--accent-cyan);
+      line-height: 1.35;
     }
     .ripa-options-group {
       display: flex;
@@ -419,23 +523,34 @@
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.1);
       color: #f1f5f9;
-      padding: 8px 12px;
+      padding: 8px 10px;
       border-radius: 8px;
-      font-size: 0.76rem;
+      font-size: 0.75rem;
       font-weight: 600;
       text-align: left;
       cursor: pointer;
       transition: all 0.2s;
       font-family: inherit;
+      line-height: 1.35;
     }
     .ripa-opt-btn:hover {
       background: rgba(56, 189, 248, 0.15);
       border-color: var(--accent-cyan);
     }
+    .ripa-opt-btn.opt-correct {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: #10b981;
+      color: #6ee7b7;
+    }
+    .ripa-opt-btn.opt-wrong {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+      color: #fca5a5;
+    }
     .ripa-feedback {
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       line-height: 1.45;
-      padding: 9px 12px;
+      padding: 8px 10px;
       border-radius: 8px;
       display: none;
     }
