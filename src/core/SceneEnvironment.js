@@ -4,6 +4,8 @@ export class SceneEnvironment {
   constructor(scene) {
     this.scene = scene;
     this.isNight = false;
+    this.activeSkyColor = 0x0284c7;
+    this.activeWaterColor = 0x0369a1;
 
     this.baseWaterY = 0.28;
     this.waveFreq = 1.5;
@@ -12,14 +14,18 @@ export class SceneEnvironment {
     this.initLights();
     this.initWater();
     this.initGrid();
+
+    // Establecer color de cielo diurno oceánico inicial
+    this.scene.background.setHex(this.activeSkyColor);
+    this.scene.fog.color.setHex(this.activeSkyColor);
   }
 
   initLights() {
-    this.hemiLight = new THREE.HemisphereLight(0xe0f2fe, 0x0c4a6e, 0.75);
+    this.hemiLight = new THREE.HemisphereLight(0xe0f2fe, 0x0c4a6e, 0.85);
     this.hemiLight.position.set(0, 50, 0);
     this.scene.add(this.hemiLight);
 
-    this.sunLight = new THREE.DirectionalLight(0xfffaed, 1.4);
+    this.sunLight = new THREE.DirectionalLight(0xfffaed, 1.45);
     this.sunLight.position.set(25, 35, 20);
     this.sunLight.castShadow = true;
     this.sunLight.shadow.mapSize.width = 2048;
@@ -41,7 +47,7 @@ export class SceneEnvironment {
   initWater() {
     const waterGeo = new THREE.PlaneGeometry(160, 160, 64, 64);
     this.waterMat = new THREE.MeshStandardMaterial({
-      color: 0x0369a1,
+      color: this.activeWaterColor,
       roughness: 0.15,
       metalness: 0.8,
       transparent: true,
@@ -75,14 +81,15 @@ export class SceneEnvironment {
       this.waterMat.color.setHex(0x021329);
       this.waterMat.opacity = 0.92;
     } else {
-      this.scene.background.setHex(0x060a14);
-      this.scene.fog.color.setHex(0x060a14);
+      const daySky = this.activeSkyColor || 0x0284c7;
+      this.scene.background.setHex(daySky);
+      this.scene.fog.color.setHex(daySky);
       this.hemiLight.color.setHex(0xe0f2fe);
       this.hemiLight.groundColor.setHex(0x0c4a6e);
-      this.hemiLight.intensity = 0.75;
+      this.hemiLight.intensity = 0.85;
       this.sunLight.color.setHex(0xfffaed);
-      this.sunLight.intensity = 1.4;
-      this.waterMat.color.setHex(0x0369a1);
+      this.sunLight.intensity = 1.45;
+      this.waterMat.color.setHex(this.activeWaterColor || 0x0369a1);
       this.waterMat.opacity = 0.82;
     }
   }
@@ -90,10 +97,16 @@ export class SceneEnvironment {
   applyWeatherCondition(preset) {
     if (!preset) return;
 
-    if (preset.waterColor) this.waterMat.color.setHex(preset.waterColor);
+    if (preset.waterColor) {
+      this.activeWaterColor = preset.waterColor;
+      this.waterMat.color.setHex(preset.waterColor);
+    }
     if (preset.skyColor) {
-      this.scene.background.setHex(preset.skyColor);
-      this.scene.fog.color.setHex(preset.skyColor);
+      this.activeSkyColor = preset.skyColor;
+      if (!this.isNight) {
+        this.scene.background.setHex(preset.skyColor);
+        this.scene.fog.color.setHex(preset.skyColor);
+      }
     }
     if (preset.waveFreq) this.waveFreq = preset.waveFreq;
     if (preset.waveAmp) this.waveAmp = preset.waveAmp;

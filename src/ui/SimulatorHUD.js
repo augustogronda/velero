@@ -299,6 +299,22 @@ export class SimulatorHUD {
         <button id="btn-auto-trim" class="btn-auto-trim" title="Cazar/filar automáticamente para máximo rendimiento">🎯 Trimado Óptimo</button>
       </div>
 
+      <div class="ctrl-row-weather">
+        <span class="ctrl-label">Clima:</span>
+        <div class="ctrl-weather-btns">
+          <button class="btn-weather-quick active" data-preset="virazon">🌊 Virazón (E 15k)</button>
+          <button class="btn-weather-quick" data-preset="sudestada">🌪️ Sudestada (SE 26k)</button>
+          <button class="btn-weather-quick" data-preset="pampero">⚡ Pampero (SW 34k)</button>
+          <button class="btn-weather-quick" data-preset="calma_norte">☀️ Calma Norte</button>
+        </div>
+        <span class="ctrl-label" style="margin-left:6px;">Rizos:</span>
+        <div class="ctrl-reef-btns">
+          <button class="btn-reef-quick active" data-reef="0">100%</button>
+          <button class="btn-reef-quick" data-reef="1">1° Rizo</button>
+          <button class="btn-reef-quick" data-reef="2">2° Rizo</button>
+        </div>
+      </div>
+
       <div class="ctrl-row-sliders">
         <div class="slider-card">
           <label>Rumbo Barco: <strong id="lbl-hdg">0°</strong></label>
@@ -520,27 +536,41 @@ export class SimulatorHUD {
       this.updateAnchorUI();
     });
 
-    // Weather buttons
-    const wBtns = document.querySelectorAll('.weather-btn');
-    wBtns.forEach(btn => {
+    // Weather presets handler (sincroniza panel de control y tarjeta de clima)
+    const handleWeatherPreset = (pKey) => {
+      document.querySelectorAll('.weather-btn, .btn-weather-quick').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-preset') === pKey);
+      });
+      const preset = this.weather.setPreset(pKey);
+      if (preset) {
+        const sliderWindDir = document.getElementById('slider-wind-dir');
+        const sliderWindSpd = document.getElementById('slider-wind-spd');
+        if (sliderWindDir) sliderWindDir.value = preset.windDir;
+        if (sliderWindSpd) sliderWindSpd.value = preset.windSpd;
+        this.applyAutoTrim();
+      }
+      this.updateWeatherUI();
+      this.update();
+    };
+
+    document.querySelectorAll('.weather-btn, .btn-weather-quick').forEach(btn => {
       btn.addEventListener('click', () => {
-        wBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const pKey = btn.getAttribute('data-preset');
-        this.weather.setPreset(pKey);
-        this.updateWeatherUI();
+        handleWeatherPreset(btn.getAttribute('data-preset'));
       });
     });
 
-    // Reefing buttons
-    const rBtns = document.querySelectorAll('.reefing-btn');
-    rBtns.forEach(btn => {
+    // Reefing buttons handler (sincroniza panel de control y tarjeta de clima)
+    const handleReefing = (rLevel) => {
+      document.querySelectorAll('.reefing-btn, .btn-reef-quick').forEach(b => {
+        b.classList.toggle('active', +b.getAttribute('data-reef') === rLevel);
+      });
+      this.weather.setReefing(rLevel);
+      this.update();
+    };
+
+    document.querySelectorAll('.reefing-btn, .btn-reef-quick').forEach(btn => {
       btn.addEventListener('click', () => {
-        rBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const rLevel = +btn.getAttribute('data-reef');
-        this.weather.setReefing(rLevel);
-        this.update();
+        handleReefing(+btn.getAttribute('data-reef'));
       });
     });
   }

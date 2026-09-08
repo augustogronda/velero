@@ -11,9 +11,9 @@
 
   <style>
     :root {
-      --bg-dark: #060a14;
-      --panel-bg: rgba(10, 17, 32, 0.88);
-      --panel-border: rgba(56, 189, 248, 0.28);
+      --bg-dark: #0284c7;
+      --panel-bg: rgba(10, 23, 44, 0.88);
+      --panel-border: rgba(56, 189, 248, 0.32);
       --accent-cyan: #38bdf8;
       --accent-gold: #f59e0b;
       --accent-emerald: #10b981;
@@ -937,6 +937,73 @@
     .btn-auto-trim:hover {
       background: var(--accent-gold);
       color: #040914;
+    }
+    .ctrl-row-weather {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 2px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 6px;
+    }
+    .ctrl-row-weather::-webkit-scrollbar { display: none; }
+    .ctrl-weather-btns, .ctrl-reef-btns {
+      display: flex;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+    .btn-weather-quick {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #cbd5e1;
+      padding: 4px 9px;
+      border-radius: 7px;
+      font-size: 0.70rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .btn-weather-quick:hover {
+      border-color: var(--accent-gold);
+      color: #ffffff;
+      background: rgba(245, 158, 11, 0.15);
+    }
+    .btn-weather-quick.active {
+      background: rgba(245, 158, 11, 0.25);
+      border-color: #f59e0b;
+      color: #fde047;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
+    }
+    .btn-reef-quick {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #cbd5e1;
+      padding: 4px 8px;
+      border-radius: 7px;
+      font-size: 0.70rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .btn-reef-quick:hover {
+      border-color: #10b981;
+      color: #ffffff;
+    }
+    .btn-reef-quick.active {
+      background: #10b981;
+      border-color: #10b981;
+      color: #030d1b;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
     }
     .btn-notes-toggle {
       background: rgba(16, 185, 129, 0.15);

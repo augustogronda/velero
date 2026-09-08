@@ -9,8 +9,8 @@ export class Engine {
     }
 
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x060a14);
-    this.scene.fog = new THREE.FogExp2(0x060a14, 0.015);
+    this.scene.background = new THREE.Color(0x0284c7);
+    this.scene.fog = new THREE.FogExp2(0x0284c7, 0.012);
 
     this.camera = new THREE.PerspectiveCamera(
       45,
