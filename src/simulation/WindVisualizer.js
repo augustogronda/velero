@@ -79,35 +79,18 @@ export class WindVisualizer {
       this.group.position.copy(this.boat.group.position);
     }
 
-    // Calcular el ángulo relativo del viento respecto a la proa del velero (-180° a +180°)
-    let deltaAngle = this.wind.trueWindDirection - this.wind.boatHeading;
-    while (deltaAngle > 180) deltaAngle -= 360;
-    while (deltaAngle < -180) deltaAngle += 360;
-    const deltaRad = THREE.MathUtils.degToRad(deltaAngle);
-
-    // Vector de flujo en el sistema de coordenadas local del barco:
-    // Proa = +Z, Popa = -Z, Estribor = +X, Babor = -X
-    // Si deltaAngle = 0° (proa), el viento sopla hacia popa (-Z)
-    // Si deltaAngle = +90° (estribor), el viento sopla hacia babor (-X)
-    const localFlow = new THREE.Vector3(
-      -Math.sin(deltaRad),
-      0,
-      -Math.cos(deltaRad)
-    );
-
-    // Rotar el vector de flujo a coordenadas de mundo según la orientación actual del barco
-    let flowDirX = localFlow.x;
-    let flowDirZ = localFlow.z;
-    if (this.boat && this.boat.group) {
-      const worldFlow = localFlow.clone().applyEuler(this.boat.group.rotation);
-      flowDirX = worldFlow.x;
-      flowDirZ = worldFlow.z;
-    }
-
-    // Normalizar vector director
-    const lenF = Math.hypot(flowDirX, flowDirZ) || 1;
-    flowDirX /= lenF;
-    flowDirZ /= lenF;
+    // Vector unitario de avance del viento real en el sistema de coordenadas de mundo:
+    // En la escena 3D náutica:
+    // Norte = +Z (0°), Este = +X (90°), Sur = -Z (180°), Oeste = -X (270°)
+    // El viento viene DESDE trueWindDirection y avanza HACIA sotavento (dirección opuesta):
+    // - TWD 0° (Norte): avanza hacia -Z (Sur) -> flowDirX = 0, flowDirZ = -1
+    // - TWD 90° (Este): avanza hacia -X (Oeste) -> flowDirX = -1, flowDirZ = 0
+    // - TWD 180° (Sur): avanza hacia +Z (Norte) -> flowDirX = 0, flowDirZ = +1
+    // - TWD 270° (Oeste): avanza hacia +X (Este) -> flowDirX = +1, flowDirZ = 0
+    // La dirección del viento real es un vector meteorológico fijo en el mundo y NO gira al cambiar el rumbo del barco.
+    const twdRad = THREE.MathUtils.degToRad(this.wind.trueWindDirection);
+    const flowDirX = -Math.sin(twdRad);
+    const flowDirZ = -Math.cos(twdRad);
 
     // Vector perpendicular al flujo para distribuir las líneas lateralmente
     const perpX = -flowDirZ;
