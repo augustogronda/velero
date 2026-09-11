@@ -2,7 +2,7 @@
 // Compatible con vite-plugin-pwa injectManifest strategy
 // Los assets pre-cacheables son inyectados por el plugin en el build
 
-const CACHE_NAME = 'nautico-v5';
+const CACHE_NAME = 'nautico-v6';
 const OFFLINE_URL = './simulador.html';
 
 // Lista de assets a pre-cachear (inyectada por vite-plugin-pwa en el build)

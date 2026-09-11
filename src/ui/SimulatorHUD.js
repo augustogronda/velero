@@ -1317,7 +1317,9 @@ export class SimulatorHUD {
       this.wind.mainSheetTrim,
       this.wind.jibSheetTrim,
       side,
-      this.wind.flutterIntensity
+      this.wind.flutterIntensity,
+      this.wind.trueWindSpeed,
+      this.wind.relativeWindAngle
     );
 
     const needleWind = document.getElementById('needle-wind');
