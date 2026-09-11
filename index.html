@@ -1794,6 +1794,7 @@
         <span class="hud-group-label">Vistas:</span>
         <div class="hud-group">
           <button class="btn-cam" id="btn-cam-general" title="Vista isométrica general (Sloop)">⛵ General</button>
+          <button class="btn-cam" id="btn-cam-crujia" title="Vista de crujía, babor y estribor">🧭 Crujía & Bandas</button>
           <button class="btn-cam" id="btn-cam-underwater" title="Vista subacuática de orza y bulbo">🤿 Quilla</button>
           <button class="btn-cam" id="btn-cam-sails" title="Vista en detalle de las velas y aparejo">📐 Velas</button>
           <button class="btn-cam" id="btn-cam-dims" title="Activar o desactivar visualización de cotas 3D">📏 Cotas 3D</button>
@@ -1939,6 +1940,7 @@
         <div class="sheet-tabs">
           <button class="sheet-tab-btn active" id="btn-sheet-1" data-sheet="1">LÁMINA 01: Nomenclatura</button>
           <button class="sheet-tab-btn" id="btn-sheet-2" data-sheet="2">LÁMINA 02: Velas & Maniobra</button>
+          <button class="sheet-tab-btn" id="btn-sheet-3" data-sheet="3">LÁMINA 03: Módulo 2 (Estabilidad & Viento)</button>
         </div>
 
         <!-- Tarjeta de vista previa activa en Láminas Técnicas -->
@@ -1983,6 +1985,22 @@
             <div class="sheet-row" data-sheet-part="Francobordo" style="grid-column: span 2;">
               <span class="sheet-num">A</span>
               <span style="font-weight:600;">A · Francobordo Mínimo en Flotación</span>
+            </div>
+          </div>
+
+          <div style="font-size:0.74rem; font-weight:700; color:#38bdf8; text-transform:uppercase; letter-spacing:0.05em; margin-top:8px;">EJES Y BANDAS DE REFERENCIA:</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+            <div class="sheet-row" data-sheet-part="Línea de Crujía" style="grid-column: span 2;">
+              <span class="sheet-num" style="background:rgba(56,189,248,0.25); color:#38bdf8;">℄</span>
+              <span style="font-weight:600;">Línea de Crujía (Plano Longitudinal de Simetría)</span>
+            </div>
+            <div class="sheet-row" data-sheet-part="Babor">
+              <span class="sheet-num" style="background:rgba(239,68,68,0.25); color:#ef4444;">🔴 Bb</span>
+              <span style="font-weight:600;">Babor (Banda Izq. · Luz Roja)</span>
+            </div>
+            <div class="sheet-row" data-sheet-part="Estribor">
+              <span class="sheet-num" style="background:rgba(34,197,94,0.25); color:#22c55e;">🟢 Eb</span>
+              <span style="font-weight:600;">Estribor (Banda Der. · Luz Verde)</span>
             </div>
           </div>
 
@@ -2049,6 +2067,93 @@
             <p>• <b>EL REPIQUE:</b> Ajusta el estiramiento del pujamen.</p>
             <p>• <b>LOS BATTENS:</b> Sostienen la baluma y evitan pliegues en el alunamiento.</p>
             <p>• <b>LA FAJA DE RIZOS:</b> Define una geometría menor para reducir la superficie de la vela mayor.</p>
+          </div>
+        </div>
+
+        <!-- Subpanel Lámina 03: Módulo 2 (Estabilidad y Viento) -->
+        <div class="sheet-subpanel" id="subpanel-sheet-3">
+          <div style="border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:0.72rem; color:var(--accent-gold); font-weight:700; text-transform:uppercase; letter-spacing:0.06em;">CURSO TIMONEL · MÓDULO 2</span>
+              <span style="font-size:0.7rem; color:var(--accent-cyan); font-weight:600;">Teoría & Física</span>
+            </div>
+            <h3 style="font-size:1.15rem; color:#fff; font-family:'Space Grotesk';">ESTABILIDAD, VIENTO Y TRIMADO</h3>
+            <p style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">Fuerzas sobre el velero, centros de esfuerzo (CV, CG, B), rumbos, amuras y física de sustentación.</p>
+          </div>
+
+          <!-- 1. ESTABILIDAD Y CENTROS -->
+          <div style="font-size:0.74rem; font-weight:700; color:var(--accent-gold); text-transform:uppercase; letter-spacing:0.05em; margin-top:8px;">1. ESTABILIDAD Y CENTROS DE FUERZA:</div>
+          <p style="font-size:0.76rem; color:#cbd5e1; line-height:1.42; margin-top:2px;">Los barcos están sometidos a diferentes esfuerzos que tienden a modificar su estabilidad. El principal es el viento sobre las velas, que provoca una escora pronunciada e incluso puede causar el volcamiento.</p>
+          
+          <div class="sheet-table" style="max-height:none; margin-top:6px;">
+            <div class="sheet-row" data-sheet-part="Centro Vélico">
+              <div class="sheet-row-left">
+                <span class="sheet-num" style="background:rgba(56,189,248,0.25); color:#38bdf8;">CV</span>
+                <div>
+                  <b>CENTRO VÉLICO (CV)</b>
+                  <div style="font-size:0.72rem; color:var(--text-muted);">Baricentros de velas combinados según superficie. A popa del palo para barco equilibrado y ardiente.</div>
+                </div>
+              </div>
+            </div>
+            <div class="sheet-row" data-sheet-part="Centro de Gravedad">
+              <div class="sheet-row-left">
+                <span class="sheet-num" style="background:rgba(245,158,11,0.25); color:var(--accent-gold);">CG</span>
+                <div>
+                  <b>CENTRO DE GRAVEDAD (CG)</b>
+                  <div style="font-size:0.72rem; color:var(--text-muted);">Actúa hacia abajo. Determinado por diseño y lastre; modificable por estiba y tripulación ('hacer banda').</div>
+                </div>
+              </div>
+            </div>
+            <div class="sheet-row" data-sheet-part="Centro de Carena">
+              <div class="sheet-row-left">
+                <span class="sheet-num" style="background:rgba(16,185,129,0.25); color:#34d399;">B</span>
+                <div>
+                  <b>CENTRO DE CARENA (FLOTACIÓN, B)</b>
+                  <div style="font-size:0.72rem; color:var(--text-muted);">Empuje de Arquímedes hacia arriba. Al escorar se desplaza lateralmente generando el par adrizante.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sheet-note-card" style="margin-top:6px;">
+            <p>• <b>MOMENTO ESCORANTE:</b> Generado entre la fuerza lateral del viento en el CV y la resistencia de la carena.</p>
+            <p>• <b>MOMENTO ADRIZANTE:</b> Par generado por la distancia lateral entre CG y B (brazo GZ). Si la escora aumenta demasiado, B puede desplazarse hacia la otra banda, sumar su fuerza a la gravedad y provocar el volcamiento.</p>
+          </div>
+
+          <!-- 2. EL VELERO Y EL VIENTO -->
+          <div style="font-size:0.74rem; font-weight:700; color:var(--accent-cyan); text-transform:uppercase; letter-spacing:0.05em; margin-top:8px;">2. EL VELERO Y EL VIENTO (RUMBOS Y MANIOBRAS):</div>
+          <div class="sheet-note-card">
+            <p>• <b>ZONA PROHIBIDA:</b> Arco de aprox. 45° a cada banda (~90° total) en el que no es posible navegar contra el viento (barco enfachado).</p>
+            <p>• <b>RUMBOS:</b> Ceñida (~45°), Través (90°), Largo (120°-150°) y Popa Redonda (180°), más posiciones intermedias.</p>
+            <p>• <b>BORDEJEAR:</b> Navegar 'tirando bordes' en zigzag alternando amuras cuando el destino está en la dirección de donde viene el viento.</p>
+            <p>• <b>ORZAR:</b> Acercar la proa hacia el viento hasta el límite de navegabilidad.</p>
+            <p>• <b>DERIVAR (ARRIBAR):</b> Alejar la proa de la dirección del viento.</p>
+            <p>• <b>VIRADA POR AVANTE:</b> La proa continúa orzando y el viento pasa a la otra banda cruzando el ojo del viento.</p>
+            <p>• <b>TRASLUCHADA (EN REDONDO):</b> La popa pasa por el viento; maniobra de cuidado por el paso violento de la botavara.</p>
+            <p>• <b>BARLOVENTO:</b> Lugar de donde viene el viento | <b>SOTAVENTO:</b> Lado hacia donde se dirige.</p>
+            <p>• <b>ABATIMIENTO:</b> Desplazamiento lateral involuntario del velero hacia sotavento que debe compensarse.</p>
+          </div>
+
+          <!-- 3. VIENTO REAL, APARENTE Y AMURAS -->
+          <div style="font-size:0.74rem; font-weight:700; color:#38bdf8; text-transform:uppercase; letter-spacing:0.05em; margin-top:8px;">3. VIENTO REAL, APARENTE Y AMURAS:</div>
+          <div class="sheet-note-card">
+            <p>• <b>VIENTO REAL:</b> El que se percibe estando en reposo absoluto.</p>
+            <p>• <b>VIENTO APARENTE:</b> Vector suma del viento real + velocidad del barco. Está más a proa y tiene mayor velocidad. En el velero se navega según el viento aparente.</p>
+            <p>• <b>AMURADOS A ESTRIBOR ('BUENAS'):</b> Viento entra por la banda de estribor. En el lenguaje habitual se dice que el barco 'viene con buenas'. <b>TIENE DERECHO DE PASO.</b></p>
+            <p>• <b>AMURADOS A BABOR ('MALAS'):</b> Viento entra por la banda de babor. Se dice que el barco 'viene con malas'. <b>DEBE CEDER EL PASO.</b></p>
+          </div>
+
+          <!-- 4. FÍSICA DEL TRIMADO Y REGLAS DE ORO -->
+          <div style="font-size:0.74rem; font-weight:700; color:#34d399; text-transform:uppercase; letter-spacing:0.05em; margin-top:8px;">4. TRIMADO, FÍSICA DE LA VELA Y REGLAS DE ORO:</div>
+          <div class="sheet-note-card">
+            <p>• <b>EMPUJE (Través a Popa):</b> Viento empuja por resistencia y arrastre directo.</p>
+            <p>• <b>SUCCIÓN / BERNOULLI (Través a Ceñida):</b> Vela actúa como ala de avión. Flujo más largo y veloz por sotavento genera baja presión y succión hacia adelante.</p>
+            <p>• <b>FLUJO LAMINAR:</b> Hacer que el viento fluya sin gualdrapeo y sin sobrecazar (sobrecazar frena y aumenta escora inútil).</p>
+            <p>• <b>CAZAR:</b> Tirar del cabo hacia uno (acercar vela a crujía).</p>
+            <p>• <b>FILAR:</b> Soltar el cabo (abrir la vela hacia sotavento).</p>
+            <p style="color:#fbbf24; font-weight:700; border-top:1px solid rgba(255,255,255,0.1); padding-top:4px; margin-top:4px;">★ REGLAS DE ORO DEL TIMONEL:</p>
+            <p style="color:#fbbf24;">1. "A MAYOR VIENTO, MENOS VELA" (tomar rizos a tiempo).</p>
+            <p style="color:#fbbf24;">2. "NO HAY ORZADA SIN CAZADA Y DERIVADA SIN FILADA".</p>
           </div>
         </div>
       </div>
@@ -2271,6 +2376,33 @@
         desc: "Plano transversal vertical o inclinado que cierra el casco en su extremo posterior. En él se montan el arraigo del baquestay, la pala de timón o la plataforma de baño.",
         note: "Lámina 01: Sección de popa. Un espejo ancho aporta estabilidad de formas y permite una bañera espaciosa."
       },
+      "Línea de Crujía": {
+        num: "℄",
+        category: "casco",
+        tag: "1/ Nomenclatura · Eje Longitudinal de Simetría",
+        icon: "🧭",
+        title: "Línea de Crujía (Centerline - ℄)",
+        desc: "Eje imaginario longitudinal que va desde el centro de la roda en proa hasta el centro del espejo en popa, dividiendo al velero en dos mitades exactamente simétricas: la banda de Babor (costado izquierdo) y la banda de Estribor (costado derecho). Es el plano de referencia para el trimado de las velas ('cazar a crujía') y para alinear la pala del timón (0° a la vía).",
+        note: "Lámina 01: Eje fundamental de referencia náutica. En arquitectura naval se abrevia con el símbolo '℄'. Sobre ella descansan el mástil, la roda, el quillote y el timón."
+      },
+      "Babor": {
+        num: "Bb",
+        category: "casco",
+        tag: "1/ Nomenclatura · Banda Izquierda (Roja)",
+        icon: "🔴",
+        title: "Babor (Port Side - Banda Izquierda)",
+        desc: "Toda la mitad o costado izquierdo del barco mirando desde popa hacia proa. Se identifica internacionalmente con el color ROJO, tanto en su farol de navegación sectorial (luz roja con un arco visible de 112.5° desde la proa hasta 22.5° a popa del través de babor) como en el balizamiento náutico IALA.",
+        note: "Regla del RIPA: Cuando dos veleros reciben el viento por bandas opuestas, el que navega 'amurado a babor' (recibiendo el viento por babor, con la botavara abierta hacia estribor) DEBE CEDER EL PASO al que navega amurado a estribor."
+      },
+      "Estribor": {
+        num: "Eb",
+        category: "casco",
+        tag: "1/ Nomenclatura · Banda Derecha (Verde)",
+        icon: "🟢",
+        title: "Estribor (Starboard Side - Banda Derecha)",
+        desc: "Toda la mitad o costado derecho del barco mirando desde popa hacia proa. Se identifica internacionalmente con el color VERDE, tanto en su farol de navegación sectorial (luz verde con un arco visible de 112.5° desde la proa hasta 22.5° a popa del través de estribor) como en las boyas y balizas náuticas.",
+        note: "Regla del RIPA (Prioridad de Paso): El velero que navega 'amurado a estribor' (recibiendo el viento por su banda de estribor, con la botavara cazada o abierta hacia babor) TIENE DERECHO DE PASO frente a una embarcación amurada a babor."
+      },
 
       // ====================================================
       // LÁMINA 01: DIMENSIONES NAVALES Y COTAS (VISTAS GENERALES)
@@ -2422,6 +2554,37 @@
         title: "Herraje Tintero (Gooseneck)",
         desc: "Gozne metálico articulado fijado en la cara posterior del mástil donde encaja la espiga de la botavara y se amura la vela mayor.",
         note: "Lámina 02: 'HERRAJE TINTERO'. 'El herraje tintero articula el movimiento de la botavara con el palo, permitiendo que abra, cierre, suba y baje'."
+      },
+
+      // ====================================================
+      // LÁMINA 03: MÓDULO 2 (ESTABILIDAD, CENTROS Y FÍSICA)
+      // ====================================================
+      "Centro Vélico": {
+        num: "CV",
+        category: "velas",
+        tag: "Módulo 2 · Aerodinámica & Baricentro",
+        icon: "🪁",
+        title: "Centro Vélico (CV)",
+        desc: "Punto donde se concentra la resultante total de la fuerza que el viento ejerce sobre las velas. Se determina trazando la recta que une los baricentros geométricos de la vela mayor y del foque, dividiéndola proporcionalmente según sus superficies. Es deseable que quede a popa del palo pero cerca de él, lo que asegura un barco equilibrado con una leve y sana tendencia a orzar.",
+        note: "Módulo 2: 'Entre la fuerza lateral del viento aplicada sobre las velas en el Centro Vélico y la resistencia de la carena se genera el momento escorante'."
+      },
+      "Centro de Gravedad": {
+        num: "CG",
+        category: "casco",
+        tag: "Módulo 2 · Estabilidad & Pesos",
+        icon: "⚖️",
+        title: "Centro de Gravedad (CG)",
+        desc: "Punto donde actúa hacia abajo el peso total de la embarcación (casco, mástil, lastre de plomo del quillote y tripulación). Determinado por diseño con el barco sin carga. La tripulación altera su posición de acuerdo con la estiba y sentándose en la banda de barlovento ('hacer banda') para contrarrestar la escora.",
+        note: "Módulo 2: 'En reposo, CG y el Centro de Carena B están alineados verticalmente. Al navegar, la distancia horizontal entre ambos genera el momento adrizante'."
+      },
+      "Centro de Carena": {
+        num: "B",
+        category: "submarino",
+        tag: "Módulo 2 · Hidrostática & Empuje",
+        icon: "🌊",
+        title: "Centro de Carena / Flotación (B)",
+        desc: "Centro geométrico del volumen sumergido de la obra viva, donde se concentra la fuerza de flotación vertical hacia arriba según el principio de Arquímedes. Al escorar el barco, la forma sumergida cambia y el Centro de Carena se desplaza lateralmente hacia la banda sumergida, creando el brazo adrizante (GZ).",
+        note: "Módulo 2: 'Si la escora aumenta demasiado, el centro de carena puede desplazarse hacia la otra banda, sumar su fuerza a la gravedad y provocar el volcamiento'."
       }
     };
 
@@ -2670,6 +2833,12 @@
           return new THREE.Vector3(0, 0, 1.8); // Se proyecta hacia proa
         case "Espejo de Popa":
           return new THREE.Vector3(0, 0, -1.8); // Se proyecta hacia popa
+        case "Línea de Crujía":
+          return new THREE.Vector3(0, 1.8, 0); // Se eleva en el plano de crujía
+        case "Babor":
+          return new THREE.Vector3(-2.2, 0.6, 0); // Se desplaza hacia la banda de babor
+        case "Estribor":
+          return new THREE.Vector3(2.2, 0.6, 0); // Se desplaza hacia la banda de estribor
         case "Línea de Flotación":
           return new THREE.Vector3(0, 0.4, 0);
         case "Cubierta":
@@ -2921,6 +3090,226 @@
     freeboardHit.position.set(0, 0.76, -1.8);
     fixedHullGroup.add(freeboardHit);
     registerInteractive(freeboardHit, "Francobordo");
+
+    // ----------------------------------------------------
+    // FUNCIÓN GENERADORA DE ETIQUETAS Y BADGES 3D NÁUTICOS
+    // ----------------------------------------------------
+    function createTextBadgeSprite(text, bgColor, textColor = '#ffffff', borderColor = null) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 384;
+      canvas.height = 96;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const r = 24;
+      const x = 8, y = 8, w = canvas.width - 16, h = canvas.height - 16;
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+
+      ctx.fillStyle = bgColor;
+      ctx.fill();
+
+      if (borderColor) {
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = borderColor;
+        ctx.stroke();
+      }
+
+      ctx.font = 'bold 36px "Space Grotesk", "Outfit", sans-serif';
+      ctx.fillStyle = textColor;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.minFilter = THREE.LinearFilter;
+      const spriteMat = new THREE.SpriteMaterial({
+        map: texture,
+        transparent: true,
+        depthTest: false
+      });
+      const sprite = new THREE.Sprite(spriteMat);
+      sprite.scale.set(1.9, 0.48, 1);
+      return sprite;
+    }
+
+    // ----------------------------------------------------
+    // LÍNEA DE CRUJÍA, BABOR (ROJO) Y ESTRIBOR (VERDE)
+    // ----------------------------------------------------
+
+    // 1. LÍNEA DE CRUJÍA (Eje longitudinal de simetría)
+    const crujiaGroup = new THREE.Group();
+    fixedHullGroup.add(crujiaGroup);
+
+    // Trazo que sigue el perfil de la cubierta de proa a popa
+    const crujiaPoints = [
+      new THREE.Vector3(0, 1.37, 4.6),    // Roda en proa
+      new THREE.Vector3(0, 1.37, 2.08),   // Frente de carroza
+      new THREE.Vector3(0, 1.83, 2.05),   // Subida a carroza
+      new THREE.Vector3(0, 1.83, 0.42),   // Escotilla / Carroza centro
+      new THREE.Vector3(0, 1.83, -1.05),  // Techo carroza posterior
+      new THREE.Vector3(0, 1.37, -1.10),  // Bajada a bañera / cubierta
+      new THREE.Vector3(0, 1.37, -3.85)   // Espejo en popa
+    ];
+    const crujiaGeo = new THREE.BufferGeometry().setFromPoints(crujiaPoints);
+    const crujiaMat = new THREE.LineBasicMaterial({
+      color: 0x38bdf8, // Cian náutico de alta visibilidad
+      linewidth: 3,
+      transparent: true,
+      opacity: 0.95
+    });
+    const crujiaLine = new THREE.Line(crujiaGeo, crujiaMat);
+    crujiaGroup.add(crujiaLine);
+    registerDecorativeExplodable(crujiaLine, "Línea de Crujía");
+
+    // Marcas de eje a proa y popa
+    const axisBow = createLine(new THREE.Vector3(-0.35, 1.38, 4.4), new THREE.Vector3(0.35, 1.38, 4.4));
+    const axisStern = createLine(new THREE.Vector3(-0.45, 1.38, -3.8), new THREE.Vector3(0.45, 1.38, -3.8));
+    crujiaGroup.add(axisBow);
+    crujiaGroup.add(axisStern);
+    registerDecorativeExplodable(axisBow, "Línea de Crujía");
+    registerDecorativeExplodable(axisStern, "Línea de Crujía");
+
+    // Badge 3D flotante para Línea de Crujía
+    const crujiaBadge = createTextBadgeSprite("℄ LÍNEA DE CRUJÍA", "rgba(10, 30, 60, 0.88)", "#38bdf8", "rgba(56, 189, 248, 0.75)");
+    crujiaBadge.position.set(0, 2.45, 0.5);
+    crujiaGroup.add(crujiaBadge);
+    registerDecorativeExplodable(crujiaBadge, "Línea de Crujía");
+
+    // Hitbox interactivo para poder cliquear o tocar la Línea de Crujía en 3D
+    const crujiaHitGeo = new THREE.CylinderGeometry(0.24, 0.24, 8.6, 8);
+    const crujiaHit = new THREE.Mesh(crujiaHitGeo, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }));
+    crujiaHit.rotation.x = Math.PI / 2;
+    crujiaHit.position.set(0, 1.5, 0.4);
+    crujiaGroup.add(crujiaHit);
+    registerInteractive(crujiaHit, "Línea de Crujía");
+
+    // 2. BANDA DE BABOR (Lado izquierdo · Color Rojo náutico)
+    const portGroup = new THREE.Group();
+    fixedHullGroup.add(portGroup);
+
+    // Franja / cinta náutica a lo largo de la borda de babor
+    const portCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, 1.33, 4.65),
+      new THREE.Vector3(-0.95, 1.33, 3.6),
+      new THREE.Vector3(-1.38, 1.33, 1.8),
+      new THREE.Vector3(-1.42, 1.33, 0.0),
+      new THREE.Vector3(-1.35, 1.33, -1.8),
+      new THREE.Vector3(-1.18, 1.33, -3.85)
+    ]);
+    const portRibbonGeo = new THREE.TubeGeometry(portCurve, 36, 0.045, 8, false);
+    const portRibbonMat = new THREE.MeshStandardMaterial({
+      color: 0xef4444,
+      emissive: 0x991b1b,
+      emissiveIntensity: 0.45,
+      roughness: 0.35,
+      metalness: 0.2
+    });
+    const portRibbonMesh = new THREE.Mesh(portRibbonGeo, portRibbonMat);
+    portGroup.add(portRibbonMesh);
+    registerInteractive(portRibbonMesh, "Babor");
+
+    // Farol de navegación de Babor (Luz roja sectorial 112.5°)
+    const portLampBracket = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.025, 0.025, 0.16, 8),
+      metalFitMat
+    );
+    portLampBracket.position.set(-1.22, 1.43, 1.5);
+    portGroup.add(portLampBracket);
+    registerDecorativeExplodable(portLampBracket, "Babor");
+
+    const portLampSphere = new THREE.Mesh(
+      new THREE.SphereGeometry(0.07, 12, 12),
+      new THREE.MeshStandardMaterial({
+        color: 0xff2222,
+        emissive: 0xff1111,
+        emissiveIntensity: 0.9,
+        roughness: 0.2
+      })
+    );
+    portLampSphere.position.set(-1.22, 1.52, 1.5);
+    portGroup.add(portLampSphere);
+    registerInteractive(portLampSphere, "Babor");
+
+    // Badge 3D flotante para Babor
+    const portBadge = createTextBadgeSprite("🔴 BABOR", "rgba(70, 10, 10, 0.88)", "#fca5a5", "rgba(239, 68, 68, 0.75)");
+    portBadge.position.set(-1.95, 1.75, 0.2);
+    portGroup.add(portBadge);
+    registerDecorativeExplodable(portBadge, "Babor");
+
+    // Hitbox amplio para seleccionar la banda de babor
+    const portHitGeo = new THREE.CylinderGeometry(0.38, 0.38, 8.4, 8);
+    const portHit = new THREE.Mesh(portHitGeo, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }));
+    portHit.rotation.x = Math.PI / 2;
+    portHit.position.set(-1.28, 1.25, 0.3);
+    portGroup.add(portHit);
+    registerInteractive(portHit, "Babor");
+
+    // 3. BANDA DE ESTRIBOR (Lado derecho · Color Verde náutico)
+    const starboardGroup = new THREE.Group();
+    fixedHullGroup.add(starboardGroup);
+
+    // Franja / cinta náutica a lo largo de la borda de estribor
+    const starboardCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, 1.33, 4.65),
+      new THREE.Vector3(0.95, 1.33, 3.6),
+      new THREE.Vector3(1.38, 1.33, 1.8),
+      new THREE.Vector3(1.42, 1.33, 0.0),
+      new THREE.Vector3(1.35, 1.33, -1.8),
+      new THREE.Vector3(1.18, 1.33, -3.85)
+    ]);
+    const starboardRibbonGeo = new THREE.TubeGeometry(starboardCurve, 36, 0.045, 8, false);
+    const starboardRibbonMat = new THREE.MeshStandardMaterial({
+      color: 0x22c55e,
+      emissive: 0x14532d,
+      emissiveIntensity: 0.45,
+      roughness: 0.35,
+      metalness: 0.2
+    });
+    const starboardRibbonMesh = new THREE.Mesh(starboardRibbonGeo, starboardRibbonMat);
+    starboardGroup.add(starboardRibbonMesh);
+    registerInteractive(starboardRibbonMesh, "Estribor");
+
+    // Farol de navegación de Estribor (Luz verde sectorial 112.5°)
+    const starboardLampBracket = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.025, 0.025, 0.16, 8),
+      metalFitMat
+    );
+    starboardLampBracket.position.set(1.22, 1.43, 1.5);
+    starboardGroup.add(starboardLampBracket);
+    registerDecorativeExplodable(starboardLampBracket, "Estribor");
+
+    const starboardLampSphere = new THREE.Mesh(
+      new THREE.SphereGeometry(0.07, 12, 12),
+      new THREE.MeshStandardMaterial({
+        color: 0x22ff44,
+        emissive: 0x16a34a,
+        emissiveIntensity: 0.9,
+        roughness: 0.2
+      })
+    );
+    starboardLampSphere.position.set(1.22, 1.52, 1.5);
+    starboardGroup.add(starboardLampSphere);
+    registerInteractive(starboardLampSphere, "Estribor");
+
+    // Badge 3D flotante para Estribor
+    const starboardBadge = createTextBadgeSprite("🟢 ESTRIBOR", "rgba(10, 50, 25, 0.88)", "#86efac", "rgba(34, 197, 94, 0.75)");
+    starboardBadge.position.set(1.95, 1.75, 0.2);
+    starboardGroup.add(starboardBadge);
+    registerDecorativeExplodable(starboardBadge, "Estribor");
+
+    // Hitbox amplio para seleccionar la banda de estribor
+    const starboardHitGeo = new THREE.CylinderGeometry(0.38, 0.38, 8.4, 8);
+    const starboardHit = new THREE.Mesh(starboardHitGeo, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }));
+    starboardHit.rotation.x = Math.PI / 2;
+    starboardHit.position.set(1.28, 1.25, 0.3);
+    starboardGroup.add(starboardHit);
+    registerInteractive(starboardHit, "Estribor");
 
     // ----------------------------------------------------
     // GRUPO DINÁMICO DE APAREJOS (CAMBIA EN VIVO EN 3D)
@@ -3703,8 +4092,10 @@
     const sheetsSection = document.getElementById('sheets-section');
     const btnSheet1 = document.getElementById('btn-sheet-1');
     const btnSheet2 = document.getElementById('btn-sheet-2');
+    const btnSheet3 = document.getElementById('btn-sheet-3');
     const subpanelSheet1 = document.getElementById('subpanel-sheet-1');
     const subpanelSheet2 = document.getElementById('subpanel-sheet-2');
+    const subpanelSheet3 = document.getElementById('subpanel-sheet-3');
     const btnCamDims = document.getElementById('btn-cam-dims');
 
     const tabButtons = document.querySelectorAll('.tab-btn');
@@ -3784,21 +4175,18 @@
       });
     }
 
-    // Alternar subpaneles de Lámina 01 y 02 en la vista teórica
-    if (btnSheet1 && btnSheet2) {
-      btnSheet1.addEventListener('click', () => {
-        btnSheet1.classList.add('active');
-        btnSheet2.classList.remove('active');
-        if (subpanelSheet1) subpanelSheet1.classList.add('active');
-        if (subpanelSheet2) subpanelSheet2.classList.remove('active');
+    // Alternar subpaneles de Lámina 01, 02 y 03 en la vista teórica
+    function setActiveSheet(num) {
+      [btnSheet1, btnSheet2, btnSheet3].forEach((b, idx) => {
+        if (b) b.classList.toggle('active', idx + 1 === num);
       });
-      btnSheet2.addEventListener('click', () => {
-        btnSheet2.classList.add('active');
-        btnSheet1.classList.remove('active');
-        if (subpanelSheet2) subpanelSheet2.classList.add('active');
-        if (subpanelSheet1) subpanelSheet1.classList.remove('active');
+      [subpanelSheet1, subpanelSheet2, subpanelSheet3].forEach((p, idx) => {
+        if (p) p.classList.toggle('active', idx + 1 === num);
       });
     }
+    if (btnSheet1) btnSheet1.addEventListener('click', () => setActiveSheet(1));
+    if (btnSheet2) btnSheet2.addEventListener('click', () => setActiveSheet(2));
+    if (btnSheet3) btnSheet3.addEventListener('click', () => setActiveSheet(3));
 
     // Delegación de clics en las filas de las Láminas Técnicas
     document.querySelectorAll('.sheet-row[data-sheet-part]').forEach(row => {
@@ -3875,7 +4263,11 @@
       const filteredParts = Object.keys(BOAT_PARTS_INFO).filter(partName => {
         const info = BOAT_PARTS_INFO[partName];
         if (categoryFilter !== "all" && info.category !== categoryFilter) {
-          return false;
+          if (categoryFilter === "dimensiones" && partName === "Línea de Crujía") {
+            // Permitir ver Línea de Crujía también en Cotas & Dimensiones
+          } else {
+            return false;
+          }
         }
         if (!query) return true;
         const textToSearch = `${partName} ${info.num} ${info.title} ${info.desc} ${info.tag}`.toLowerCase();
@@ -4160,6 +4552,30 @@
         camera.position.set(0, 2.6, -11);
         controls.target.set(0, 1.2, -2.5);
         controls.update();
+      } else if (partName === "Línea de Crujía") {
+        camera.position.set(0, 11.5, 6.5);
+        controls.target.set(0, 1.2, 0.5);
+        controls.update();
+      } else if (partName === "Babor") {
+        camera.position.set(-8.5, 3.8, 1.5);
+        controls.target.set(-0.5, 1.2, 0.2);
+        controls.update();
+      } else if (partName === "Estribor") {
+        camera.position.set(8.5, 3.8, 1.5);
+        controls.target.set(0.5, 1.2, 0.2);
+        controls.update();
+      } else if (partName === "Centro Vélico") {
+        camera.position.set(7, 6.5, 9);
+        controls.target.set(0, 5.0, 0.5);
+        controls.update();
+      } else if (partName === "Centro de Gravedad") {
+        camera.position.set(11, 2.5, 0);
+        controls.target.set(0, 0.5, 0);
+        controls.update();
+      } else if (partName === "Centro de Carena") {
+        camera.position.set(9, -4.0, 7);
+        controls.target.set(0, -0.6, 0);
+        controls.update();
       }
     }
 
@@ -4408,8 +4824,16 @@
 
         if (isTarget) {
           if (mesh.material.emissive) {
-            mesh.material.emissive.setHex(0x0284c7); // Cyan brillante
-            mesh.material.emissiveIntensity = 0.85;
+            if (targetPartName === "Babor") {
+              mesh.material.emissive.setHex(0xff0000); // Rojo náutico
+              mesh.material.emissiveIntensity = 1.0;
+            } else if (targetPartName === "Estribor") {
+              mesh.material.emissive.setHex(0x00ff22); // Verde náutico
+              mesh.material.emissiveIntensity = 1.0;
+            } else {
+              mesh.material.emissive.setHex(0x0284c7); // Cyan brillante
+              mesh.material.emissiveIntensity = 0.85;
+            }
           }
           mesh.material.transparent = mesh.userData.originalTransparent !== undefined ? mesh.userData.originalTransparent : false;
           mesh.material.opacity = mesh.userData.originalOpacity !== undefined ? mesh.userData.originalOpacity : 1.0;
@@ -4492,6 +4916,16 @@
       controls.update();
       selectPart("Casco");
     });
+
+    const btnCamCrujia = document.getElementById('btn-cam-crujia');
+    if (btnCamCrujia) {
+      btnCamCrujia.addEventListener('click', () => {
+        camera.position.set(0, 11.5, 6.5);
+        controls.target.set(0, 1.2, 0.5);
+        controls.update();
+        selectPart("Línea de Crujía");
+      });
+    }
 
     document.getElementById('btn-cam-sails').addEventListener('click', () => {
       camera.position.set(7, 7.5, 8);
@@ -4688,8 +5122,17 @@
 
           if (hoveredMesh.material) {
             if (hoveredMesh.material.emissive) {
-              hoveredMesh.material.emissive.setHex(0x38bdf8);
-              hoveredMesh.material.emissiveIntensity = 0.55;
+              const hName = hoveredMesh.userData.partName;
+              if (hName === "Babor") {
+                hoveredMesh.material.emissive.setHex(0xff2222);
+                hoveredMesh.material.emissiveIntensity = 0.85;
+              } else if (hName === "Estribor") {
+                hoveredMesh.material.emissive.setHex(0x22ff44);
+                hoveredMesh.material.emissiveIntensity = 0.85;
+              } else {
+                hoveredMesh.material.emissive.setHex(0x38bdf8);
+                hoveredMesh.material.emissiveIntensity = 0.55;
+              }
             }
             if (isolateMode && selectedPartName && hoveredMesh.userData.partName !== selectedPartName) {
               hoveredMesh.material.opacity = 0.52;
@@ -4712,8 +5155,17 @@
               }
             } else {
               if (hoveredMesh.material.emissive) {
-                hoveredMesh.material.emissive.setHex(0x0284c7);
-                hoveredMesh.material.emissiveIntensity = 0.85;
+                const sName = hoveredMesh.userData.partName;
+                if (sName === "Babor") {
+                  hoveredMesh.material.emissive.setHex(0xff0000);
+                  hoveredMesh.material.emissiveIntensity = 1.0;
+                } else if (sName === "Estribor") {
+                  hoveredMesh.material.emissive.setHex(0x00ff22);
+                  hoveredMesh.material.emissiveIntensity = 1.0;
+                } else {
+                  hoveredMesh.material.emissive.setHex(0x0284c7);
+                  hoveredMesh.material.emissiveIntensity = 0.85;
+                }
               }
               hoveredMesh.material.opacity = hoveredMesh.userData.originalOpacity !== undefined ? hoveredMesh.userData.originalOpacity : 1.0;
             }
