@@ -187,6 +187,19 @@ export class SimulatorHUD {
         navigator.serviceWorker.register('./sw.js', { scope: './' })
           .then(reg => {
             if (import.meta.env?.DEV) console.log('⚓ SW registrado:', reg.scope);
+            if (reg.waiting) {
+              reg.waiting.postMessage('SKIP_WAITING');
+            }
+            reg.addEventListener('updatefound', () => {
+              const newWorker = reg.installing;
+              if (newWorker) {
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    newWorker.postMessage('SKIP_WAITING');
+                  }
+                });
+              }
+            });
           })
           .catch(err => {
             if (import.meta.env?.DEV) console.warn('SW no disponible:', err);
@@ -317,7 +330,7 @@ export class SimulatorHUD {
     this.compassWidget.className = 'sim-compass-card';
     this.compassWidget.innerHTML = `
       <div class="compass-header">
-        <span>🧭 Rosa de los Vientos</span>
+        <span class="compass-title" title="Rosa de los Vientos">🧭 Rosa<span class="compass-title-long"> de los Vientos</span></span>
         <span class="compass-legend-tws" id="compass-tws">14 kts</span>
         <div class="panel-size-controls" title="Cambiar tamaño del panel">
           <button class="panel-size-btn" data-size="collapsed" title="Colapsar panel de rosa" aria-label="Colapsar panel brújula">−</button>

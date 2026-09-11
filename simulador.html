@@ -203,7 +203,7 @@
     /* ── ROSA DE LOS VIENTOS (COMPASS) ────────────────────────────── */
     .sim-compass-card {
       position: fixed;
-      top: max(110px, calc(env(safe-area-inset-top, 0px) + 104px));
+      top: max(80px, calc(env(safe-area-inset-top, 0px) + 74px));
       left: 16px;
       z-index: 40;
       background: var(--panel-bg);
@@ -299,7 +299,7 @@
     /* ── TELEMETRÍA NÁUTICA ───────────────────────────────────────── */
     .sim-telemetry-card {
       position: fixed;
-      top: max(96px, calc(env(safe-area-inset-top, 0px) + 90px));
+      top: max(80px, calc(env(safe-area-inset-top, 0px) + 74px));
       right: 16px;
       z-index: 40;
       background: var(--panel-bg);
@@ -1495,7 +1495,7 @@
 
       /* Widgets de rosa y telemetría compactos en esquinas superiores */
       .sim-compass-card {
-        top: max(80px, calc(env(safe-area-inset-top, 0px) + 76px));
+        top: max(105px, calc(env(safe-area-inset-top, 0px) + 98px));
         bottom: auto;
         left: 8px;
         width: 105px;
@@ -1519,7 +1519,7 @@
       }
 
       .sim-telemetry-card {
-        top: max(80px, calc(env(safe-area-inset-top, 0px) + 76px));
+        top: max(105px, calc(env(safe-area-inset-top, 0px) + 98px));
         bottom: auto;
         right: 8px;
         width: 140px;
@@ -1617,34 +1617,40 @@
     /* Botones de control de tamaño en headers de panel */
     .panel-size-controls {
       display: flex;
-      gap: 4px;
+      gap: 3px;
       align-items: center;
       margin-left: auto;
+      flex-shrink: 0;
     }
     .panel-size-btn {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
       color: #94a3b8;
-      width: 26px;
-      height: 26px;
-      border-radius: 6px;
+      width: 22px;
+      height: 22px;
+      min-width: 22px !important;
+      min-height: 22px !important;
+      max-width: 22px;
+      max-height: 22px;
+      border-radius: 5px;
       font-size: 0.68rem;
       cursor: pointer;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       transition: all 0.15s ease;
       font-family: inherit;
       font-weight: 700;
       flex-shrink: 0;
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
-      min-width: 44px;
-      min-height: 44px;
     }
     .panel-size-btn:hover,
     .panel-size-btn:active {
-      background: rgba(56,189,248,0.2);
+      background: rgba(56,189,248,0.25);
       border-color: var(--accent-cyan);
       color: #ffffff;
     }
@@ -1661,19 +1667,40 @@
                   opacity 0.2s ease;
       will-change: width, min-height;
       overflow: hidden;
+      box-sizing: border-box;
+      width: 230px;
     }
     .sim-compass-card .compass-header {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      width: 100%;
+    }
+    .compass-title {
+      font-size: 0.74rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .compass-title-long {
+      display: none;
+    }
+    @media (min-width: 1400px) {
+      .sim-compass-card:not([data-size="collapsed"]) .compass-title-long {
+        display: inline;
+      }
     }
     .sim-compass-card[data-size="collapsed"] .compass-dial-container,
     .sim-compass-card[data-size="collapsed"] .compass-subtext {
       display: none !important;
     }
     .sim-compass-card[data-size="collapsed"] {
-      width: 140px;
-      padding: 8px 12px;
+      width: 205px;
+      padding: 8px 10px;
     }
     .sim-compass-card[data-size="expanded"] {
       width: 260px;
@@ -1703,8 +1730,15 @@
       display: none !important;
     }
     .sim-telemetry-card[data-size="collapsed"] {
-      width: 200px;
+      width: 215px;
       padding: 8px 12px;
+    }
+    .sim-telemetry-card[data-size="collapsed"] .tel-label {
+      font-size: 0.68rem;
+    }
+    .sim-telemetry-card[data-size="collapsed"] .tel-point-badge {
+      font-size: 0.76rem;
+      padding: 2px 6px;
     }
     .sim-telemetry-card[data-size="expanded"] {
       width: 360px;
@@ -1791,17 +1825,46 @@
        ══════════════════════════════════════════════════════════════════ */
     @media (min-width: 768px) and (max-width: 1366px) {
 
-      /* Touch targets mínimo 44px en todos los botones interactivos */
-      .mode-tab {
-        min-height: 44px;
-        padding: 10px 16px;
-        font-size: 0.82rem;
+      /* Header compacto en iPad/laptop para encajar holgadamente en 1 fila */
+      .sim-header {
+        align-items: center;
+        gap: 6px;
+        left: 10px;
+        right: 10px;
       }
-      .sim-btn {
-        min-height: 44px;
-        padding: 10px 16px;
-        font-size: 0.82rem;
-        border-radius: 12px;
+      .sim-brand {
+        padding: 4px 8px;
+        flex-shrink: 0;
+      }
+      .sim-brand h1 {
+        font-size: 0.86rem;
+      }
+      .sim-badge {
+        font-size: 0.52rem;
+      }
+      .sim-mode-selector {
+        flex-shrink: 1;
+        gap: 2px;
+        padding: 2px;
+      }
+      .sim-header .mode-tab {
+        min-height: 32px;
+        padding: 4px 7px;
+        font-size: 0.68rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .sim-header-actions {
+        flex-shrink: 0;
+        gap: 3px;
+      }
+      .sim-header .sim-btn {
+        min-height: 32px;
+        padding: 4px 7px;
+        font-size: 0.68rem;
+        border-radius: 8px;
+        white-space: nowrap;
+        gap: 3px;
       }
       .ripa-nav-btn {
         min-height: 44px;
@@ -1918,13 +1981,59 @@
 
     /* ── iPad en portrait (768×1024) ────────────────────────────────── */
     @media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+      .sim-header {
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px 10px;
+        top: max(10px, env(safe-area-inset-top, 10px));
+        left: 12px;
+        right: 12px;
+      }
+      .sim-brand {
+        order: 1;
+        flex: 0 0 auto;
+        padding: 5px 12px;
+      }
+      .sim-brand h1 {
+        font-size: 0.92rem;
+      }
+      .sim-badge {
+        font-size: 0.58rem;
+      }
+      .sim-header-actions {
+        order: 2;
+        flex: 0 0 auto;
+        margin-left: auto;
+        gap: 5px;
+      }
+      .sim-header-actions .sim-btn {
+        padding: 5px 8px;
+        font-size: 0.72rem;
+      }
+      .sim-mode-selector {
+        order: 3;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        gap: 4px;
+        padding: 3px;
+      }
+      .sim-mode-selector .mode-tab {
+        flex: 1 1 auto;
+        text-align: center;
+        padding: 7px 6px;
+        font-size: 0.72rem;
+      }
+
+      /* Widgets de rosa y telemetría debajo del header de 2 filas (sin solapamiento) */
       .sim-compass-card {
-        width: 190px;
-        top: max(90px, calc(env(safe-area-inset-top, 0px) + 84px));
+        width: 200px;
+        top: max(112px, calc(env(safe-area-inset-top, 0px) + 106px));
       }
       .sim-telemetry-card {
-        width: 250px;
-        top: max(90px, calc(env(safe-area-inset-top, 0px) + 84px));
+        width: 260px;
+        top: max(112px, calc(env(safe-area-inset-top, 0px) + 106px));
       }
       .ctrl-row-sliders {
         grid-template-columns: repeat(3, 1fr);
