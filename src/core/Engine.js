@@ -12,16 +12,18 @@ export class Engine {
     this.scene.background = new THREE.Color(0x7dd3fc); // Cielo azul diurno luminoso
     this.scene.fog = new THREE.FogExp2(0x7dd3fc, 0.006);
 
+    const { width, height } = this.getViewportSize();
+
     this.camera = new THREE.PerspectiveCamera(
       45,
-      window.innerWidth / window.innerHeight,
+      width / height,
       0.1,
       1000
     );
     this.camera.position.set(12, 7, 16);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.3; // Exposición diurna radiante
@@ -40,13 +42,61 @@ export class Engine {
     this.updatables = [];
     this.clock = new THREE.Clock();
 
+    // Eventos de resize estándar y visualViewport
     window.addEventListener('resize', () => this.onResize());
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', () => this.onResize());
+    }
+
+    // ResizeObserver directo sobre el contenedor WebGL
+    if (typeof ResizeObserver !== 'undefined' && this.container) {
+      this.resizeObserver = new ResizeObserver(() => this.onResize());
+      this.resizeObserver.observe(this.container);
+    }
+
+    // Solución al arranque de iPadOS en modo standalone / fullscreen PWA:
+    // WebKit ajusta la altura final de pantalla tras la animación de inicio sin disparar 'resize'.
+    // Varios ticks garantizan que el canvas tome el 100% de la pantalla sin dejar franjas muertas.
+    setTimeout(() => this.onResize(), 60);
+    setTimeout(() => this.onResize(), 180);
+    setTimeout(() => this.onResize(), 350);
+    setTimeout(() => this.onResize(), 700);
+    setTimeout(() => this.onResize(), 1200);
+
+    window.addEventListener('orientationchange', () => {
+      setTimeout(() => this.onResize(), 100);
+      setTimeout(() => this.onResize(), 300);
+      setTimeout(() => this.onResize(), 600);
+    });
+  }
+
+  /**
+   * Obtiene dimensiones exactas del viewport dando prioridad al contenedor y visualViewport.
+   * Evita el bug de WebKit en iOS donde window.innerHeight reporta dimensiones incompletas.
+   */
+  getViewportSize() {
+    let width = this.container ? this.container.clientWidth : 0;
+    let height = this.container ? this.container.clientHeight : 0;
+
+    if (!width || !height) {
+      if (window.visualViewport) {
+        width = Math.round(window.visualViewport.width);
+        height = Math.round(window.visualViewport.height);
+      } else {
+        width = window.innerWidth;
+        height = window.innerHeight;
+      }
+    }
+    return { width, height };
   }
 
   onResize() {
-    this.camera.aspect = window.innerWidth / window.innerHeight;
+    const { width, height } = this.getViewportSize();
+    if (width <= 0 || height <= 0) return;
+
+    this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   }
 

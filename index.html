@@ -33,10 +33,19 @@
       -webkit-touch-callout: none;
     }
 
-    body, html {
+    html, body {
       width: 100%;
       height: 100%;
-      height: 100dvh;
+      min-height: 100%;
+      min-height: -webkit-fill-available;
+      position: fixed;
+      inset: 0;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: 0;
+      padding: 0;
       overflow: hidden;
       background-color: var(--bg-dark);
       font-family: 'Outfit', sans-serif;
@@ -47,12 +56,26 @@
 
     /* Lienzo WebGL 3D */
     #webgl-container {
-      position: absolute;
+      position: fixed;
+      inset: 0;
       top: 0;
       left: 0;
+      right: 0;
+      bottom: 0;
       width: 100%;
       height: 100%;
+      min-height: 100%;
+      min-height: -webkit-fill-available;
       z-index: 1;
+      overflow: hidden;
+    }
+
+    #webgl-container canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+      touch-action: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     /* Capa de interfaz de usuario flotante */
@@ -5214,12 +5237,43 @@
 
     animate();
 
-    // Redimensionamiento responsive
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
+    // Redimensionamiento responsive adaptado a iPadOS PWA fullscreen
+    function handleResize() {
+      const container = document.getElementById('webgl-container');
+      let w = container ? container.clientWidth : 0;
+      let h = container ? container.clientHeight : 0;
+      if (!w || !h) {
+        if (window.visualViewport) {
+          w = Math.round(window.visualViewport.width);
+          h = Math.round(window.visualViewport.height);
+        } else {
+          w = window.innerWidth;
+          h = window.innerHeight;
+        }
+      }
+      if (w <= 0 || h <= 0) return;
+      camera.aspect = w / h;
       camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setSize(w, h);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    }
+
+    window.addEventListener('resize', handleResize);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleResize);
+    }
+    const webglContainer = document.getElementById('webgl-container');
+    if (typeof ResizeObserver !== 'undefined' && webglContainer) {
+      new ResizeObserver(handleResize).observe(webglContainer);
+    }
+    setTimeout(handleResize, 60);
+    setTimeout(handleResize, 180);
+    setTimeout(handleResize, 350);
+    setTimeout(handleResize, 700);
+    setTimeout(handleResize, 1200);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(handleResize, 100);
+      setTimeout(handleResize, 300);
     });
 
     // Iniciar con aparejo Sloop y seleccionar Casco por defecto
