@@ -1794,7 +1794,7 @@
         <span class="hud-group-label">Vistas:</span>
         <div class="hud-group">
           <button class="btn-cam" id="btn-cam-general" title="Vista isométrica general (Sloop)">⛵ General</button>
-          <button class="btn-cam" id="btn-cam-crujia" title="Vista de crujía, babor y estribor">🧭 Crujía & Bandas</button>
+          <button class="btn-cam" id="btn-toggle-crujia" title="Activar o desactivar visualización de crujía, babor y estribor (Atajo: C)">🧭 Crujía: OFF</button>
           <button class="btn-cam" id="btn-cam-underwater" title="Vista subacuática de orza y bulbo">🤿 Quilla</button>
           <button class="btn-cam" id="btn-cam-sails" title="Vista en detalle de las velas y aparejo">📐 Velas</button>
           <button class="btn-cam" id="btn-cam-dims" title="Activar o desactivar visualización de cotas 3D">📏 Cotas 3D</button>
@@ -2836,9 +2836,9 @@
         case "Línea de Crujía":
           return new THREE.Vector3(0, 1.8, 0); // Se eleva en el plano de crujía
         case "Babor":
-          return new THREE.Vector3(-2.2, 0.6, 0); // Se desplaza hacia la banda de babor
+          return new THREE.Vector3(2.2, 0.6, 0); // Se desplaza hacia la banda de babor (+X)
         case "Estribor":
-          return new THREE.Vector3(2.2, 0.6, 0); // Se desplaza hacia la banda de estribor
+          return new THREE.Vector3(-2.2, 0.6, 0); // Se desplaza hacia la banda de estribor (-X)
         case "Línea de Flotación":
           return new THREE.Vector3(0, 0.4, 0);
         case "Cubierta":
@@ -3141,10 +3141,13 @@
     // ----------------------------------------------------
     // LÍNEA DE CRUJÍA, BABOR (ROJO) Y ESTRIBOR (VERDE)
     // ----------------------------------------------------
+    const crujiaRefGroup = new THREE.Group();
+    fixedHullGroup.add(crujiaRefGroup);
+    crujiaRefGroup.visible = false; // Comienza desactivado por defecto (se activa con botón o seleccionando la parte)
 
     // 1. LÍNEA DE CRUJÍA (Eje longitudinal de simetría)
     const crujiaGroup = new THREE.Group();
-    fixedHullGroup.add(crujiaGroup);
+    crujiaRefGroup.add(crujiaGroup);
 
     // Trazo que sigue el perfil de la cubierta de proa a popa
     const crujiaPoints = [
@@ -3189,18 +3192,18 @@
     crujiaGroup.add(crujiaHit);
     registerInteractive(crujiaHit, "Línea de Crujía");
 
-    // 2. BANDA DE BABOR (Lado izquierdo · Color Rojo náutico)
+    // 2. BANDA DE BABOR (Lado izquierdo mirando hacia proa · Color Rojo náutico · +X)
     const portGroup = new THREE.Group();
-    fixedHullGroup.add(portGroup);
+    crujiaRefGroup.add(portGroup);
 
-    // Franja / cinta náutica a lo largo de la borda de babor
+    // Franja / cinta náutica a lo largo de la borda de babor (+X)
     const portCurve = new THREE.CatmullRomCurve3([
       new THREE.Vector3(0, 1.33, 4.65),
-      new THREE.Vector3(-0.95, 1.33, 3.6),
-      new THREE.Vector3(-1.38, 1.33, 1.8),
-      new THREE.Vector3(-1.42, 1.33, 0.0),
-      new THREE.Vector3(-1.35, 1.33, -1.8),
-      new THREE.Vector3(-1.18, 1.33, -3.85)
+      new THREE.Vector3(0.95, 1.33, 3.6),
+      new THREE.Vector3(1.38, 1.33, 1.8),
+      new THREE.Vector3(1.42, 1.33, 0.0),
+      new THREE.Vector3(1.35, 1.33, -1.8),
+      new THREE.Vector3(1.18, 1.33, -3.85)
     ]);
     const portRibbonGeo = new THREE.TubeGeometry(portCurve, 36, 0.045, 8, false);
     const portRibbonMat = new THREE.MeshStandardMaterial({
@@ -3214,12 +3217,12 @@
     portGroup.add(portRibbonMesh);
     registerInteractive(portRibbonMesh, "Babor");
 
-    // Farol de navegación de Babor (Luz roja sectorial 112.5°)
+    // Farol de navegación de Babor (Luz roja sectorial 112.5° · +X)
     const portLampBracket = new THREE.Mesh(
       new THREE.CylinderGeometry(0.025, 0.025, 0.16, 8),
       metalFitMat
     );
-    portLampBracket.position.set(-1.22, 1.43, 1.5);
+    portLampBracket.position.set(1.22, 1.43, 1.5);
     portGroup.add(portLampBracket);
     registerDecorativeExplodable(portLampBracket, "Babor");
 
@@ -3232,36 +3235,36 @@
         roughness: 0.2
       })
     );
-    portLampSphere.position.set(-1.22, 1.52, 1.5);
+    portLampSphere.position.set(1.22, 1.52, 1.5);
     portGroup.add(portLampSphere);
     registerInteractive(portLampSphere, "Babor");
 
-    // Badge 3D flotante para Babor
+    // Badge 3D flotante para Babor (+X)
     const portBadge = createTextBadgeSprite("🔴 BABOR", "rgba(70, 10, 10, 0.88)", "#fca5a5", "rgba(239, 68, 68, 0.75)");
-    portBadge.position.set(-1.95, 1.75, 0.2);
+    portBadge.position.set(1.95, 1.75, 0.2);
     portGroup.add(portBadge);
     registerDecorativeExplodable(portBadge, "Babor");
 
-    // Hitbox amplio para seleccionar la banda de babor
+    // Hitbox amplio para seleccionar la banda de babor (+X)
     const portHitGeo = new THREE.CylinderGeometry(0.38, 0.38, 8.4, 8);
     const portHit = new THREE.Mesh(portHitGeo, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }));
     portHit.rotation.x = Math.PI / 2;
-    portHit.position.set(-1.28, 1.25, 0.3);
+    portHit.position.set(1.28, 1.25, 0.3);
     portGroup.add(portHit);
     registerInteractive(portHit, "Babor");
 
-    // 3. BANDA DE ESTRIBOR (Lado derecho · Color Verde náutico)
+    // 3. BANDA DE ESTRIBOR (Lado derecho mirando hacia proa · Color Verde náutico · -X)
     const starboardGroup = new THREE.Group();
-    fixedHullGroup.add(starboardGroup);
+    crujiaRefGroup.add(starboardGroup);
 
-    // Franja / cinta náutica a lo largo de la borda de estribor
+    // Franja / cinta náutica a lo largo de la borda de estribor (-X)
     const starboardCurve = new THREE.CatmullRomCurve3([
       new THREE.Vector3(0, 1.33, 4.65),
-      new THREE.Vector3(0.95, 1.33, 3.6),
-      new THREE.Vector3(1.38, 1.33, 1.8),
-      new THREE.Vector3(1.42, 1.33, 0.0),
-      new THREE.Vector3(1.35, 1.33, -1.8),
-      new THREE.Vector3(1.18, 1.33, -3.85)
+      new THREE.Vector3(-0.95, 1.33, 3.6),
+      new THREE.Vector3(-1.38, 1.33, 1.8),
+      new THREE.Vector3(-1.42, 1.33, 0.0),
+      new THREE.Vector3(-1.35, 1.33, -1.8),
+      new THREE.Vector3(-1.18, 1.33, -3.85)
     ]);
     const starboardRibbonGeo = new THREE.TubeGeometry(starboardCurve, 36, 0.045, 8, false);
     const starboardRibbonMat = new THREE.MeshStandardMaterial({
@@ -3275,12 +3278,12 @@
     starboardGroup.add(starboardRibbonMesh);
     registerInteractive(starboardRibbonMesh, "Estribor");
 
-    // Farol de navegación de Estribor (Luz verde sectorial 112.5°)
+    // Farol de navegación de Estribor (Luz verde sectorial 112.5° · -X)
     const starboardLampBracket = new THREE.Mesh(
       new THREE.CylinderGeometry(0.025, 0.025, 0.16, 8),
       metalFitMat
     );
-    starboardLampBracket.position.set(1.22, 1.43, 1.5);
+    starboardLampBracket.position.set(-1.22, 1.43, 1.5);
     starboardGroup.add(starboardLampBracket);
     registerDecorativeExplodable(starboardLampBracket, "Estribor");
 
@@ -3293,21 +3296,21 @@
         roughness: 0.2
       })
     );
-    starboardLampSphere.position.set(1.22, 1.52, 1.5);
+    starboardLampSphere.position.set(-1.22, 1.52, 1.5);
     starboardGroup.add(starboardLampSphere);
     registerInteractive(starboardLampSphere, "Estribor");
 
-    // Badge 3D flotante para Estribor
+    // Badge 3D flotante para Estribor (-X)
     const starboardBadge = createTextBadgeSprite("🟢 ESTRIBOR", "rgba(10, 50, 25, 0.88)", "#86efac", "rgba(34, 197, 94, 0.75)");
-    starboardBadge.position.set(1.95, 1.75, 0.2);
+    starboardBadge.position.set(-1.95, 1.75, 0.2);
     starboardGroup.add(starboardBadge);
     registerDecorativeExplodable(starboardBadge, "Estribor");
 
-    // Hitbox amplio para seleccionar la banda de estribor
+    // Hitbox amplio para seleccionar la banda de estribor (-X)
     const starboardHitGeo = new THREE.CylinderGeometry(0.38, 0.38, 8.4, 8);
     const starboardHit = new THREE.Mesh(starboardHitGeo, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }));
     starboardHit.rotation.x = Math.PI / 2;
-    starboardHit.position.set(1.28, 1.25, 0.3);
+    starboardHit.position.set(-1.28, 1.25, 0.3);
     starboardGroup.add(starboardHit);
     registerInteractive(starboardHit, "Estribor");
 
@@ -4216,6 +4219,37 @@
       });
     }
 
+    // Botón de alternar visualización de Línea de Crujía, Babor y Estribor en barra inferior
+    let crujiaVisible = false;
+    const btnToggleCrujia = document.getElementById('btn-toggle-crujia');
+
+    function setCrujiaVisible(visible, moveCamera = false) {
+      crujiaVisible = visible;
+      if (typeof crujiaRefGroup !== 'undefined' && crujiaRefGroup) {
+        crujiaRefGroup.visible = crujiaVisible;
+      }
+      if (btnToggleCrujia) {
+        btnToggleCrujia.textContent = crujiaVisible ? "🧭 Crujía: ON" : "🧭 Crujía: OFF";
+        btnToggleCrujia.style.borderColor = crujiaVisible ? 'var(--accent-cyan)' : 'rgba(56, 189, 248, 0.3)';
+        btnToggleCrujia.style.color = crujiaVisible ? 'var(--accent-cyan)' : 'var(--text-secondary)';
+      }
+      if (crujiaVisible && moveCamera) {
+        camera.position.set(0, 7.5, -8.5);
+        controls.target.set(0, 1.8, 1.0);
+        controls.update();
+      }
+    }
+
+    if (btnToggleCrujia) {
+      btnToggleCrujia.addEventListener('click', () => {
+        const nextState = !crujiaVisible;
+        setCrujiaVisible(nextState, nextState);
+        if (nextState) {
+          selectPart("Línea de Crujía");
+        }
+      });
+    }
+
     // En pantallas de celulares / móviles, iniciar el Bottom Sheet contraído para priorizar la vista 3D
     if (window.innerWidth <= 860 && infoPanel) {
       setSheetExpanded(false);
@@ -4553,16 +4587,16 @@
         controls.target.set(0, 1.2, -2.5);
         controls.update();
       } else if (partName === "Línea de Crujía") {
-        camera.position.set(0, 11.5, 6.5);
-        controls.target.set(0, 1.2, 0.5);
+        camera.position.set(0, 7.5, -8.5);
+        controls.target.set(0, 1.8, 1.0);
         controls.update();
       } else if (partName === "Babor") {
-        camera.position.set(-8.5, 3.8, 1.5);
-        controls.target.set(-0.5, 1.2, 0.2);
-        controls.update();
-      } else if (partName === "Estribor") {
         camera.position.set(8.5, 3.8, 1.5);
         controls.target.set(0.5, 1.2, 0.2);
+        controls.update();
+      } else if (partName === "Estribor") {
+        camera.position.set(-8.5, 3.8, 1.5);
+        controls.target.set(-0.5, 1.2, 0.2);
         controls.update();
       } else if (partName === "Centro Vélico") {
         camera.position.set(7, 6.5, 9);
@@ -4611,6 +4645,10 @@
           btnCamDims.style.borderColor = 'var(--accent-gold)';
           btnCamDims.style.color = 'var(--accent-gold)';
         }
+      }
+
+      if (partName === "Línea de Crujía" || partName === "Babor" || partName === "Estribor") {
+        setCrujiaVisible(true);
       }
 
       panelNum.textContent = info.num;
@@ -4884,6 +4922,12 @@
         toggleWireframeMode();
       } else if (key === 'a' || key === 'i') {
         toggleIsolateMode();
+      } else if (key === 'c') {
+        const nextState = !crujiaVisible;
+        setCrujiaVisible(nextState, nextState);
+        if (nextState) {
+          selectPart("Línea de Crujía");
+        }
       } else if (key === 'm') {
         toggleBoatMotion();
       } else if (key === 'x') {
@@ -4916,16 +4960,6 @@
       controls.update();
       selectPart("Casco");
     });
-
-    const btnCamCrujia = document.getElementById('btn-cam-crujia');
-    if (btnCamCrujia) {
-      btnCamCrujia.addEventListener('click', () => {
-        camera.position.set(0, 11.5, 6.5);
-        controls.target.set(0, 1.2, 0.5);
-        controls.update();
-        selectPart("Línea de Crujía");
-      });
-    }
 
     document.getElementById('btn-cam-sails').addEventListener('click', () => {
       camera.position.set(7, 7.5, 8);

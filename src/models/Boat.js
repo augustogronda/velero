@@ -244,39 +244,39 @@ export class Boat {
 
     addCable(new THREE.Vector3(0, 1.4, 4.4), new THREE.Vector3(0, 12.1, 0.95));  // Estay Proel
     addCable(new THREE.Vector3(0, 1.3, -3.8), new THREE.Vector3(0, 12.1, 0.95)); // Baquestay
-    addCable(new THREE.Vector3(-1.18, 1.3, 0.9), new THREE.Vector3(0, 12.1, 0.95));// Obenque Babor
-    addCable(new THREE.Vector3(1.18, 1.3, 0.9), new THREE.Vector3(0, 12.1, 0.95)); // Obenque Estribor
+    addCable(new THREE.Vector3(1.18, 1.3, 0.9), new THREE.Vector3(0, 12.1, 0.95)); // Obenque Babor (+X)
+    addCable(new THREE.Vector3(-1.18, 1.3, 0.9), new THREE.Vector3(0, 12.1, 0.95));// Obenque Estribor (-X)
   }
 
   buildNavigationLights() {
     this.lightsGroup = new THREE.Group();
     this.tiltGroup.add(this.lightsGroup);
 
-    // Luz de Babor (Roja - 112.5° hacia proa y banda de babor)
+    // Luz de Babor (Roja - 112.5° hacia proa y banda de babor - Izquierda looking forward / +X)
     this.portLamp = new THREE.Mesh(
       new THREE.SphereGeometry(0.07, 12, 12),
       new THREE.MeshStandardMaterial({ color: 0xff2222, emissive: 0xff0000, emissiveIntensity: 0 })
     );
-    this.portLamp.position.set(-1.18, 1.35, 1.2);
+    this.portLamp.position.set(1.18, 1.35, 1.2);
     this.lightsGroup.add(this.portLamp);
 
     this.portSpot = new THREE.SpotLight(0xff2222, 0, 14, Math.PI * 0.35, 0.5);
-    this.portSpot.position.set(-1.18, 1.35, 1.2);
-    this.portSpot.target.position.set(-5, 0, 5);
+    this.portSpot.position.set(1.18, 1.35, 1.2);
+    this.portSpot.target.position.set(5, 0, 5);
     this.lightsGroup.add(this.portSpot);
     this.lightsGroup.add(this.portSpot.target);
 
-    // Luz de Estribor (Verde - 112.5° hacia proa y banda de estribor)
+    // Luz de Estribor (Verde - 112.5° hacia proa y banda de estribor - Derecha looking forward / -X)
     this.starboardLamp = new THREE.Mesh(
       new THREE.SphereGeometry(0.07, 12, 12),
       new THREE.MeshStandardMaterial({ color: 0x22ff44, emissive: 0x00ff22, emissiveIntensity: 0 })
     );
-    this.starboardLamp.position.set(1.18, 1.35, 1.2);
+    this.starboardLamp.position.set(-1.18, 1.35, 1.2);
     this.lightsGroup.add(this.starboardLamp);
 
     this.starboardSpot = new THREE.SpotLight(0x22ff44, 0, 14, Math.PI * 0.35, 0.5);
-    this.starboardSpot.position.set(1.18, 1.35, 1.2);
-    this.starboardSpot.target.position.set(5, 0, 5);
+    this.starboardSpot.position.set(-1.18, 1.35, 1.2);
+    this.starboardSpot.target.position.set(-5, 0, 5);
     this.lightsGroup.add(this.starboardSpot);
     this.lightsGroup.add(this.starboardSpot.target);
 
