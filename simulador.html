@@ -4,22 +4,49 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Simulador Náutico de Viento y Maniobras 3D - Curso de Timonel (PNA)</title>
-  
+
+  <!-- PWA: Instalación como Web App -->
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#0a172c" />
+
+  <!-- iOS / iPadOS específico -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Náutico PNA" />
+  <!-- Favicon e Iconos -->
+  <link rel="icon" type="image/png" href="./icons/icon-192.png" />
+  <link rel="shortcut icon" href="./icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+
+  <!-- SEO / descripción -->
+  <meta name="description" content="Simulador interactivo 3D de viento, maniobras RIPA, boyado IALA B y fondeo para el Curso de Timonel PNA." />
+  <meta name="mobile-web-app-capable" content="yes" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --bg-dark: #7dd3fc;
+      --sky-day: #7dd3fc;
       --panel-bg: rgba(10, 23, 44, 0.88);
       --panel-border: rgba(56, 189, 248, 0.32);
       --accent-cyan: #38bdf8;
       --accent-gold: #f59e0b;
       --accent-emerald: #10b981;
-      --accent-rose: #f43f5e;
+      --accent-rose: #ef4444;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
+
+      /* Escala armónica de z-index */
+      --z-canvas: 1;
+      --z-cards: 40;
+      --z-header: 50;
+      --z-controls: 50;
+      --z-env: 55;
+      --z-hud-toggle: 60;
+      --z-drawer: 100;
+      --z-pwa-banner: 200;
     }
 
     * {
@@ -31,12 +58,17 @@
       -webkit-touch-callout: none;
     }
 
+    *:focus-visible {
+      outline: 2px solid var(--accent-cyan);
+      outline-offset: 2px;
+    }
+
     body, html {
       width: 100%;
       height: 100%;
       height: 100dvh;
       overflow: hidden;
-      background-color: var(--bg-dark);
+      background-color: var(--sky-day);
       font-family: 'Outfit', sans-serif;
       color: var(--text-main);
       -webkit-font-smoothing: antialiased;
@@ -48,7 +80,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: 1;
+      z-index: var(--z-canvas);
     }
 
     /* ── BARRA SUPERIOR ────────────────────────────────────────────── */
@@ -72,11 +104,11 @@
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid var(--panel-border);
       border-radius: 14px;
-      padding: 8px 16px;
+      padding: 6px 14px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.5);
     }
     .sim-badge {
-      font-size: 0.64rem;
+      font-size: 0.62rem;
       font-weight: 800;
       color: var(--accent-cyan);
       letter-spacing: 0.08em;
@@ -84,30 +116,30 @@
     }
     .sim-brand h1 {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.15rem;
+      font-size: 1.05rem;
       font-weight: 700;
       color: #ffffff;
-      line-height: 1.2;
+      line-height: 1.15;
     }
 
     .sim-mode-selector {
       display: flex;
-      gap: 6px;
+      gap: 4px;
       background: var(--panel-bg);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid var(--panel-border);
       border-radius: 12px;
-      padding: 4px;
+      padding: 3px;
       pointer-events: auto;
     }
     .mode-tab {
       background: transparent;
       border: none;
       color: var(--text-muted);
-      padding: 6px 12px;
+      padding: 6px 10px;
       border-radius: 8px;
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       font-weight: 700;
       cursor: pointer;
       transition: all 0.2s;
@@ -126,7 +158,7 @@
     .sim-header-actions {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       pointer-events: auto;
     }
 
@@ -136,16 +168,16 @@
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid var(--panel-border);
       color: #ffffff;
-      padding: 8px 14px;
+      padding: 6px 11px;
       border-radius: 10px;
-      font-size: 0.78rem;
+      font-size: 0.74rem;
       font-weight: 600;
       cursor: pointer;
       text-decoration: none;
       transition: all 0.2s ease;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       font-family: inherit;
     }
     .sim-btn:hover {
@@ -171,7 +203,7 @@
     /* ── ROSA DE LOS VIENTOS (COMPASS) ────────────────────────────── */
     .sim-compass-card {
       position: fixed;
-      top: max(80px, calc(env(safe-area-inset-top, 0px) + 74px));
+      top: max(110px, calc(env(safe-area-inset-top, 0px) + 104px));
       left: 16px;
       z-index: 40;
       background: var(--panel-bg);
@@ -267,7 +299,7 @@
     /* ── TELEMETRÍA NÁUTICA ───────────────────────────────────────── */
     .sim-telemetry-card {
       position: fixed;
-      top: max(80px, calc(env(safe-area-inset-top, 0px) + 74px));
+      top: max(96px, calc(env(safe-area-inset-top, 0px) + 90px));
       right: 16px;
       z-index: 40;
       background: var(--panel-bg);
@@ -354,7 +386,7 @@
     /* ── TARJETA RIPA ─────────────────────────────────────────────── */
     .sim-ripa-card {
       position: fixed;
-      top: max(80px, calc(env(safe-area-inset-top, 0px) + 74px));
+      top: max(96px, calc(env(safe-area-inset-top, 0px) + 90px));
       right: 16px;
       z-index: 40;
       background: var(--panel-bg);
@@ -418,8 +450,11 @@
       align-items: center;
       gap: 4px;
       overflow-x: auto;
-      padding-bottom: 2px;
+      padding-bottom: 4px;
       scrollbar-width: thin;
+      scrollbar-color: rgba(56, 189, 248, 0.35) transparent;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
     }
     .ripa-pill {
       flex: 0 0 28px;
@@ -436,6 +471,7 @@
       cursor: pointer;
       transition: all 0.2s;
       font-family: 'Space Grotesk', sans-serif;
+      scroll-snap-align: start;
     }
     .ripa-pill:hover {
       background: rgba(255,255,255,0.12);
@@ -490,6 +526,12 @@
       outline: none;
       font-family: inherit;
       cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .ripa-select:focus,
+    .ripa-select:focus-visible {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.35);
     }
     .ripa-select option {
       background: #0f172a;
@@ -570,7 +612,7 @@
     /* ── TARJETA IALA B ───────────────────────────────────────────── */
     .sim-iala-card {
       position: fixed;
-      top: max(80px, calc(env(safe-area-inset-top, 0px) + 74px));
+      top: max(96px, calc(env(safe-area-inset-top, 0px) + 90px));
       right: 16px;
       z-index: 40;
       background: var(--panel-bg);
@@ -628,7 +670,7 @@
     /* ── TARJETA FONDEO Y BORNEO ──────────────────────────────────── */
     .sim-anchor-card {
       position: fixed;
-      top: max(80px, calc(env(safe-area-inset-top, 0px) + 74px));
+      top: max(96px, calc(env(safe-area-inset-top, 0px) + 90px));
       right: 16px;
       z-index: 40;
       background: var(--panel-bg);
@@ -1281,46 +1323,51 @@
     .note-item p {
       font-size: 0.74rem;
       color: #cbd5e1;
-      line-height: 1.45;
+      line-height: 1.5;
+      white-space: pre-line;
     }
 
-    /* ── BOTÓN FLOTANTE OCULTAR/MOSTRAR HUD ────────────────────────── */
-    .sim-btn-hud-toggle {
+    /* ── ANIMACIÓN DE ENTRADA SUAVE PARA PANELES ─────────────────── */
+    @keyframes panelEnter {
+      from {
+        opacity: 0;
+        transform: translateY(6px) scale(0.985);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .panel-entering {
+      animation: panelEnter 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* ── BOTÓN OCULTAR/MOSTRAR HUD ────────────────────────────────── */
+    #btn-toggle-hud.hud-off {
+      background: rgba(16, 185, 129, 0.25);
+      border-color: #10b981;
+      color: #34d399;
+    }
+
+    body.hud-hidden #btn-toggle-hud {
       position: fixed;
-      left: 12px;
-      bottom: max(68px, calc(env(safe-area-inset-bottom, 0px) + 64px));
-      z-index: 60;
-      background: var(--panel-bg);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--panel-border);
-      color: var(--accent-cyan);
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      font-size: 1.1rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-      transition: all 0.2s ease;
-      touch-action: manipulation;
-    }
-    .sim-btn-hud-toggle:hover {
-      background: rgba(56, 189, 248, 0.25);
-      transform: scale(1.08);
-    }
-    .sim-btn-hud-toggle.hud-off {
-      background: rgba(239, 68, 68, 0.25);
-      border-color: #ef4444;
-      color: #fca5a5;
+      top: max(12px, env(safe-area-inset-top, 12px));
+      right: 16px;
+      z-index: var(--z-hud-toggle);
+      background: rgba(16, 185, 129, 0.35) !important;
+      border: 1px solid #10b981 !important;
+      color: #34d399 !important;
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.5);
     }
 
+    body.hud-hidden .sim-header .sim-brand,
+    body.hud-hidden .sim-header .sim-mode-selector,
+    body.hud-hidden .sim-header .sim-header-actions button:not(#btn-toggle-hud),
+    body.hud-hidden .sim-header .sim-header-actions a,
     body.hud-hidden .sim-compass-card,
     body.hud-hidden .sim-telemetry-card,
-    body.hud-hidden .sim-controls-panel .ctrl-drawer-content,
-    body.hud-hidden .sim-header .sim-mode-selector,
+    body.hud-hidden .sim-controls-panel,
     body.hud-hidden .sim-ripa-card,
     body.hud-hidden .sim-anchor-card,
     body.hud-hidden .sim-iala-card {
@@ -1560,6 +1607,334 @@
         border-radius: 16px;
         z-index: 55;
       }
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       SISTEMA DE PANELES REDIMENSIONABLES — SNAP A 3 ESTADOS
+       collapsed | normal | expanded
+       ══════════════════════════════════════════════════════════════════ */
+
+    /* Botones de control de tamaño en headers de panel */
+    .panel-size-controls {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      margin-left: auto;
+    }
+    .panel-size-btn {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #94a3b8;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      font-size: 0.68rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      font-family: inherit;
+      font-weight: 700;
+      flex-shrink: 0;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      min-width: 44px;
+      min-height: 44px;
+    }
+    .panel-size-btn:hover,
+    .panel-size-btn:active {
+      background: rgba(56,189,248,0.2);
+      border-color: var(--accent-cyan);
+      color: #ffffff;
+    }
+    .panel-size-btn.active-size {
+      background: var(--accent-cyan);
+      color: #030d1b;
+      border-color: var(--accent-cyan);
+    }
+
+    /* ── Estados de Brújula ──────────────────────────────────────────── */
+    .sim-compass-card {
+      transition: width 0.3s cubic-bezier(0.2,0.8,0.2,1),
+                  min-height 0.3s cubic-bezier(0.2,0.8,0.2,1),
+                  opacity 0.2s ease;
+      will-change: width, min-height;
+      overflow: hidden;
+    }
+    .sim-compass-card .compass-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sim-compass-card[data-size="collapsed"] .compass-dial-container,
+    .sim-compass-card[data-size="collapsed"] .compass-subtext {
+      display: none !important;
+    }
+    .sim-compass-card[data-size="collapsed"] {
+      width: 140px;
+      padding: 8px 12px;
+    }
+    .sim-compass-card[data-size="expanded"] {
+      width: 260px;
+    }
+    .sim-compass-card[data-size="expanded"] .compass-svg {
+      width: 210px;
+      height: 210px;
+    }
+
+    /* ── Estados de Telemetría ───────────────────────────────────────── */
+    .sim-telemetry-card {
+      transition: width 0.3s cubic-bezier(0.2,0.8,0.2,1),
+                  opacity 0.2s ease;
+      will-change: width;
+      overflow: hidden;
+    }
+    .sim-telemetry-card .tel-header-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding-bottom: 8px;
+      margin-bottom: 2px;
+    }
+    .sim-telemetry-card[data-size="collapsed"] .tel-metrics-grid,
+    .sim-telemetry-card[data-size="collapsed"] .tel-eval-box {
+      display: none !important;
+    }
+    .sim-telemetry-card[data-size="collapsed"] {
+      width: 200px;
+      padding: 8px 12px;
+    }
+    .sim-telemetry-card[data-size="expanded"] {
+      width: 360px;
+    }
+    .sim-telemetry-card[data-size="expanded"] .tel-eval-box {
+      display: block !important;
+    }
+
+    /* ── BANNER DE INSTALACIÓN PWA (iOS "Add to Home Screen") ────────── */
+    .pwa-install-banner {
+      position: fixed;
+      bottom: max(90px, calc(env(safe-area-inset-bottom, 0px) + 86px));
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      z-index: 200;
+      background: rgba(10, 23, 44, 0.97);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 16px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.7), 0 0 0 1px rgba(56,189,248,0.1);
+      min-width: 320px;
+      max-width: 420px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.2,0.8,0.2,1);
+    }
+    .pwa-install-banner.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+    .pwa-banner-icon {
+      font-size: 2rem;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+    .pwa-banner-text {
+      flex: 1;
+    }
+    .pwa-banner-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 3px;
+    }
+    .pwa-banner-desc {
+      font-size: 0.73rem;
+      color: #94a3b8;
+      line-height: 1.4;
+    }
+    .pwa-banner-desc strong {
+      color: var(--accent-cyan);
+    }
+    .pwa-banner-close {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #94a3b8;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      touch-action: manipulation;
+      transition: all 0.15s;
+    }
+    .pwa-banner-close:hover {
+      background: rgba(255,255,255,0.12);
+      color: #ffffff;
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       OPTIMIZACIÓN IPAD 9 — 768px–1024px (landscape: 1024×768 logical)
+       Apple HIG: touch targets mínimo 44×44px
+       ══════════════════════════════════════════════════════════════════ */
+    @media (min-width: 768px) and (max-width: 1366px) {
+
+      /* Touch targets mínimo 44px en todos los botones interactivos */
+      .mode-tab {
+        min-height: 44px;
+        padding: 10px 16px;
+        font-size: 0.82rem;
+      }
+      .sim-btn {
+        min-height: 44px;
+        padding: 10px 16px;
+        font-size: 0.82rem;
+        border-radius: 12px;
+      }
+      .ripa-nav-btn {
+        min-height: 44px;
+        padding: 8px 14px;
+        font-size: 0.76rem;
+      }
+      .ripa-opt-btn {
+        min-height: 44px;
+        padding: 10px 12px;
+      }
+      .btn-preset {
+        min-height: 44px;
+        padding: 8px 14px;
+        font-size: 0.78rem;
+      }
+      .btn-weather-quick,
+      .btn-reef-quick {
+        min-height: 44px;
+        padding: 8px 12px;
+      }
+      .ripa-pill {
+        min-width: 44px;
+        min-height: 44px;
+        flex: 0 0 36px;
+        height: 36px;
+      }
+      .weather-btn {
+        min-height: 44px;
+        padding: 10px 12px;
+      }
+      .reefing-btn {
+        min-height: 44px;
+      }
+      input[type="range"] {
+        height: 6px !important;
+        cursor: pointer;
+      }
+      /* Slider thumb más grande para dedo */
+      input[type="range"]::-webkit-slider-thumb {
+        width: 24px;
+        height: 24px;
+      }
+
+      /* Panel brújula: tamaño iPad */
+      .sim-compass-card {
+        width: 230px;
+      }
+      .compass-svg {
+        width: 185px;
+        height: 185px;
+      }
+
+      /* Panel telemetría: tamaño iPad */
+      .sim-telemetry-card {
+        width: 310px;
+      }
+
+      /* Métricas con más espacio */
+      .m-val {
+        font-size: 1.4rem;
+      }
+      .tel-label {
+        font-size: 0.76rem;
+      }
+
+      /* Panel de controles inferior — más espacio */
+      .sim-controls-panel {
+        padding: 12px 18px;
+      }
+      .ctrl-row-sliders {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+      }
+      .slider-card {
+        padding: 8px 12px;
+      }
+      .slider-card label {
+        font-size: 0.72rem;
+      }
+
+      /* Cards laterales — ancho iPad */
+      .sim-ripa-card,
+      .sim-anchor-card,
+      .sim-weather-card {
+        width: 400px;
+      }
+      .sim-iala-card {
+        width: 380px;
+      }
+
+      /* Fuentes más legibles en pantalla 10.2" */
+      .ripa-question {
+        font-size: 0.95rem;
+      }
+      .ripa-desc {
+        font-size: 0.84rem;
+        line-height: 1.5;
+      }
+      .anchor-advice {
+        font-size: 0.80rem;
+        line-height: 1.5;
+      }
+
+      /* Modo noche: título visible */
+      .sim-btn .btn-text {
+        display: inline;
+      }
+
+      /* Drawer de apuntes: más ancho en iPad */
+      .sim-notes-drawer {
+        width: 480px;
+      }
+    }
+
+    /* ── iPad en portrait (768×1024) ────────────────────────────────── */
+    @media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+      .sim-compass-card {
+        width: 190px;
+        top: max(90px, calc(env(safe-area-inset-top, 0px) + 84px));
+      }
+      .sim-telemetry-card {
+        width: 250px;
+        top: max(90px, calc(env(safe-area-inset-top, 0px) + 84px));
+      }
+      .ctrl-row-sliders {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    /* ── Canvas: prevenir gestos del navegador ───────────────────────── */
+    #webgl-container canvas {
+      touch-action: none;
+      -webkit-tap-highlight-color: transparent;
     }
   </style>
 </head>

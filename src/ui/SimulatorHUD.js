@@ -3,6 +3,143 @@ import { COURSE_NOTES } from './CourseNotes.js';
 import { RIPA_SCENARIOS } from '../simulation/RipaEngine.js';
 import { WEATHER_PRESETS } from '../simulation/WeatherSystem.js';
 
+// ══════════════════════════════════════════════════════════════════════════════
+// PanelManager — Sistema de paneles con 3 estados snap: collapsed | normal | expanded
+// Persistencia en localStorage, doble-tap para toggle, transiciones suaves CSS
+// ══════════════════════════════════════════════════════════════════════════════
+class PanelManager {
+  /**
+   * @param {HTMLElement} el  — El elemento panel
+   * @param {string} id       — Identificador único para localStorage
+   * @param {string[]} sizes  — Orden de tamaños: ['collapsed','normal','expanded']
+   */
+  constructor(el, id, sizes = ['collapsed', 'normal', 'expanded']) {
+    this.el = el;
+    this.id = id;
+    this.sizes = sizes;
+    this.storageKey = `panel-size-${id}`;
+
+    // Restaurar estado guardado o usar 'normal'
+    const saved = localStorage.getItem(this.storageKey);
+    this.currentSize = sizes.includes(saved) ? saved : 'normal';
+    this._apply(this.currentSize, false);
+
+    // Doble-tap para toggle collapsed/normal
+    this._setupDoubleTap();
+  }
+
+  /** Cambia al tamaño indicado con animación */
+  setSize(size) {
+    if (!this.sizes.includes(size)) return;
+    this.currentSize = size;
+    this._apply(size, true);
+    try { localStorage.setItem(this.storageKey, size); } catch(e) {}
+  }
+
+  /** Cicla al siguiente tamaño */
+  cycleNext() {
+    const idx = this.sizes.indexOf(this.currentSize);
+    const next = this.sizes[(idx + 1) % this.sizes.length];
+    this.setSize(next);
+  }
+
+  _apply(size, animate = true) {
+    if (!animate) this.el.style.transition = 'none';
+    this.el.setAttribute('data-size', size);
+    if (!animate) requestAnimationFrame(() => { this.el.style.transition = ''; });
+  }
+
+  _setupDoubleTap() {
+    let lastTap = 0;
+    const header = this.el.querySelector('.compass-header, .tel-header-row, .panel-double-tap-zone');
+    const target = header || this.el;
+
+    target.addEventListener('pointerdown', (e) => {
+      // Solo actuar sobre el header, no sobre botones internos
+      if (e.target.closest('button, input, select')) return;
+      const now = Date.now();
+      if (now - lastTap < 300) {
+        // Doble-tap: toggle entre collapsed y normal
+        const next = this.currentSize === 'collapsed' ? 'normal' : 'collapsed';
+        this.setSize(next);
+        e.preventDefault();
+      }
+      lastTap = now;
+    });
+  }
+
+  /** Registra los botones S/M/L del panel */
+  bindSizeButtons(container) {
+    if (!container) return;
+    const btns = container.querySelectorAll('.panel-size-btn');
+    btns.forEach(btn => {
+      const size = btn.getAttribute('data-size');
+      btn.classList.toggle('active-size', size === this.currentSize);
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.setSize(size);
+        btns.forEach(b => b.classList.toggle('active-size', b.getAttribute('data-size') === size));
+      });
+    });
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PWA Install Banner — Toast para "Add to Home Screen" en iOS/iPadOS
+// ══════════════════════════════════════════════════════════════════════════════
+class PWAInstallBanner {
+  constructor() {
+    // Solo mostrar en iOS/iPadOS standalone-capable y si no fue descartado
+    const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+      (navigator.userAgent.includes('Mac') && 'ontouchend' in document);
+    const isStandalone = window.navigator.standalone === true;
+    const wasDismissed = localStorage.getItem('pwa-banner-dismissed') === '1';
+
+    if (!isIos || isStandalone || wasDismissed) return;
+
+    this._build();
+    // Mostrar 3s después de la carga
+    setTimeout(() => this._show(), 3000);
+  }
+
+  _build() {
+    this.el = document.createElement('div');
+    this.el.className = 'pwa-install-banner';
+    this.el.setAttribute('role', 'status');
+    this.el.setAttribute('aria-live', 'polite');
+    this.el.innerHTML = `
+      <div class="pwa-banner-icon">⚓</div>
+      <div class="pwa-banner-text">
+        <div class="pwa-banner-title">Instalar como App</div>
+        <div class="pwa-banner-desc">
+          Tocá <strong>Compartir</strong> (□↑) y luego<br>
+          <strong>"Agregar al inicio"</strong> para usar sin internet
+        </div>
+      </div>
+      <button class="pwa-banner-close" aria-label="Cerrar">✕</button>
+    `;
+    document.body.appendChild(this.el);
+
+    this.el.querySelector('.pwa-banner-close').addEventListener('click', () => {
+      this._dismiss();
+    });
+
+    // Auto-cerrar después de 12s
+    setTimeout(() => this._dismiss(), 12000);
+  }
+
+  _show() {
+    if (this.el) this.el.classList.add('visible');
+  }
+
+  _dismiss() {
+    if (!this.el) return;
+    this.el.classList.remove('visible');
+    try { localStorage.setItem('pwa-banner-dismissed', '1'); } catch(e) {}
+    setTimeout(() => this.el?.remove(), 400);
+  }
+}
+
 export class SimulatorHUD {
   constructor(windSystem, boat, environment, otherVessel, ripaEngine, ialaSystem, anchorSystem, weatherSystem, engine = null, windVisualizer = null) {
     this.wind = windSystem;
@@ -18,10 +155,73 @@ export class SimulatorHUD {
 
     this.currentMode = 'wind'; // 'wind', 'ripa', 'iala', 'anchor'
 
+    // ── Optimización Three.js para iPad: limitar DPR a 2x ───────────
+    if (this.engine && this.engine.renderer) {
+      const dpr = Math.min(window.devicePixelRatio, 2);
+      this.engine.renderer.setPixelRatio(dpr);
+    }
+
+    // ── Throttle del loop cuando app está en background ──────────────
+    this._setupVisibilityThrottle();
+
     this.initDOM();
     this.populateRipaNavigation();
     this.bindEvents();
+
+    // ── Inicializar sistema de paneles redimensionables ───────────────
+    this._initPanelManagers();
+
+    // ── Banner de instalación PWA ─────────────────────────────────────
+    new PWAInstallBanner();
+
+    // ── Registrar Service Worker ──────────────────────────────────────
+    this._registerServiceWorker();
+
     this.update();
+  }
+
+  /** Registra el Service Worker para soporte offline */
+  _registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js', { scope: './' })
+          .then(reg => {
+            if (import.meta.env?.DEV) console.log('⚓ SW registrado:', reg.scope);
+          })
+          .catch(err => {
+            if (import.meta.env?.DEV) console.warn('SW no disponible:', err);
+          });
+      });
+    }
+  }
+
+  /** Throttle del game loop cuando la pestaña está en background */
+  _setupVisibilityThrottle() {
+    if (!this.engine) return;
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        // Pausar o reducir FPS a 1fps cuando está en background
+        this.engine.setThrottled(true);
+      } else {
+        this.engine.setThrottled(false);
+      }
+    });
+  }
+
+  /** Inicializa PanelManagers para brújula y telemetría */
+  _initPanelManagers() {
+    // Brújula
+    if (this.compassWidget) {
+      this.compassPM = new PanelManager(this.compassWidget, 'compass');
+      const sizeCtrl = this.compassWidget.querySelector('.panel-size-controls');
+      this.compassPM.bindSizeButtons(sizeCtrl);
+    }
+    // Telemetría
+    if (this.telemetryCard) {
+      this.telemetryPM = new PanelManager(this.telemetryCard, 'telemetry');
+      const sizeCtrl = this.telemetryCard.querySelector('.panel-size-controls');
+      this.telemetryPM.bindSizeButtons(sizeCtrl);
+    }
   }
 
   initDOM() {
@@ -29,55 +229,49 @@ export class SimulatorHUD {
     this.header = document.createElement('header');
     this.header.className = 'sim-header';
     this.header.innerHTML = `
-      <div class="sim-header-top-row">
-        <div class="sim-brand">
-          <div class="sim-badge">⚓ CURSO DE TIMONEL PNA</div>
-          <h1>Simulador Náutico 3D</h1>
-        </div>
-        <div class="sim-header-actions">
-          <button id="btn-env-settings" class="sim-btn" title="Ajustar brillo del sol, agua y viento 3D">☀️ <span class="btn-text">Luz & Agua</span></button>
-          <button id="btn-night-toggle" class="sim-btn sim-btn-night" title="Alternar modo noche y luces reglamentarias de navegación">🌙 <span class="btn-text">Modo Noche</span></button>
-          <button id="btn-notes-toggle" class="sim-btn" title="Ver apuntes y glosario del curso">📖 <span class="btn-text">Apuntes</span></button>
-          <a href="index.html" class="sim-btn sim-btn-link" title="Volver a la vista de partes y despiece 3D">⛵ <span class="btn-text">Nomenclatura</span></a>
-        </div>
+      <div class="sim-brand">
+        <div class="sim-badge">⚓ CURSO DE TIMONEL PNA</div>
+        <h1>Simulador Náutico 3D</h1>
       </div>
-      <div class="sim-mode-selector">
-        <button class="mode-tab active" data-mode="wind">🧭 Viento & Clima</button>
-        <button class="mode-tab" data-mode="ripa">⚖️ RIPA (10 Cruces)</button>
-        <button class="mode-tab" data-mode="iala">📍 Boyado B</button>
-        <button class="mode-tab" data-mode="anchor">⚓ Fondeo & Borneo</button>
+
+      <div class="sim-mode-selector" role="tablist" aria-label="Ejes temáticos del simulador">
+        <button class="mode-tab active" role="tab" id="tab-wind" aria-selected="true" aria-controls="sim-controls-panel" data-mode="wind" title="Física de viento real, aparente y trimado">🧭 Viento & Clima</button>
+        <button class="mode-tab" role="tab" id="tab-ripa" aria-selected="false" data-mode="ripa" title="Reglamento Internacional para Prevenir Abordajes: 10 ejercicios interactivos">⚖️ RIPA (10 Cruces)</button>
+        <button class="mode-tab" role="tab" id="tab-iala" aria-selected="false" data-mode="iala" title="Sistema de Boyado Marítimo IALA Región B">📍 Balizamiento IALA B</button>
+        <button class="mode-tab" role="tab" id="tab-anchor" aria-selected="false" data-mode="anchor" title="Reglas y física de fondeo, filado y círculo de borneo">⚓ Fondeo & Borneo</button>
+      </div>
+
+      <div class="sim-header-actions">
+        <button id="btn-env-settings" class="sim-btn" title="Ajustar brillo del sol, agua y viento 3D">☀️ <span class="btn-text">Luz</span></button>
+        <button id="btn-night-toggle" class="sim-btn sim-btn-night" title="Alternar modo noche y luces reglamentarias de navegación">🌙 <span class="btn-text">Noche</span></button>
+        <button id="btn-notes-toggle" class="sim-btn" title="Ver apuntes y glosario del curso">📖 <span class="btn-text">Apuntes</span></button>
+        <button id="btn-toggle-hud" class="sim-btn" title="Ocultar interfaz para vista panorámica 3D" aria-label="Ocultar interfaz visual">👁️ <span class="btn-text">HUD</span></button>
+        <a href="index.html" class="sim-btn sim-btn-link" title="Volver a la vista de partes y despiece 3D">⛵ <span class="btn-text">Partes</span></a>
       </div>
     `;
     document.body.appendChild(this.header);
 
-    // Botón flotante para ocultar/mostrar toda la interfaz (HUD)
-    this.hudToggleBtn = document.createElement('button');
-    this.hudToggleBtn.id = 'btn-toggle-hud';
-    this.hudToggleBtn.className = 'sim-btn-hud-toggle';
-    this.hudToggleBtn.setAttribute('title', 'Ocultar / Mostrar interfaz (HUD)');
-    this.hudToggleBtn.setAttribute('aria-label', 'Alternar interfaz visual');
-    this.hudToggleBtn.innerHTML = '👁️';
-    document.body.appendChild(this.hudToggleBtn);
-
     // 1b. Panel de Ajustes de Luz y Agua (Brillo solar, posición y transparencia de oleaje)
     this.envCard = document.createElement('div');
     this.envCard.className = 'sim-env-card';
+    this.envCard.setAttribute('role', 'dialog');
+    this.envCard.setAttribute('aria-label', 'Ajustes de Luz, Agua y Viento');
     this.envCard.style.display = 'none';
     this.envCard.innerHTML = `
       <div class="env-card-header">
         <span>☀️ Ajustes de Luz, Agua y Viento</span>
-        <button id="btn-env-close" class="btn-env-close" aria-label="Cerrar panel">✕</button>
+        <button id="btn-env-close" class="btn-env-close" aria-label="Cerrar ajustes de luz">✕</button>
       </div>
       <div class="env-card-body">
         <div class="env-section">
           <div class="env-section-title">☀️ Iluminación Solar Diurna</div>
           <div class="env-row">
             <label>Brillo Solar: <strong id="lbl-sun-brightness">1.6x</strong></label>
-            <input type="range" id="slider-sun-brightness" min="0.5" max="2.5" step="0.1" value="1.6">
+            <input type="range" id="slider-sun-brightness" min="0.5" max="2.5" step="0.1" value="1.6" aria-label="Brillo solar">
           </div>
           <div class="env-row">
             <label>Posición / Altura del Sol: <strong id="lbl-sun-elevation">42°</strong></label>
-            <input type="range" id="slider-sun-elevation" min="15" max="80" step="1" value="42">
+            <input type="range" id="slider-sun-elevation" min="15" max="80" step="1" value="42" aria-label="Altura del sol en grados">
           </div>
         </div>
 
@@ -85,7 +279,7 @@ export class SimulatorHUD {
           <div class="env-section-title">🌊 Simulación del Agua</div>
           <div class="env-row">
             <label>Transparencia / Opacidad: <strong id="lbl-water-opacity">65%</strong></label>
-            <input type="range" id="slider-water-opacity" min="0.15" max="0.95" step="0.05" value="0.65">
+            <input type="range" id="slider-water-opacity" min="0.15" max="0.95" step="0.05" value="0.65" aria-label="Transparencia del agua">
           </div>
           <div class="env-row">
             <label>Animación de Oleaje:</label>
@@ -96,7 +290,7 @@ export class SimulatorHUD {
           </div>
           <div class="env-row" id="row-wave-height">
             <label>Altura de Olas: <strong id="lbl-wave-height">0.07 m</strong></label>
-            <input type="range" id="slider-wave-height" min="0.02" max="0.20" step="0.01" value="0.07">
+            <input type="range" id="slider-wave-height" min="0.02" max="0.20" step="0.01" value="0.07" aria-label="Altura de olas en metros">
           </div>
         </div>
 
@@ -111,7 +305,7 @@ export class SimulatorHUD {
           </div>
           <div class="env-row" id="row-wind-opacity">
             <label>Visibilidad / Opacidad: <strong id="lbl-wind-opacity">70%</strong></label>
-            <input type="range" id="slider-wind-opacity" min="0.2" max="1.0" step="0.05" value="0.7">
+            <input type="range" id="slider-wind-opacity" min="0.2" max="1.0" step="0.05" value="0.7" aria-label="Opacidad de líneas de viento">
           </div>
         </div>
       </div>
@@ -123,11 +317,16 @@ export class SimulatorHUD {
     this.compassWidget.className = 'sim-compass-card';
     this.compassWidget.innerHTML = `
       <div class="compass-header">
-        <span>Rosa de los Vientos</span>
+        <span>🧭 Rosa de los Vientos</span>
         <span class="compass-legend-tws" id="compass-tws">14 kts</span>
+        <div class="panel-size-controls" title="Cambiar tamaño del panel">
+          <button class="panel-size-btn" data-size="collapsed" title="Colapsar panel de rosa" aria-label="Colapsar panel brújula">−</button>
+          <button class="panel-size-btn active-size" data-size="normal" title="Tamaño normal" aria-label="Tamaño normal brújula">□</button>
+          <button class="panel-size-btn" data-size="expanded" title="Expandir panel" aria-label="Expandir panel brújula">+</button>
+        </div>
       </div>
-      <div class="compass-wrap">
-        <svg viewBox="0 0 200 200" class="compass-svg">
+      <div class="compass-dial-container">
+        <svg viewBox="0 0 200 200" class="compass-svg" role="img" aria-label="Rosa de los vientos indicando viento real y rumbo de proa">
           <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
           <circle cx="100" cy="100" r="75" fill="none" stroke="rgba(56,189,248,0.15)" stroke-width="1" stroke-dasharray="2,4"/>
           
@@ -137,7 +336,7 @@ export class SimulatorHUD {
           <text x="20" y="104" text-anchor="middle" class="c-cardinal">W (270°)</text>
 
           <!-- Zona muerta (no go zone) sombreada -->
-          <path d="M 100 100 L 70 28 A 90 90 0 0 1 130 28 Z" fill="rgba(239,68,68,0.15)"/>
+          <path d="M 100 100 L 70 28 A 90 90 0 0 1 130 28 Z" fill="rgba(239,68,68,0.18)"/>
 
           <!-- Aguja de Viento Real (Cian) -->
           <g id="needle-wind" transform="rotate(0 100 100)">
@@ -155,14 +354,14 @@ export class SimulatorHUD {
         </svg>
       </div>
       <div class="compass-footer">
-        <div class="compass-legend-item">
+        <div class="compass-legend-item" title="Dirección de donde sopla el viento">
           <span class="legend-dot cyan"></span> Viento: <strong id="val-twd">0°</strong>
         </div>
-        <div class="compass-legend-item">
+        <div class="compass-legend-item" title="Rumbo hacia donde apunta la proa">
           <span class="legend-dot gold"></span> Rumbo: <strong id="val-hdg">0°</strong>
         </div>
       </div>
-      <div class="compass-subtext">Viento aparente y sustentación en tiempo real</div>
+      <div class="compass-subtext">Sector rojo = Zona prohibida / Barco enfachado</div>
     `;
     document.body.appendChild(this.compassWidget);
 
@@ -170,33 +369,42 @@ export class SimulatorHUD {
     this.telemetryCard = document.createElement('div');
     this.telemetryCard.className = 'sim-telemetry-card';
     this.telemetryCard.innerHTML = `
+      <div class="tel-header-row panel-double-tap-zone">
+        <span class="tel-label" style="color:var(--accent-cyan);font-size:0.78rem;">📊 Telemetría</span>
+        <div class="panel-size-controls" title="Cambiar tamaño del panel">
+          <button class="panel-size-btn" data-size="collapsed" title="Colapsar" aria-label="Colapsar panel telemetría">−</button>
+          <button class="panel-size-btn active-size" data-size="normal" title="Normal" aria-label="Tamaño normal telemetría">□</button>
+          <button class="panel-size-btn" data-size="expanded" title="Expandir" aria-label="Expandir panel telemetría">+</button>
+        </div>
+      </div>
       <div class="tel-row-point">
         <span class="tel-label">Punto de la Vela:</span>
-        <span class="tel-point-badge danger" id="tel-point">Zona Muerta (En Facha)</span>
+        <span class="tel-point-badge" id="tel-point">Calculando rumbo...</span>
       </div>
       <div class="tel-metrics-grid">
-        <div class="metric-box">
+        <div class="metric-box" title="Velocidad sobre el agua calculada con diagrama polar del velero">
           <span class="m-val" id="tel-speed">0.0</span>
           <span class="m-unit">NUDOS (VELOCIDAD)</span>
         </div>
-        <div class="metric-box">
+        <div class="metric-box" title="Inclinación lateral del casco por fuerza escorante del viento">
           <span class="m-val" id="tel-heel">0°</span>
           <span class="m-unit">ESCORA</span>
         </div>
-        <div class="metric-box">
+        <div class="metric-box" title="Viento resultante a bordo combinando viento real con la marcha del barco">
           <span class="m-val" id="tel-app-wind">14.0</span>
           <span class="m-unit">VIENTO APARENTE</span>
         </div>
-        <div class="metric-box">
+        <div class="metric-box" title="Banda por donde ingresa el viento según RIPA regla 12">
           <span class="m-val" id="tel-tack">Estribor</span>
           <span class="m-unit" id="tel-tack-rule">🟢 PREFERENCIA (RIPA 12)</span>
         </div>
       </div>
       <div class="tel-eval-box" id="tel-eval">
-        Barco proa al viento. Las velas flamean violentamente.
+        Ajustando trimado aerodinámico...
       </div>
     `;
     document.body.appendChild(this.telemetryCard);
+
 
     // 4. Tarjeta interactiva para ejercicios RIPA (Modo RIPA)
     this.ripaCard = document.createElement('div');
@@ -205,17 +413,20 @@ export class SimulatorHUD {
     this.ripaCard.innerHTML = `
       <div class="ripa-header">
         <div class="ripa-top-bar">
-          <span class="ripa-badge" id="ripa-badge">⚖️ EJERCICIO 1 DE 10</span>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span class="ripa-badge" id="ripa-badge">⚖️ EJERCICIO 1 DE 10</span>
+            <span id="ripa-progress-badge" style="font-size:0.68rem;font-weight:800;color:var(--accent-emerald);background:rgba(16,185,129,0.15);padding:2px 7px;border-radius:6px;border:1px solid rgba(16,185,129,0.3);">0/10 ✓</span>
+          </div>
           <div class="ripa-nav-actions">
-            <button id="btn-ripa-prev" class="ripa-nav-btn" title="Ejercicio anterior">◀ Ant</button>
-            <button id="btn-ripa-next" class="ripa-nav-btn" title="Siguiente ejercicio">Sig ▶</button>
-            <button id="btn-ripa-reset" class="ripa-nav-btn" title="Reiniciar posiciones de los barcos">🔄 Repetir</button>
+            <button id="btn-ripa-prev" class="ripa-nav-btn" title="Ejercicio anterior" aria-label="Ejercicio anterior">◀ Ant</button>
+            <button id="btn-ripa-next" class="ripa-nav-btn" title="Siguiente ejercicio" aria-label="Siguiente ejercicio">Sig ▶</button>
+            <button id="btn-ripa-reset" class="ripa-nav-btn" title="Reiniciar posiciones de los barcos" aria-label="Reiniciar simulación de cruce">🔄 Repetir</button>
           </div>
         </div>
 
         <div class="ripa-pills-bar" id="ripa-pills-bar"></div>
 
-        <select id="select-ripa-scenario" class="ripa-select" aria-label="Seleccionar caso RIPA"></select>
+        <select id="select-ripa-scenario" class="ripa-select" aria-label="Seleccionar caso de colisión RIPA"></select>
       </div>
 
       <div class="ripa-tactical-banner role-privilegiado" id="ripa-tactical-banner">
@@ -289,21 +500,21 @@ export class SimulatorHUD {
         </div>
       </div>
       <div class="anchor-sliders-group">
-        <div class="anchor-slider-row">
+        <div class="anchor-slider-row" title="Profundidad de la columna de agua bajo el casco">
           <label>Profundidad (Sonda): <strong id="lbl-anchor-depth">4.0 m</strong></label>
-          <input type="range" id="slider-anchor-depth" min="2" max="10" step="0.5" value="4">
+          <input type="range" id="slider-anchor-depth" min="2" max="10" step="0.5" value="4" aria-label="Profundidad de sonda en metros">
         </div>
-        <div class="anchor-slider-row">
+        <div class="anchor-slider-row" title="Longitud de cadena y cabo arrojada al fondo marino">
           <label>Cadena/Cabo Filado: <strong id="lbl-anchor-rode">24 m</strong></label>
-          <input type="range" id="slider-anchor-rode" min="6" max="50" step="1" value="24">
+          <input type="range" id="slider-anchor-rode" min="6" max="50" step="1" value="24" aria-label="Cadena o cabo filado en metros">
         </div>
-        <div class="anchor-slider-row">
+        <div class="anchor-slider-row" title="Dirección de donde sopla el viento que ejerce fuerza de arrastre">
           <label>Dirección del Viento: <strong id="lbl-anchor-wind">90°</strong></label>
-          <input type="range" id="slider-anchor-wind" min="0" max="359" value="90">
+          <input type="range" id="slider-anchor-wind" min="0" max="359" value="90" aria-label="Dirección del viento de fondeo en grados">
         </div>
-        <div class="anchor-slider-row">
+        <div class="anchor-slider-row" title="Rumbo y velocidad de la corriente de marea en el fondeadero">
           <label>Corriente de Marea: <strong id="lbl-anchor-curr">120° (1.2 kts)</strong></label>
-          <input type="range" id="slider-anchor-curr" min="0" max="359" value="120">
+          <input type="range" id="slider-anchor-curr" min="0" max="359" value="120" aria-label="Dirección de corriente de marea en grados">
         </div>
       </div>
       <p class="anchor-advice" id="anchor-advice">
@@ -317,7 +528,7 @@ export class SimulatorHUD {
     this.controlsCard.className = 'sim-controls-panel';
     this.controlsCard.id = 'sim-controls-panel';
     this.controlsCard.innerHTML = `
-      <div class="ctrl-drawer-handle" id="ctrl-drawer-toggle">
+      <div class="ctrl-drawer-handle" id="ctrl-drawer-toggle" role="button" tabindex="0" aria-label="Abrir o cerrar panel de controles náuticos">
         <div class="drawer-pill"></div>
         <div class="drawer-bar-info">
           <span class="dbi-badge">🎮 Controles</span>
@@ -330,30 +541,30 @@ export class SimulatorHUD {
         <div class="ctrl-row-presets">
           <span class="ctrl-label">Rumbos de Examen:</span>
           <div class="ctrl-preset-btns">
-            <button class="btn-preset active" data-heading="0">Proa Viento</button>
-            <button class="btn-preset" data-heading="45">Ceñida</button>
-            <button class="btn-preset" data-heading="90">Través</button>
-            <button class="btn-preset" data-heading="135">Un Largo</button>
-            <button class="btn-preset" data-heading="180">Popa</button>
+            <button class="btn-preset" data-heading="0" title="0°: Proa al ojo del viento (Zona de exclusión)">Proa Viento</button>
+            <button class="btn-preset active" data-heading="45" title="45°: Navegación cerrada contra el viento">Ceñida</button>
+            <button class="btn-preset" data-heading="90" title="90°: Viento entra perpendicular por el costado">Través</button>
+            <button class="btn-preset" data-heading="135" title="135°: Viento entra por la aleta (rumbo franco)">Un Largo</button>
+            <button class="btn-preset" data-heading="180" title="180°: Viento entra directo por el espejo de popa">Popa</button>
           </div>
-          <button id="btn-auto-trim" class="btn-auto-trim" title="Cazar/filar automáticamente para máximo rendimiento">🎯 Trimado Óptimo</button>
+          <button id="btn-auto-trim" class="btn-auto-trim" title="Cazar/filar automáticamente para máximo rendimiento según el rumbo actual">🎯 Trimado Óptimo</button>
           <button id="btn-toggle-wind-lines" class="btn-toggle-wind-lines active" title="Alternar líneas de flujo aerodinámico de viento 3D">💨 Viento 3D: ON</button>
         </div>
 
         <div class="ctrl-row-weather">
           <span class="ctrl-label">Clima:</span>
           <div class="ctrl-weather-btns">
-            <button class="btn-weather-quick active" data-preset="virazon">🌊 Virazón (E 15k)</button>
-            <button class="btn-weather-quick" data-preset="sudestada">🌪️ Sudestada (SE 26k)</button>
-            <button class="btn-weather-quick" data-preset="pampero">⚡ Pampero (SW 34k)</button>
-            <button class="btn-weather-quick" data-preset="calma_norte">☀️ Calma Norte</button>
-            <button class="btn-weather-quick" data-preset="custom" id="btn-weather-custom">⚙️ Personalizado</button>
+            <button class="btn-weather-quick active" data-preset="virazon" title="Brisa térmica estival del Este">🌊 Virazón (E 15k)</button>
+            <button class="btn-weather-quick" data-preset="sudestada" title="Viento húmedo con crecida y oleaje corto">🌪️ Sudestada (SE 26k)</button>
+            <button class="btn-weather-quick" data-preset="pampero" title="Frente frío del SW con ráfagas violentas">⚡ Pampero (SW 34k)</button>
+            <button class="btn-weather-quick" data-preset="calma_norte" title="Viento suave del Norte y río calmo">☀️ Calma Norte</button>
+            <button class="btn-weather-quick" data-preset="custom" id="btn-weather-custom" title="Ajuste manual libre">⚙️ Personalizado</button>
           </div>
           <span class="ctrl-label" style="margin-left:6px;">Rizos:</span>
           <div class="ctrl-reef-btns">
-            <button class="btn-reef-quick active" data-reef="0">100%</button>
-            <button class="btn-reef-quick" data-reef="1">1° Rizo</button>
-            <button class="btn-reef-quick" data-reef="2">2° Rizo</button>
+            <button class="btn-reef-quick active" data-reef="0" title="100% paño completo">100%</button>
+            <button class="btn-reef-quick" data-reef="1" title="1er Rizo: reduce 30% la superficie mayor">1° Rizo</button>
+            <button class="btn-reef-quick" data-reef="2" title="2do Rizo: reduce 60% la superficie para vientos duros">2° Rizo</button>
           </div>
         </div>
 
@@ -362,25 +573,25 @@ export class SimulatorHUD {
         </div>
 
         <div class="ctrl-row-sliders">
-          <div class="slider-card">
+          <div class="slider-card" title="Rumbo de proa en grados sexagesimales (0° a 359°)">
             <label>Rumbo Barco: <strong id="lbl-hdg">0°</strong></label>
-            <input type="range" id="slider-hdg" min="0" max="359" value="0">
+            <input type="range" id="slider-hdg" min="0" max="359" value="0" aria-label="Rumbo de proa en grados">
           </div>
-          <div class="slider-card">
+          <div class="slider-card" title="Dirección de donde sopla el viento real (0° = Norte, 90° = Este)">
             <label>Dirección Viento: <strong id="lbl-wind-dir">90°</strong></label>
-            <input type="range" id="slider-wind-dir" min="0" max="359" value="90">
+            <input type="range" id="slider-wind-dir" min="0" max="359" value="90" aria-label="Dirección del viento real en grados">
           </div>
-          <div class="slider-card">
+          <div class="slider-card" title="Intensidad o fuerza del viento real medida en nudos náuticos (kts)">
             <label>Intensidad Viento: <strong id="lbl-wind-spd">15 kts</strong></label>
-            <input type="range" id="slider-wind-spd" min="4" max="35" value="15">
+            <input type="range" id="slider-wind-spd" min="4" max="35" value="15" aria-label="Intensidad del viento en nudos">
           </div>
-          <div class="slider-card">
+          <div class="slider-card" title="Cabo de control de la vela mayor: cazá (baja %) en ceñida o filá (sube %) en rumbos francos">
             <label>Escota Mayor: <strong id="lbl-main-sheet">25%</strong></label>
-            <input type="range" id="slider-main-sheet" min="0" max="100" value="25">
+            <input type="range" id="slider-main-sheet" min="0" max="100" value="25" aria-label="Tensión de escota de vela mayor">
           </div>
-          <div class="slider-card">
+          <div class="slider-card" title="Cabo de control del foque de proa: cazá o filá para equilibrar el centro vélico con el timón">
             <label>Escota Foque: <strong id="lbl-jib-sheet">25%</strong></label>
-            <input type="range" id="slider-jib-sheet" min="0" max="100" value="25">
+            <input type="range" id="slider-jib-sheet" min="0" max="100" value="25" aria-label="Tensión de escota de foque">
           </div>
         </div>
       </div>
@@ -390,16 +601,19 @@ export class SimulatorHUD {
     // 8. Drawer de Apuntes
     this.notesDrawer = document.createElement('aside');
     this.notesDrawer.className = 'sim-notes-drawer';
+    this.notesDrawer.setAttribute('role', 'dialog');
+    this.notesDrawer.setAttribute('aria-label', 'Cuaderno de Estudio Náutico PNA');
     this.notesDrawer.innerHTML = `
       <div class="notes-header">
         <h3>📖 Cuaderno de Estudio Náutico (PNA)</h3>
-        <button id="btn-notes-close" class="btn-notes-close" aria-label="Cerrar apuntes">✕</button>
+        <button id="btn-notes-close" class="btn-notes-close" aria-label="Cerrar cuaderno de apuntes">✕</button>
       </div>
       <div class="notes-body" id="notes-content"></div>
     `;
     document.body.appendChild(this.notesDrawer);
     this.populateNotes();
   }
+
 
   populateRipaNavigation() {
     const pillsContainer = document.getElementById('ripa-pills-bar');
@@ -459,25 +673,46 @@ export class SimulatorHUD {
       });
     });
 
-    // Drawer colapsable inferior para móviles (Bottom Sheet)
+    // Drawer colapsable inferior para móviles (Bottom Sheet) — con swipe táctil
     const drawerToggle = document.getElementById('ctrl-drawer-toggle');
     const drawerArrow = document.getElementById('dbi-arrow');
     if (drawerToggle && this.controlsCard) {
+      // Tap en el handle
       drawerToggle.addEventListener('click', () => {
         const isOpen = this.controlsCard.classList.toggle('drawer-open');
-        if (drawerArrow) {
-          drawerArrow.textContent = isOpen ? '▼' : '▲';
-        }
+        if (drawerArrow) drawerArrow.textContent = isOpen ? '▼' : '▲';
       });
+
+      // ── Swipe up/down en el panel de controles ────────────────────
+      let swipeTouchStartY = 0;
+      let swipeTouchStartTime = 0;
+
+      this.controlsCard.addEventListener('touchstart', (e) => {
+        swipeTouchStartY = e.touches[0].clientY;
+        swipeTouchStartTime = Date.now();
+      }, { passive: true });
+
+      this.controlsCard.addEventListener('touchend', (e) => {
+        const dy = swipeTouchStartY - e.changedTouches[0].clientY;
+        const dt = Date.now() - swipeTouchStartTime;
+        // Swipe rápido (< 350ms) de al menos 40px
+        if (dt < 350 && Math.abs(dy) > 40) {
+          const isOpen = dy > 0; // swipe up = abrir, swipe down = cerrar
+          this.controlsCard.classList.toggle('drawer-open', isOpen);
+          if (drawerArrow) drawerArrow.textContent = isOpen ? '▼' : '▲';
+        }
+      }, { passive: true });
     }
 
-    // Botón flotante para ocultar/mostrar toda la interfaz (HUD)
+    // Botón para ocultar/mostrar toda la interfaz (HUD)
     const btnToggleHud = document.getElementById('btn-toggle-hud');
     if (btnToggleHud) {
       btnToggleHud.addEventListener('click', () => {
         const isHidden = document.body.classList.toggle('hud-hidden');
         btnToggleHud.classList.toggle('hud-off', isHidden);
-        btnToggleHud.innerHTML = isHidden ? '👁️‍🗨️' : '👁️';
+        btnToggleHud.innerHTML = isHidden
+          ? '👁️ <span class="btn-text">Ver HUD</span>'
+          : '👁️ <span class="btn-text">HUD</span>';
       });
     }
 
@@ -819,26 +1054,45 @@ export class SimulatorHUD {
     });
   }
 
+  _showPanel(panel, displayType = 'flex') {
+    if (!panel) return;
+    panel.style.display = displayType;
+    panel.classList.remove('panel-entering');
+    void panel.offsetWidth; // Forzar reflow para reiniciar animación CSS
+    panel.classList.add('panel-entering');
+  }
+
   setMode(mode) {
     this.currentMode = mode;
 
-    // Resetear visibilidades de tarjetas secundarias
-    this.compassWidget.style.display = 'none';
-    this.telemetryCard.style.display = 'none';
-    this.ripaCard.style.display = 'none';
-    this.ialaCard.style.display = 'none';
-    this.anchorCard.style.display = 'none';
-    this.controlsCard.style.display = 'none';
+    // Actualizar tabs accesibles
+    const modeTabs = document.querySelectorAll('.mode-tab');
+    modeTabs.forEach(t => {
+      const isActive = t.getAttribute('data-mode') === mode;
+      t.classList.toggle('active', isActive);
+      t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
 
-    // Desactivar subsistemas especializados
-    this.otherVessel.setupScenario({ active: false });
-    this.iala.setActive(false);
-    this.anchor.setActive(false);
+    // Ocultar todas las tarjetas antes de mostrar el modo activo
+    [this.compassWidget, this.telemetryCard, this.ripaCard, this.ialaCard, this.anchorCard, this.controlsCard].forEach(c => {
+      if (c) c.style.display = 'none';
+    });
+
+    // Desactivar subsistemas especializados defensivamente
+    if (this.otherVessel && typeof this.otherVessel.setupScenario === 'function') {
+      this.otherVessel.setupScenario({ active: false });
+    }
+    if (this.iala && typeof this.iala.setActive === 'function') {
+      this.iala.setActive(false);
+    }
+    if (this.anchor && typeof this.anchor.setActive === 'function') {
+      this.anchor.setActive(false);
+    }
 
     if (mode === 'wind') {
-      this.compassWidget.style.display = 'block';
-      this.telemetryCard.style.display = 'flex';
-      this.controlsCard.style.display = 'flex';
+      this._showPanel(this.compassWidget, 'block');
+      this._showPanel(this.telemetryCard, 'flex');
+      this._showPanel(this.controlsCard, 'flex');
       this.boat.group.position.set(0, 0, 0);
       this.env.setNightMode(false);
       this.boat.setNavigationLights(false, false);
@@ -847,25 +1101,37 @@ export class SimulatorHUD {
         this.engine.controls.target.set(0, 1.8, 0);
       }
     } else if (mode === 'ripa') {
-      this.ripaCard.style.display = 'flex';
+      this._showPanel(this.ripaCard, 'flex');
       this.loadRipaScenario(this.ripa.currentScenarioKey);
     } else if (mode === 'iala') {
-      this.ialaCard.style.display = 'flex';
-      this.controlsCard.style.display = 'flex';
+      this._showPanel(this.ialaCard, 'flex');
+      this._showPanel(this.controlsCard, 'flex');
       this.boat.group.position.set(0, 0, 0);
-      this.iala.setActive(true);
+      if (this.iala) this.iala.setActive(true);
       if (this.engine) {
         this.engine.camera.position.set(16, 12, 28);
         this.engine.controls.target.set(0, 2, 8);
       }
     } else if (mode === 'anchor') {
-      this.anchorCard.style.display = 'flex';
-      this.anchor.setActive(true);
+      this._showPanel(this.anchorCard, 'flex');
+      if (this.anchor) this.anchor.setActive(true);
       this.updateAnchorUI();
       if (this.engine) {
         this.engine.camera.position.set(18, 16, 26);
         this.engine.controls.target.set(0, 0, 8);
       }
+    }
+  }
+
+  updateRipaProgress() {
+    const badge = document.getElementById('ripa-progress-badge');
+    if (!badge || !this.ripa) return;
+    const list = this.ripa.getScenarioList();
+    const completedCount = list.filter(s => this.ripa.isCompleted(s.id)).length;
+    badge.textContent = `${completedCount}/${list.length} resueltos ✓`;
+    if (completedCount === list.length) {
+      badge.textContent = '🏆 10/10 ¡Aprobado PNA!';
+      badge.style.background = 'rgba(16, 185, 129, 0.3)';
     }
   }
 
@@ -898,6 +1164,8 @@ export class SimulatorHUD {
       feedback.className = 'ripa-feedback';
       feedback.style.display = 'none';
     }
+
+    this.updateRipaProgress();
 
     const list = this.ripa.getScenarioList();
     const pills = document.querySelectorAll('.ripa-pill');
@@ -938,40 +1206,48 @@ export class SimulatorHUD {
 
     if (optionsGroup && scen.options) {
       optionsGroup.innerHTML = scen.options.map((opt, idx) => `
-        <button class="ripa-opt-btn" data-idx="${idx}">${opt.text}</button>
+        <button class="ripa-opt-btn" data-idx="${idx}" aria-label="Opción ${idx + 1}">${opt.text}</button>
       `).join('');
 
-      optionsGroup.querySelectorAll('.ripa-opt-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const idx = +btn.getAttribute('data-idx');
-          const opt = scen.options[idx];
+      // Delegación de eventos en optionsGroup para evitar múltiples listeners acumulados
+      optionsGroup.onclick = (e) => {
+        const btn = e.target.closest('.ripa-opt-btn');
+        if (!btn) return;
+        const idx = +btn.getAttribute('data-idx');
+        const opt = scen.options[idx];
+        if (!opt) return;
 
-          optionsGroup.querySelectorAll('.ripa-opt-btn').forEach(b => {
-            b.classList.remove('opt-correct', 'opt-wrong');
-          });
+        optionsGroup.querySelectorAll('.ripa-opt-btn').forEach(b => {
+          b.classList.remove('opt-correct', 'opt-wrong');
+        });
 
-          if (opt.correct) {
-            btn.classList.add('opt-correct');
+        if (opt.correct) {
+          btn.classList.add('opt-correct');
+          if (feedback) {
             feedback.textContent = opt.feedback;
             feedback.className = 'ripa-feedback feedback-correct';
-            this.ripa.markCompleted(key);
+          }
+          this.ripa.markCompleted(key);
 
-            const activePill = document.querySelector(`.ripa-pill[data-key="${key}"]`);
-            if (activePill) {
-              activePill.classList.add('completed');
-              activePill.textContent = '✓';
-            }
-          } else {
-            btn.classList.add('opt-wrong');
+          const activePill = document.querySelector(`.ripa-pill[data-key="${key}"]`);
+          if (activePill) {
+            activePill.classList.add('completed');
+            activePill.textContent = '✓';
+          }
+          this.updateRipaProgress();
+        } else {
+          btn.classList.add('opt-wrong');
+          if (feedback) {
             feedback.textContent = opt.feedback;
             feedback.className = 'ripa-feedback feedback-wrong';
           }
-        });
-      });
+        }
+      };
     }
 
     this.update();
   }
+
 
   updateAnchorUI() {
     if (!this.anchor) return;

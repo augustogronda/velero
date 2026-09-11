@@ -69,6 +69,12 @@ export const WEATHER_PRESETS = {
   }
 };
 
+export const REEF_CONFIG = [
+  { level: 0, label: 'Paño completo (100%)', mainScaleY: 1.0, jibScale: 1.0, windFactor: 1.00 },
+  { level: 1, label: '1° Rizo (-30% sup.)', mainScaleY: 0.72, jibScale: 0.8, windFactor: 0.65 },
+  { level: 2, label: '2° Rizo (-60% sup.)', mainScaleY: 0.48, jibScale: 0.5, windFactor: 0.35 }
+];
+
 export class WeatherSystem {
   constructor(sceneEnvironment, windSystem, boat) {
     this.env = sceneEnvironment;
@@ -104,28 +110,30 @@ export class WeatherSystem {
   }
 
   setReefing(level) {
-    this.reefingLevel = Math.max(0, Math.min(2, level));
+    this.reefingLevel = Math.max(0, Math.min(REEF_CONFIG.length - 1, level));
     this.applyReefing(this.reefingLevel);
   }
 
   applyReefing(level) {
-    if (!this.boat) return;
+    const config = REEF_CONFIG[level] || REEF_CONFIG[0];
 
-    // Escalar visualmente la vela mayor según los rizos tomados
-    const reefScaleY = level === 0 ? 1.0 : (level === 1 ? 0.72 : 0.48);
-    if (this.boat.sails && this.boat.sails.mainMesh) {
-      this.boat.sails.mainMesh.scale.set(1.0, reefScaleY, 1.0);
-    }
-    if (this.boat.sails && this.boat.sails.jibMesh) {
-      const jibScale = level === 0 ? 1.0 : (level === 1 ? 0.8 : 0.5);
-      this.boat.sails.jibMesh.scale.set(jibScale, jibScale, jibScale);
+    // 1. Escalar visualmente velas si el modelo está presente
+    if (this.boat && this.boat.sails) {
+      if (this.boat.sails.mainMesh) {
+        this.boat.sails.mainMesh.scale.set(1.0, config.mainScaleY, 1.0);
+      }
+      if (this.boat.sails.jibMesh) {
+        this.boat.sails.jibMesh.scale.set(config.jibScale, config.jibScale, config.jibScale);
+      }
     }
 
-    // Actualizar factor de rizado en el sistema de física de viento y escora
+    // 2. Actualizar factor de rizado físico en WindSystem y sincronizar escora
     if (this.wind) {
-      const reduction = level === 0 ? 1.0 : (level === 1 ? 0.65 : 0.35);
-      this.wind.setReefingFactor(reduction);
-      this.boat.setHeel(this.wind.heelingAngle);
+      this.wind.setReefingFactor(config.windFactor);
+      if (this.boat && typeof this.boat.setHeel === 'function') {
+        this.boat.setHeel(this.wind.heelingAngle);
+      }
     }
   }
 }
+

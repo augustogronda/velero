@@ -54,9 +54,30 @@ export class Engine {
     this.updatables.push(object);
   }
 
+  /**
+   * Throttle del render loop cuando la app está en background.
+   * En modo throttled renderiza a máximo 1fps para ahorrar batería.
+   * @param {boolean} throttled
+   */
+  setThrottled(throttled) {
+    this._throttled = throttled;
+    console.log(`⚡ Engine: render ${throttled ? 'throttled (background)' : 'normal (foreground)'}`);
+  }
+
   start() {
+    this._throttled = false;
+    this._lastThrottledFrame = 0;
+
     const loop = () => {
       requestAnimationFrame(loop);
+
+      // En background: renderizar a 1fps máximo para ahorrar batería iPad
+      if (this._throttled) {
+        const now = performance.now();
+        if (now - this._lastThrottledFrame < 1000) return;
+        this._lastThrottledFrame = now;
+      }
+
       const delta = this.clock.getDelta();
       const time = this.clock.getElapsedTime();
 

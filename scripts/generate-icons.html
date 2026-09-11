@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head><title>Generador de Íconos PWA</title></head>
+<body>
+<canvas id="c"></canvas>
+<script>
+// Genera todos los íconos PWA y los descarga como PNG
+const sizes = [
+  { name: 'icon-192.png', size: 192, maskable: false },
+  { name: 'icon-512.png', size: 512, maskable: false },
+  { name: 'icon-maskable-512.png', size: 512, maskable: true },
+  { name: 'apple-touch-icon.png', size: 180, maskable: false },
+];
+
+function drawIcon(canvas, size, maskable) {
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const cx = size / 2, cy = size / 2, r = size / 2;
+
+  // Background
+  if (maskable) {
+    ctx.fillStyle = '#0a172c';
+    ctx.fillRect(0, 0, size, size);
+  } else {
+    ctx.fillStyle = '#0a172c';
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  // Outer ring
+  ctx.strokeStyle = 'rgba(56,189,248,0.5)';
+  ctx.lineWidth = size * 0.015;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.88, 0, Math.PI*2);
+  ctx.stroke();
+
+  // Water
+  const wGrad = ctx.createLinearGradient(0, cy, 0, size);
+  wGrad.addColorStop(0, 'rgba(7,89,133,0.6)');
+  wGrad.addColorStop(1, 'rgba(3,105,161,0.3)');
+  ctx.fillStyle = wGrad;
+  ctx.beginPath();
+  ctx.ellipse(cx, cy + r*0.28, r*0.78, r*0.32, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // Hull
+  const hullY = cy + size*0.14, hullW = size*0.38, hullH = size*0.12;
+  ctx.fillStyle = '#1e3a5f';
+  ctx.strokeStyle = '#38bdf8';
+  ctx.lineWidth = size*0.018;
+  ctx.beginPath();
+  ctx.moveTo(cx - hullW*0.5, hullY);
+  ctx.quadraticCurveTo(cx, hullY + hullH, cx + hullW*0.5, hullY);
+  ctx.closePath();
+  ctx.fill(); ctx.stroke();
+
+  // Mast
+  const mastX = cx - size*0.02, mastTop = cy - size*0.36;
+  ctx.strokeStyle = '#94a3b8';
+  ctx.lineWidth = size*0.022;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(mastX, hullY);
+  ctx.lineTo(mastX, mastTop);
+  ctx.stroke();
+
+  // Main sail
+  const sg = ctx.createLinearGradient(mastX, mastTop, cx+size*0.18, hullY);
+  sg.addColorStop(0, 'rgba(56,189,248,0.95)');
+  sg.addColorStop(1, 'rgba(255,255,255,0.55)');
+  ctx.fillStyle = sg;
+  ctx.beginPath();
+  ctx.moveTo(mastX, mastTop + size*0.04);
+  ctx.lineTo(mastX, hullY - size*0.03);
+  ctx.lineTo(cx + size*0.18, hullY - size*0.03);
+  ctx.closePath();
+  ctx.fill();
+
+  // Jib
+  ctx.fillStyle = 'rgba(248,250,252,0.65)';
+  ctx.beginPath();
+  ctx.moveTo(mastX, mastTop + size*0.1);
+  ctx.lineTo(mastX, hullY - size*0.03);
+  ctx.lineTo(cx - size*0.18, hullY - size*0.03);
+  ctx.closePath();
+  ctx.fill();
+
+  // Compass rose (top right)
+  const rr = size*0.1, rx = cx+size*0.26, ry = cy-size*0.22;
+  ctx.strokeStyle = 'rgba(245,158,11,0.85)';
+  ctx.lineWidth = size*0.012;
+  ctx.beginPath(); ctx.moveTo(rx, ry-rr); ctx.lineTo(rx, ry+rr); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(rx-rr, ry); ctx.lineTo(rx+rr, ry); ctx.stroke();
+  ctx.fillStyle = '#f59e0b';
+  ctx.beginPath();
+  ctx.moveTo(rx, ry-rr);
+  ctx.lineTo(rx-rr*0.32, ry-rr*0.32);
+  ctx.lineTo(rx+rr*0.32, ry-rr*0.32);
+  ctx.closePath();
+  ctx.fill();
+}
+
+const canvas = document.getElementById('c');
+for (const { name, size, maskable } of sizes) {
+  drawIcon(canvas, size, maskable);
+  const a = document.createElement('a');
+  a.download = name;
+  a.href = canvas.toDataURL('image/png');
+  a.textContent = `Descargar ${name}`;
+  a.style.cssText = 'display:block;margin:8px;font-family:sans-serif;';
+  document.body.appendChild(a);
+  a.click(); // Auto-descarga
+}
+document.body.insertAdjacentHTML('afterbegin', '<p style="font-family:sans-serif;color:green;">✅ Íconos generados. Movelos a public/icons/</p>');
+</script>
+</body>
+</html>
