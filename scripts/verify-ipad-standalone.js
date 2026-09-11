@@ -6,11 +6,11 @@ const URL = 'http://localhost:3000/simulador.html';
 const PORT = 9222;
 
 async function run() {
-  console.log('🚀 Iniciando Edge headless para verificar iPad PWA standalone...');
+  console.log('🚀 Iniciando Edge headless para verificar iPad 9 responsive...');
   const browser = spawn(EDGE_PATH, [
     `--remote-debugging-port=${PORT}`,
     '--headless=new',
-    '--window-size=1024,768',
+    '--window-size=1080,810',
     '--user-data-dir=C:\\Users\\augus\\.gemini\\antigravity\\edge-test-profile-pwa',
     '--no-first-run',
     '--disable-gpu',
@@ -47,9 +47,6 @@ async function run() {
     });
   }
 
-  let loadedResolve;
-  const loadedPromise = new Promise(r => loadedResolve = r);
-
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
     if (data.id && pending.has(data.id)) {
@@ -57,9 +54,6 @@ async function run() {
       pending.delete(data.id);
       resolve(data.result);
       return;
-    }
-    if (data.method === 'Page.loadEventFired') {
-      if (loadedResolve) loadedResolve();
     }
   };
 
@@ -72,9 +66,10 @@ async function run() {
     features: [{ name: 'display-mode', value: 'standalone' }]
   });
 
+  // Emular iPad 9 Landscape: 1080x810 (resolución nativa lógica iPad 9)
   await send('Emulation.setDeviceMetricsOverride', {
-    width: 1024,
-    height: 768,
+    width: 1080,
+    height: 810,
     deviceScaleFactor: 2,
     mobile: true,
     screenOrientation: { angle: 90, type: 'landscapePrimary' }
@@ -84,55 +79,63 @@ async function run() {
   await send('Page.navigate', { url: URL });
   await new Promise(r => setTimeout(r, 2500));
 
-  const check = await send('Runtime.evaluate', {
+  // 1. Verificar estado abierto/expandido
+  const checkExpanded = await send('Runtime.evaluate', {
     expression: `(() => {
       const container = document.getElementById('webgl-container');
       const canvas = container ? container.querySelector('canvas') : null;
       const controls = document.querySelector('.sim-controls-panel');
-      const body = document.body;
+      const drawerHandle = document.querySelector('.ctrl-drawer-handle');
 
       const cRect = canvas ? canvas.getBoundingClientRect() : null;
-      const contRect = container ? container.getBoundingClientRect() : null;
       const ctrlRect = controls ? controls.getBoundingClientRect() : null;
-      const bRect = body.getBoundingClientRect();
+      const hStyle = drawerHandle ? window.getComputedStyle(drawerHandle).display : 'none';
 
       return {
-        window: { innerWidth: window.innerWidth, innerHeight: window.innerHeight },
-        body: { top: bRect.top, bottom: bRect.bottom, height: bRect.height, width: bRect.width },
-        container: contRect ? { top: contRect.top, bottom: contRect.bottom, height: contRect.height } : null,
-        canvas: cRect ? { top: cRect.top, bottom: cRect.bottom, height: cRect.height, width: cRect.width } : null,
-        controls: ctrlRect ? { top: ctrlRect.top, bottom: ctrlRect.bottom, height: ctrlRect.height, left: ctrlRect.left, right: ctrlRect.right } : null,
+        window: { w: window.innerWidth, h: window.innerHeight },
+        canvas: cRect ? { w: cRect.width, h: cRect.height, top: cRect.top, bottom: cRect.bottom } : null,
+        controls: ctrlRect ? { top: ctrlRect.top, bottom: ctrlRect.bottom, height: ctrlRect.height } : null,
+        drawerHandleDisplay: hStyle,
         isCanvasFullHeight: cRect && Math.abs(cRect.height - window.innerHeight) <= 1,
-        isCanvasFullWidth: cRect && Math.abs(cRect.width - window.innerWidth) <= 1,
         isControlsDockedBottom: ctrlRect && Math.abs(ctrlRect.bottom - window.innerHeight) <= 1
       };
     })()`,
     returnByValue: true
   });
 
-  const res = check.result.value;
-  console.log('📊 Métricas de iPad Standalone:', JSON.stringify(res, null, 2));
+  console.log('📊 iPad 9 (1080x810) - Panel Expandido:', JSON.stringify(checkExpanded.result.value, null, 2));
 
-  if (!res.isCanvasFullHeight) {
-    console.error('❌ ERROR: El canvas NO cubre el 100% de la altura de la pantalla!');
-  } else {
-    console.log('✅ Canvas cubre 100% de la altura física (sin franja vacía).');
-  }
+  const snap1 = await send('Page.captureScreenshot', { format: 'png' });
+  writeFileSync('C:\\Users\\augus\\.gemini\\antigravity\\brain\\16b29ddc-a869-41af-b974-080625862029\\screenshot-ipad-9-expanded.png', Buffer.from(snap1.data, 'base64'));
+  console.log('📸 Guardado: screenshot-ipad-9-expanded.png');
 
-  if (!res.isControlsDockedBottom) {
-    console.warn('⚠️ Panel de controles no está al borde inferior:', res.controls?.bottom, 'vs', res.window.innerHeight);
-  } else {
-    console.log('✅ Panel de controles perfectamente acoplado al fondo sin franja muerta.');
-  }
+  // 2. Probar colapsar el panel con tap en el handle
+  console.log('\n--- Colapsando panel de controles vía handle ---');
+  await send('Runtime.evaluate', {
+    expression: `document.getElementById('ctrl-drawer-toggle')?.click()`
+  });
+  await new Promise(r => setTimeout(r, 500));
 
-  const snap = await send('Page.captureScreenshot', { format: 'png' });
-  const filename = 'screenshot-ipad-standalone-full.png';
-  const fullPath = `C:\\Users\\augus\\.gemini\\antigravity\\brain\\16b29ddc-a869-41af-b974-080625862029\\${filename}`;
-  writeFileSync(fullPath, Buffer.from(snap.data, 'base64'));
-  console.log(`📸 Screenshot guardado en: ${filename}`);
+  const checkCollapsed = await send('Runtime.evaluate', {
+    expression: `(() => {
+      const controls = document.querySelector('.sim-controls-panel');
+      const ctrlRect = controls ? controls.getBoundingClientRect() : null;
+      return {
+        collapsedHeight: ctrlRect ? ctrlRect.height : null,
+        bottom: ctrlRect ? ctrlRect.bottom : null
+      };
+    })()`,
+    returnByValue: true
+  });
+  console.log('📊 Panel Colapsado (altura compacta):', JSON.stringify(checkCollapsed.result.value, null, 2));
+
+  const snap2 = await send('Page.captureScreenshot', { format: 'png' });
+  writeFileSync('C:\\Users\\augus\\.gemini\\antigravity\\brain\\16b29ddc-a869-41af-b974-080625862029\\screenshot-ipad-9-collapsed.png', Buffer.from(snap2.data, 'base64'));
+  console.log('📸 Guardado: screenshot-ipad-9-collapsed.png');
 
   ws.close();
   browser.kill();
+  console.log('✅ Verificación completada!');
 }
 
 run().catch(err => {

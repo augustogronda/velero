@@ -77,7 +77,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: var(--sky-day);
+      background-color: #0a172c;
       font-family: 'Outfit', sans-serif;
       color: var(--text-main);
       -webkit-font-smoothing: antialiased;
@@ -97,6 +97,17 @@
       min-height: -webkit-fill-available;
       z-index: var(--z-canvas);
       overflow: hidden;
+    }
+
+    #webgl-container canvas {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100% !important;
+      height: 100% !important;
+      touch-action: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     /* ── BARRA SUPERIOR ────────────────────────────────────────────── */
@@ -912,23 +923,39 @@
       color: #cbd5e1;
     }
 
-    /* ── PANEL INFERIOR DE MANIOBRAS ───────────────────────────────── */
+    /* ── PANEL INFERIOR DE MANIOBRAS (Dock universal responsivo) ──── */
     .sim-controls-panel {
       position: fixed;
-      bottom: max(14px, env(safe-area-inset-bottom, 14px));
-      left: 16px;
-      right: 16px;
+      bottom: 0;
+      left: 10px;
+      right: 10px;
       z-index: 50;
       background: var(--panel-bg);
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
       border: 1px solid var(--panel-border);
-      border-radius: 18px;
-      padding: 10px 14px;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.65);
+      border-bottom: none;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      padding: 4px 12px max(8px, env(safe-area-inset-bottom, 8px)) 12px;
+      box-shadow: 0 -8px 30px rgba(0,0,0,0.65);
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 5px;
+      max-height: 44px;
+      overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease;
+    }
+    .sim-controls-panel.drawer-open {
+      max-height: 65vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      box-shadow: 0 -12px 45px rgba(0,0,0,0.85);
+    }
+    .sim-controls-panel.drawer-open #dbi-arrow {
+      transform: rotate(180deg);
     }
     .ctrl-row-presets {
       display: flex;
@@ -1390,16 +1417,18 @@
       display: none !important;
     }
 
-    /* ── MANIJA DEL DRAWER DE CONTROLES INFERIOR ────────────────────── */
+    /* ── MANIJA DEL DRAWER DE CONTROLES INFERIOR (Disponible en iPad y Mobile) ──── */
     .ctrl-drawer-handle {
-      display: none;
+      display: flex;
       cursor: pointer;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
-      padding: 4px 0 6px 0;
+      gap: 3px;
+      padding: 3px 0 5px 0;
       user-select: none;
       touch-action: manipulation;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 3px;
     }
     .drawer-pill {
       width: 36px;
@@ -1892,20 +1921,21 @@
         padding: 10px 12px;
       }
       .btn-preset {
-        min-height: 44px;
-        padding: 8px 14px;
-        font-size: 0.78rem;
+        min-height: 36px;
+        padding: 5px 10px;
+        font-size: 0.74rem;
       }
       .btn-weather-quick,
       .btn-reef-quick {
-        min-height: 44px;
-        padding: 8px 12px;
+        min-height: 34px;
+        padding: 5px 9px;
+        font-size: 0.72rem;
       }
       .ripa-pill {
-        min-width: 44px;
-        min-height: 44px;
-        flex: 0 0 36px;
-        height: 36px;
+        min-width: 40px;
+        min-height: 40px;
+        flex: 0 0 34px;
+        height: 34px;
       }
       .weather-btn {
         min-height: 44px;
@@ -1946,24 +1976,35 @@
         font-size: 0.76rem;
       }
 
-      /* Panel de controles inferior — dock inferior limpio sin franja muerta debajo */
+      /* Panel de controles inferior — dock inferior limpio y compacto */
       .sim-controls-panel {
         bottom: 0;
         left: 10px;
         right: 10px;
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
-        padding: 10px 16px max(10px, env(safe-area-inset-bottom, 10px)) 16px;
+        padding: 4px 12px max(8px, env(safe-area-inset-bottom, 8px)) 12px;
+        gap: 4px;
       }
       .ctrl-row-sliders {
         grid-template-columns: repeat(5, 1fr);
-        gap: 10px;
+        gap: 6px;
       }
       .slider-card {
-        padding: 8px 12px;
+        padding: 4px 8px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
       }
       .slider-card label {
-        font-size: 0.72rem;
+        font-size: 0.68rem;
+        margin-bottom: 2px;
+      }
+      .weather-info-box {
+        font-size: 0.70rem;
+        padding: 3px 8px;
+        margin: 1px 0;
+        border-radius: 6px;
       }
 
       /* Cards laterales — ancho iPad */

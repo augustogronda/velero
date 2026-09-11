@@ -75,18 +75,18 @@ export class Engine {
    * Evita el bug de WebKit en iOS donde window.innerHeight reporta dimensiones incompletas.
    */
   getViewportSize() {
-    let width = this.container ? this.container.clientWidth : 0;
-    let height = this.container ? this.container.clientHeight : 0;
+    const contW = this.container ? this.container.clientWidth : 0;
+    const contH = this.container ? this.container.clientHeight : 0;
+    const winW = window.innerWidth || 0;
+    const winH = window.innerHeight || 0;
+    const docW = document.documentElement ? document.documentElement.clientWidth : 0;
+    const docH = document.documentElement ? document.documentElement.clientHeight : 0;
+    const vvW = window.visualViewport ? Math.round(window.visualViewport.width) : 0;
+    const vvH = window.visualViewport ? Math.round(window.visualViewport.height) : 0;
 
-    if (!width || !height) {
-      if (window.visualViewport) {
-        width = Math.round(window.visualViewport.width);
-        height = Math.round(window.visualViewport.height);
-      } else {
-        width = window.innerWidth;
-        height = window.innerHeight;
-      }
-    }
+    const width = Math.max(contW, winW, docW, vvW) || 1024;
+    const height = Math.max(contH, winH, docH, vvH) || 768;
+
     return { width, height };
   }
 

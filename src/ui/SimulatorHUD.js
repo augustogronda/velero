@@ -180,9 +180,17 @@ export class SimulatorHUD {
     this.update();
   }
 
-  /** Registra el Service Worker para soporte offline */
+  /** Registra el Service Worker para soporte offline y auto-actualización */
   _registerServiceWorker() {
     if ('serviceWorker' in navigator) {
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) {
+          refreshing = true;
+          window.location.reload();
+        }
+      });
+
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js', { scope: './' })
           .then(reg => {
@@ -537,8 +545,9 @@ export class SimulatorHUD {
     document.body.appendChild(this.anchorCard);
 
     // 7. Panel de Control Táctil Inferior: Rumbos, Clima Rioplatense, Rizos y Sliders
+    const isTabletOrDesktop = window.innerWidth >= 768;
     this.controlsCard = document.createElement('div');
-    this.controlsCard.className = 'sim-controls-panel';
+    this.controlsCard.className = `sim-controls-panel${isTabletOrDesktop ? ' drawer-open' : ''}`;
     this.controlsCard.id = 'sim-controls-panel';
     this.controlsCard.innerHTML = `
       <div class="ctrl-drawer-handle" id="ctrl-drawer-toggle" role="button" tabindex="0" aria-label="Abrir o cerrar panel de controles náuticos">
@@ -546,7 +555,7 @@ export class SimulatorHUD {
         <div class="drawer-bar-info">
           <span class="dbi-badge">🎮 Controles</span>
           <span class="dbi-val" id="dbi-summary">0° · 15 kts · 0.0 kts</span>
-          <span class="dbi-arrow" id="dbi-arrow">▲</span>
+          <span class="dbi-arrow" id="dbi-arrow">${isTabletOrDesktop ? '▼' : '▲'}</span>
         </div>
       </div>
 
