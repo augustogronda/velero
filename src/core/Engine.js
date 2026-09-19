@@ -114,6 +114,30 @@ export class Engine {
     console.log(`⚡ Engine: render ${throttled ? 'throttled (background)' : 'normal (foreground)'}`);
   }
 
+  /**
+   * Desplaza el encuadre de la cámara 3D verticalmente en móviles
+   * para que el velero quede en la zona libre visible sobre la ficha inferior
+   * @param {boolean} expanded
+   */
+  setCameraOffset(expanded) {
+    if (!this.camera) return;
+    const isMobile = window.innerWidth <= 767 && window.innerHeight > 520;
+    if (expanded && isMobile) {
+      const offsetPx = Math.round(window.innerHeight * 0.22);
+      this.camera.setViewOffset(
+        window.innerWidth,
+        window.innerHeight,
+        0,
+        offsetPx,
+        window.innerWidth,
+        window.innerHeight
+      );
+    } else {
+      this.camera.clearViewOffset();
+    }
+    this.camera.updateProjectionMatrix();
+  }
+
   start() {
     this._throttled = false;
     this._lastThrottledFrame = 0;

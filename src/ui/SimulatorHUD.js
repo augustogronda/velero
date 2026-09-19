@@ -85,6 +85,227 @@ class PanelManager {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
+// MobileBottomSheetController — Hoja inferior deslizable táctil tipo iOS
+// 3 estados de snap: 'collapsed' (44px) | 'mid' (36dvh) | 'full' (78dvh)
+// Arrastre 1:1, elasticidad rubber-band, inercia flick y elevación de cámara 3D
+// ══════════════════════════════════════════════════════════════════════════════
+class MobileBottomSheetController {
+  constructor(panel, handle, options = {}) {
+    this.panel = panel;
+    this.handle = handle || panel;
+    this.options = options;
+    this.engine = options.engine || null;
+    this.currentState = options.initialState || 'collapsed';
+    this.isTouchDragging = false;
+    this.dragStartY = 0;
+    this.dragStartTime = 0;
+    this.dragInitialTranslateY = 0;
+    this.dragLastY = 0;
+    this.dragLastTime = 0;
+    this.dragVelocityY = 0;
+
+    this._init();
+  }
+
+  isMobilePortrait() {
+    return window.innerWidth <= 767 && window.innerHeight > 520;
+  }
+
+  getSnapTranslate(state) {
+    if (!this.panel) return 0;
+    const panelH = this.panel.offsetHeight || Math.round(window.innerHeight * 0.78);
+    if (state === 'full') {
+      return 0;
+    } else if (state === 'mid') {
+      const visibleH = Math.round(window.innerHeight * 0.36);
+      return Math.max(0, panelH - visibleH);
+    } else {
+      // 'collapsed'
+      const visibleH = 44;
+      return Math.max(0, panelH - visibleH);
+    }
+  }
+
+  snapTo(state, animate = true) {
+    if (!this.panel) return;
+    if (!this.isMobilePortrait()) return;
+
+    this.currentState = state;
+
+    this.panel.classList.remove('sheet-collapsed', 'sheet-mid', 'sheet-full', 'drawer-open', 'is-dragging');
+
+    if (state === 'collapsed') {
+      this.panel.classList.add('sheet-collapsed');
+      if (this.engine && typeof this.engine.setCameraOffset === 'function') {
+        this.engine.setCameraOffset(false);
+      }
+    } else if (state === 'mid') {
+      this.panel.classList.add('sheet-mid');
+      if (this.engine && typeof this.engine.setCameraOffset === 'function') {
+        this.engine.setCameraOffset(true);
+      }
+    } else if (state === 'full') {
+      this.panel.classList.add('sheet-full');
+      if (this.engine && typeof this.engine.setCameraOffset === 'function') {
+        this.engine.setCameraOffset(true);
+      }
+    }
+
+    this.panel.style.transform = '';
+    if (!animate) {
+      this.panel.style.transition = 'none';
+    } else {
+      this.panel.style.transition = 'transform 0.32s cubic-bezier(0.32, 0.72, 0, 1)';
+    }
+
+    if (this.options.onStateChange) {
+      this.options.onStateChange(state);
+    }
+  }
+
+  toggle() {
+    if (!this.isMobilePortrait()) return;
+    if (this.currentState === 'collapsed') {
+      this.snapTo('mid');
+    } else if (this.currentState === 'mid') {
+      this.snapTo('full');
+    } else {
+      this.snapTo('collapsed');
+    }
+  }
+
+  _init() {
+    if (!this.panel) return;
+
+    if (this.handle) {
+      this.handle.addEventListener('click', () => {
+        if (!this.isMobilePortrait()) return;
+        if (this.isTouchDragging) return;
+        this.toggle();
+      });
+    }
+
+    const onTouchStart = (e) => {
+      if (!this.isMobilePortrait()) return;
+      if (e.touches.length !== 1) return;
+
+      const touch = e.touches[0];
+      const target = e.target;
+      const isHandle = this.handle && (target === this.handle || this.handle.contains(target));
+      const isContent = this.panel.contains(target);
+
+      if (!isHandle && !isContent) return;
+
+      // Permitir scroll normal si está expandido al 100% y no se arrastra la manija
+      if (this.currentState === 'full' && !isHandle && this.panel.scrollTop > 4) {
+        return;
+      }
+
+      this.isTouchDragging = true;
+      this.dragStartY = touch.clientY;
+      this.dragLastY = touch.clientY;
+      this.dragStartTime = performance.now();
+      this.dragLastTime = this.dragStartTime;
+      this.dragVelocityY = 0;
+
+      this.dragInitialTranslateY = this.getSnapTranslate(this.currentState);
+
+      this.panel.classList.add('is-dragging');
+      this.panel.style.transition = 'none';
+      this.panel.style.transform = `translateY(${this.dragInitialTranslateY}px)`;
+    };
+
+    const onTouchMove = (e) => {
+      if (!this.isTouchDragging) return;
+      if (e.touches.length !== 1) return;
+
+      const touch = e.touches[0];
+      const now = performance.now();
+      const dy = touch.clientY - this.dragStartY;
+
+      const dt = now - this.dragLastTime;
+      if (dt > 8) {
+        this.dragVelocityY = (touch.clientY - this.dragLastY) / dt;
+        this.dragLastY = touch.clientY;
+        this.dragLastTime = now;
+      }
+
+      if (this.currentState === 'full' && dy < 0 && this.panel.scrollTop > 0) {
+        return;
+      }
+
+      let targetTranslateY = this.dragInitialTranslateY + dy;
+      const minTranslateY = 0;
+      const maxTranslateY = this.getSnapTranslate('collapsed');
+
+      // Resistencia elástica amortiguada (Rubber-band)
+      if (targetTranslateY < minTranslateY) {
+        targetTranslateY = minTranslateY + (targetTranslateY - minTranslateY) * 0.35;
+      } else if (targetTranslateY > maxTranslateY) {
+        targetTranslateY = maxTranslateY + (targetTranslateY - maxTranslateY) * 0.35;
+      }
+
+      this.panel.style.transform = `translateY(${targetTranslateY}px)`;
+
+      if (e.cancelable && ((this.handle && this.handle.contains(e.target)) || dy > 0)) {
+        e.preventDefault();
+      }
+    };
+
+    const onTouchEnd = (e) => {
+      if (!this.isTouchDragging) return;
+      this.isTouchDragging = false;
+
+      this.panel.classList.remove('is-dragging');
+
+      const touch = e.changedTouches[0];
+      const totalDy = touch.clientY - this.dragStartY;
+      const totalDt = performance.now() - this.dragStartTime;
+
+      const midTranslateY = this.getSnapTranslate('mid');
+      const collapsedTranslateY = this.getSnapTranslate('collapsed');
+      const currentY = this.dragInitialTranslateY + totalDy;
+
+      // 1. Inercia rápida (Flick / Swipe)
+      if (Math.abs(this.dragVelocityY) > 0.4 || (Math.abs(totalDy) > 45 && totalDt < 320)) {
+        if (totalDy < 0) {
+          if (this.dragInitialTranslateY >= collapsedTranslateY - 15) {
+            this.snapTo('mid');
+          } else {
+            this.snapTo('full');
+          }
+        } else {
+          if (this.dragInitialTranslateY <= 20) {
+            this.snapTo('mid');
+          } else {
+            this.snapTo('collapsed');
+          }
+        }
+        return;
+      }
+
+      // 2. Acople magnético por distancia
+      const distToFull = Math.abs(currentY - 0);
+      const distToMid = Math.abs(currentY - midTranslateY);
+      const distToCollapsed = Math.abs(currentY - collapsedTranslateY);
+
+      if (distToFull <= distToMid && distToFull <= distToCollapsed) {
+        this.snapTo('full');
+      } else if (distToMid <= distToFull && distToMid <= distToCollapsed) {
+        this.snapTo('mid');
+      } else {
+        this.snapTo('collapsed');
+      }
+    };
+
+    this.panel.addEventListener('touchstart', onTouchStart, { passive: false });
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
+    window.addEventListener('touchend', onTouchEnd, { passive: true });
+    window.addEventListener('touchcancel', onTouchEnd, { passive: true });
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
 // PWA Install Banner — Toast para "Add to Home Screen" en iOS/iPadOS
 // ══════════════════════════════════════════════════════════════════════════════
 class PWAInstallBanner {
@@ -455,11 +676,21 @@ export class SimulatorHUD {
     document.body.appendChild(this.telemetryCard);
 
 
+    const isTabletOrDesktop = window.innerWidth >= 768;
+
     // 4. Tarjeta interactiva para ejercicios RIPA (Modo RIPA)
     this.ripaCard = document.createElement('div');
-    this.ripaCard.className = 'sim-ripa-card';
+    this.ripaCard.className = `sim-ripa-card${isTabletOrDesktop ? '' : ' sheet-collapsed'}`;
     this.ripaCard.style.display = 'none';
     this.ripaCard.innerHTML = `
+      <div class="ctrl-drawer-handle sheet-drag-handle" id="ripa-drawer-toggle" role="button" tabindex="0" aria-label="Abrir o cerrar panel RIPA">
+        <div class="drawer-pill"></div>
+        <div class="drawer-bar-info">
+          <span class="dbi-badge">⚖️ Maniobras RIPA</span>
+          <span class="dbi-val" id="ripa-drawer-summary">Reglas de cruce & preferencia</span>
+          <span class="dbi-arrow" id="ripa-dbi-arrow">▲</span>
+        </div>
+      </div>
       <div class="ripa-header">
         <div class="ripa-top-bar">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
@@ -494,9 +725,17 @@ export class SimulatorHUD {
 
     // 5. Tarjeta informativa de Boyado IALA B (Modo IALA)
     this.ialaCard = document.createElement('div');
-    this.ialaCard.className = 'sim-iala-card';
+    this.ialaCard.className = `sim-iala-card${isTabletOrDesktop ? '' : ' sheet-collapsed'}`;
     this.ialaCard.style.display = 'none';
     this.ialaCard.innerHTML = `
+      <div class="ctrl-drawer-handle sheet-drag-handle" id="iala-drawer-toggle" role="button" tabindex="0" aria-label="Abrir o cerrar panel IALA">
+        <div class="drawer-pill"></div>
+        <div class="drawer-bar-info">
+          <span class="dbi-badge">📍 Boyado IALA B</span>
+          <span class="dbi-val">Señalización marítima (Argentina)</span>
+          <span class="dbi-arrow" id="iala-dbi-arrow">▲</span>
+        </div>
+      </div>
       <div class="iala-header">
         <span class="iala-badge">📍 SISTEMA IALA B (ARGENTINA)</span>
       </div>
@@ -529,9 +768,17 @@ export class SimulatorHUD {
 
     // 6. Tarjeta interactiva de Fondeo y Círculo de Borneo (Modo Fondeo)
     this.anchorCard = document.createElement('div');
-    this.anchorCard.className = 'sim-anchor-card';
+    this.anchorCard.className = `sim-anchor-card${isTabletOrDesktop ? '' : ' sheet-collapsed'}`;
     this.anchorCard.style.display = 'none';
     this.anchorCard.innerHTML = `
+      <div class="ctrl-drawer-handle sheet-drag-handle" id="anchor-drawer-toggle" role="button" tabindex="0" aria-label="Abrir o cerrar panel de Fondeo">
+        <div class="drawer-pill"></div>
+        <div class="drawer-bar-info">
+          <span class="dbi-badge">⚓ Fondeo & Borneo</span>
+          <span class="dbi-val" id="anchor-drawer-summary">Cálculo de filado PNA</span>
+          <span class="dbi-arrow" id="anchor-dbi-arrow">▲</span>
+        </div>
+      </div>
       <div class="anchor-header">
         <span class="anchor-badge">⚓ MANIOBRA DE FONDEO Y BORNEO (PNA)</span>
       </div>
@@ -573,9 +820,8 @@ export class SimulatorHUD {
     document.body.appendChild(this.anchorCard);
 
     // 7. Panel de Control Táctil Inferior: Rumbos, Clima Rioplatense, Rizos y Sliders
-    const isTabletOrDesktop = window.innerWidth >= 768;
     this.controlsCard = document.createElement('div');
-    this.controlsCard.className = `sim-controls-panel${isTabletOrDesktop ? ' drawer-open' : ''}`;
+    this.controlsCard.className = `sim-controls-panel${isTabletOrDesktop ? ' drawer-open' : ' sheet-collapsed'}`;
     this.controlsCard.id = 'sim-controls-panel';
     this.controlsCard.innerHTML = `
       <div class="ctrl-drawer-handle" id="ctrl-drawer-toggle" role="button" tabindex="0" aria-label="Abrir o cerrar panel de controles náuticos">
@@ -723,36 +969,72 @@ export class SimulatorHUD {
       });
     });
 
-    // Drawer colapsable inferior para móviles (Bottom Sheet) — con swipe táctil
+    // Drawer colapsable inferior para móviles (Bottom Sheet) y desktop
     const drawerToggle = document.getElementById('ctrl-drawer-toggle');
     const drawerArrow = document.getElementById('dbi-arrow');
+
+    // Toggle en desktop/tablet
     if (drawerToggle && this.controlsCard) {
-      // Tap en el handle
       drawerToggle.addEventListener('click', () => {
-        const isOpen = this.controlsCard.classList.toggle('drawer-open');
-        if (drawerArrow) drawerArrow.textContent = isOpen ? '▼' : '▲';
-      });
-
-      // ── Swipe up/down en el panel de controles ────────────────────
-      let swipeTouchStartY = 0;
-      let swipeTouchStartTime = 0;
-
-      this.controlsCard.addEventListener('touchstart', (e) => {
-        swipeTouchStartY = e.touches[0].clientY;
-        swipeTouchStartTime = Date.now();
-      }, { passive: true });
-
-      this.controlsCard.addEventListener('touchend', (e) => {
-        const dy = swipeTouchStartY - e.changedTouches[0].clientY;
-        const dt = Date.now() - swipeTouchStartTime;
-        // Swipe rápido (< 350ms) de al menos 40px
-        if (dt < 350 && Math.abs(dy) > 40) {
-          const isOpen = dy > 0; // swipe up = abrir, swipe down = cerrar
-          this.controlsCard.classList.toggle('drawer-open', isOpen);
+        if (window.innerWidth >= 768) {
+          const isOpen = this.controlsCard.classList.toggle('drawer-open');
           if (drawerArrow) drawerArrow.textContent = isOpen ? '▼' : '▲';
         }
-      }, { passive: true });
+      });
     }
+
+    // Inicializar controladores Bottom Sheet táctiles para móviles
+    this.controlsBS = new MobileBottomSheetController(this.controlsCard, drawerToggle, {
+      engine: this.engine,
+      initialState: window.innerWidth >= 768 ? 'full' : 'collapsed'
+    });
+
+    const ripaToggle = document.getElementById('ripa-drawer-toggle');
+    this.ripaBS = new MobileBottomSheetController(this.ripaCard, ripaToggle, {
+      engine: this.engine,
+      initialState: 'collapsed'
+    });
+
+    const ialaToggle = document.getElementById('iala-drawer-toggle');
+    this.ialaBS = new MobileBottomSheetController(this.ialaCard, ialaToggle, {
+      engine: this.engine,
+      initialState: 'collapsed'
+    });
+
+    const anchorToggle = document.getElementById('anchor-drawer-toggle');
+    this.anchorBS = new MobileBottomSheetController(this.anchorCard, anchorToggle, {
+      engine: this.engine,
+      initialState: 'collapsed'
+    });
+
+    this.activeBottomSheet = this.controlsBS;
+
+    // Toque en el lienzo 3D o fuera de las fichas: en smartphones, colapsar el panel inferior para ver el barco libremente
+    let canvasTapStart = 0;
+    let canvasTapPos = { x: 0, y: 0 };
+
+    window.addEventListener('pointerdown', (e) => {
+      // Ignorar si el toque se origina dentro de un bottom sheet, header o drawer lateral
+      if (e.target.closest('.sim-controls-panel, .sim-ripa-card, .sim-anchor-card, .sim-iala-card, .sim-env-card, .sim-header, .sim-mode-selector, .sim-quick-actions, .sim-notes-drawer, button, select, input')) {
+        return;
+      }
+      canvasTapStart = Date.now();
+      canvasTapPos = { x: e.clientX, y: e.clientY };
+    });
+
+    window.addEventListener('pointerup', (e) => {
+      if (!canvasTapStart) return;
+      const dist = Math.hypot(e.clientX - canvasTapPos.x, e.clientY - canvasTapPos.y);
+      const duration = Date.now() - canvasTapStart;
+      canvasTapStart = 0;
+      if (duration < 320 && dist < 15) {
+        if (window.innerWidth <= 767 && this.activeBottomSheet) {
+          if (this.activeBottomSheet.currentState !== 'collapsed') {
+            this.activeBottomSheet.snapTo('collapsed');
+          }
+        }
+      }
+    });
 
     // Botón para ocultar/mostrar toda la interfaz (HUD)
     const btnToggleHud = document.getElementById('btn-toggle-hud');
@@ -1178,10 +1460,19 @@ export class SimulatorHUD {
       this.anchor.setActive(false);
     }
 
+    // Restablecer bottom sheet activo previo en móviles
+    if (this.activeBottomSheet && window.innerWidth <= 767) {
+      this.activeBottomSheet.snapTo('collapsed', false);
+    }
+
     if (mode === 'wind') {
       this._showPanel(this.compassWidget, 'block');
       this._showPanel(this.telemetryCard, 'flex');
       this._showPanel(this.controlsCard, 'flex');
+      this.activeBottomSheet = this.controlsBS;
+      if (window.innerWidth <= 767 && this.controlsBS) {
+        this.controlsBS.snapTo('mid');
+      }
       this.boat.group.position.set(0, 0, 0);
       this.env.setNightMode(false);
       this.boat.setNavigationLights(false, false);
@@ -1191,10 +1482,18 @@ export class SimulatorHUD {
       }
     } else if (mode === 'ripa') {
       this._showPanel(this.ripaCard, 'flex');
+      this.activeBottomSheet = this.ripaBS;
+      if (window.innerWidth <= 767 && this.ripaBS) {
+        this.ripaBS.snapTo('mid');
+      }
       this.loadRipaScenario(this.ripa.currentScenarioKey);
     } else if (mode === 'iala') {
       this._showPanel(this.ialaCard, 'flex');
       this._showPanel(this.controlsCard, 'flex');
+      this.activeBottomSheet = this.ialaBS;
+      if (window.innerWidth <= 767 && this.ialaBS) {
+        this.ialaBS.snapTo('mid');
+      }
       this.boat.group.position.set(0, 0, 0);
       if (this.iala) this.iala.setActive(true);
       if (this.engine) {
@@ -1203,6 +1502,10 @@ export class SimulatorHUD {
       }
     } else if (mode === 'anchor') {
       this._showPanel(this.anchorCard, 'flex');
+      this.activeBottomSheet = this.anchorBS;
+      if (window.innerWidth <= 767 && this.anchorBS) {
+        this.anchorBS.snapTo('mid');
+      }
       if (this.anchor) this.anchor.setActive(true);
       this.updateAnchorUI();
       if (this.engine) {

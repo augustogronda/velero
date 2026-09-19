@@ -1430,6 +1430,11 @@
       display: none !important;
     }
 
+    /* Ocultar manijas táctiles de cartas especializadas en desktop */
+    .sheet-drag-handle {
+      display: none;
+    }
+
     /* ── MANIJA DEL DRAWER DE CONTROLES INFERIOR (Disponible en iPad y Mobile) ──── */
     .ctrl-drawer-handle {
       display: flex;
@@ -1699,30 +1704,126 @@
         font-size: 0.48rem;
       }
 
-      /* Panel de control inferior: Bottom Sheet ergonómico (máx 42vh para no tapar el 3D) */
-      .ctrl-drawer-handle {
+      /* ── BOTTOM SHEET TÁCTIL TIPO IOS CON SNAP POINTS (COLLAPSED / MID / FULL) ── */
+      .ctrl-drawer-handle,
+      .sheet-drag-handle {
         display: flex;
-        padding: 2px 0 4px 0;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 6px 4px 6px 4px;
+        cursor: grab;
+        position: relative;
+        touch-action: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        min-height: 42px;
+        flex-shrink: 0;
       }
-      .sim-controls-panel {
-        left: 8px;
-        right: 8px;
-        bottom: max(6px, env(safe-area-inset-bottom, 6px));
-        padding: 5px 10px;
-        border-radius: 16px;
-        max-height: 38px;
-        overflow: hidden;
-        transition: max-height 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease;
+      .ctrl-drawer-handle:active,
+      .sheet-drag-handle:active {
+        cursor: grabbing;
       }
-      .sim-controls-panel.drawer-open {
-        max-height: 42vh;
-        max-height: 42dvh;
+      .drawer-pill {
+        position: absolute;
+        top: -1px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 5px;
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.38);
+        transition: width 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+      }
+      .ctrl-drawer-handle:active .drawer-pill,
+      .sheet-drag-handle:active .drawer-pill,
+      .sim-controls-panel.is-dragging .drawer-pill,
+      .sim-ripa-card.is-dragging .drawer-pill,
+      .sim-anchor-card.is-dragging .drawer-pill,
+      .sim-iala-card.is-dragging .drawer-pill {
+        width: 54px;
+        background: var(--accent-cyan);
+        box-shadow: 0 0 12px rgba(56, 189, 248, 0.8);
+      }
+      .dbi-arrow {
+        transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+        display: inline-block;
+        transform: rotate(0deg);
+      }
+      .sim-controls-panel.sheet-mid .dbi-arrow,
+      .sim-controls-panel.sheet-full .dbi-arrow,
+      .sim-controls-panel.drawer-open .dbi-arrow,
+      .sim-ripa-card.sheet-mid .dbi-arrow,
+      .sim-ripa-card.sheet-full .dbi-arrow,
+      .sim-anchor-card.sheet-mid .dbi-arrow,
+      .sim-anchor-card.sheet-full .dbi-arrow,
+      .sim-iala-card.sheet-mid .dbi-arrow,
+      .sim-iala-card.sheet-full .dbi-arrow {
+        transform: rotate(180deg);
+      }
+
+      /* Panel de control y tarjetas de modo como Bottom Sheets unificados */
+      .sim-controls-panel,
+      .sim-ripa-card,
+      .sim-anchor-card,
+      .sim-iala-card,
+      .sim-env-card {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: auto;
+        width: 100%;
+        max-width: 100%;
+        height: 78vh;
+        height: 78dvh;
+        max-height: 78vh;
+        max-height: 78dvh;
+        padding: 4px 12px max(14px, env(safe-area-inset-bottom, 14px)) 12px;
+        border-radius: 22px 22px 0 0;
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        border-bottom: none;
+        background: rgba(8, 14, 28, 0.96);
+        backdrop-filter: blur(28px);
+        -webkit-backdrop-filter: blur(28px);
+        box-shadow: 0 -10px 35px rgba(0, 0, 0, 0.8), 0 0 20px rgba(56, 189, 248, 0.15);
+        z-index: 70;
+        transform: translateY(calc(100% - 44px - env(safe-area-inset-bottom, 0px)));
+        transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+        touch-action: pan-y;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        box-shadow: 0 -10px 40px rgba(0,0,0,0.85);
+        will-change: transform;
       }
-      .sim-controls-panel.drawer-open #dbi-arrow {
-        transform: rotate(180deg);
+
+      /* Snap point 1: Contraído (Pastilla compacta 44px) */
+      .sim-controls-panel.sheet-collapsed,
+      .sim-ripa-card.sheet-collapsed,
+      .sim-anchor-card.sheet-collapsed,
+      .sim-iala-card.sheet-collapsed,
+      .sim-env-card.sheet-collapsed {
+        transform: translateY(calc(100% - 44px - env(safe-area-inset-bottom, 0px)));
+      }
+
+      /* Snap point 2: Intermedio (~36vh visible, 64% libre al velero 3D) */
+      .sim-controls-panel.sheet-mid,
+      .sim-ripa-card.sheet-mid,
+      .sim-anchor-card.sheet-mid,
+      .sim-iala-card.sheet-mid,
+      .sim-env-card.sheet-mid {
+        transform: translateY(calc(100% - 36vh));
+        transform: translateY(calc(100% - 36dvh));
+      }
+
+      /* Snap point 3: Completo (~78vh visible) */
+      .sim-controls-panel.sheet-full,
+      .sim-controls-panel.drawer-open,
+      .sim-ripa-card.sheet-full,
+      .sim-anchor-card.sheet-full,
+      .sim-iala-card.sheet-full,
+      .sim-env-card.sheet-full {
+        transform: translateY(0);
       }
 
       .ctrl-row-presets,
@@ -1766,28 +1867,6 @@
       }
       .slider-card input[type="range"] {
         height: 18px;
-      }
-
-      /* Tarjetas de modos RIPA, IALA, Fondeo y Entorno adaptadas a Bottom Sheet (48vh) */
-      .sim-ripa-card,
-      .sim-anchor-card,
-      .sim-iala-card,
-      .sim-env-card {
-        position: fixed;
-        bottom: 0;
-        top: auto;
-        left: 6px;
-        right: 6px;
-        width: calc(100% - 12px);
-        max-height: 48vh;
-        max-height: 48dvh;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        padding: 10px 12px max(14px, env(safe-area-inset-bottom, 14px)) 12px;
-        border-radius: 18px 18px 0 0;
-        border-bottom: none;
-        z-index: 55;
-        box-shadow: 0 -12px 40px rgba(0,0,0,0.85);
       }
     }
 
