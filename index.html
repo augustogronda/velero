@@ -1424,7 +1424,7 @@
         min-height: 26px;
       }
 
-      /* Panel Flotante transformado en Bottom Sheet ergonómico (50vh máx para dejar 50% al 3D) */
+      /* Panel Flotante transformado en Bottom Sheet ergonómico (36vh máx para dejar 64% libre al 3D) */
       .info-panel {
         position: fixed;
         top: auto;
@@ -1433,10 +1433,10 @@
         right: 0;
         width: 100%;
         max-width: 100%;
-        max-height: 50vh;
-        max-height: 50dvh;
+        max-height: 36vh;
+        max-height: 36dvh;
         border-radius: 20px 20px 0 0;
-        padding: 6px 14px max(16px, env(safe-area-inset-bottom, 16px)) 14px;
+        padding: 6px 14px max(14px, env(safe-area-inset-bottom, 14px)) 14px;
         border: 1px solid rgba(56, 189, 248, 0.35);
         border-bottom: none;
         background: rgba(8, 14, 28, 0.95);
@@ -1448,7 +1448,8 @@
         transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
         touch-action: pan-y;
         animation: none;
-        gap: 10px;
+        gap: 8px;
+        overflow-y: auto;
       }
 
       /* Estado contraído: pastilla interactiva compacta (44px) */
@@ -1511,10 +1512,15 @@
         justify-content: center;
         color: #ffffff;
         cursor: pointer;
-        transition: transform 0.3s ease;
       }
-      .info-panel.collapsed .btn-sheet-toggle svg {
+      .btn-sheet-toggle svg {
+        transition: transform 0.3s ease;
+        /* Abierto: apunta hacia abajo para contraer */
         transform: rotate(180deg);
+      }
+      /* Colapsado: apunta hacia arriba para desplegar */
+      .info-panel.collapsed .btn-sheet-toggle svg {
+        transform: rotate(0deg);
       }
 
       .btn-panel-minimize {
@@ -4157,6 +4163,24 @@
       return window.innerWidth <= 767 && window.innerHeight > 520;
     }
 
+    function updateMobileCameraOffset(expanded) {
+      if (!camera) return;
+      if (expanded && isMobilePortrait()) {
+        const offsetPx = Math.round(window.innerHeight * 0.22);
+        camera.setViewOffset(
+          window.innerWidth,
+          window.innerHeight,
+          0,
+          offsetPx,
+          window.innerWidth,
+          window.innerHeight
+        );
+      } else {
+        camera.clearViewOffset();
+      }
+      camera.updateProjectionMatrix();
+    }
+
     function setSheetExpanded(expanded) {
       if (!infoPanel) return;
       document.body.classList.toggle('sheet-expanded', expanded);
@@ -4167,6 +4191,7 @@
         infoPanel.classList.add('collapsed');
         if (handleTag) handleTag.textContent = 'Toca para ver detalles ▴';
       }
+      updateMobileCameraOffset(expanded);
     }
 
     function toggleSheet() {
@@ -4193,6 +4218,49 @@
       btnSheetToggle.addEventListener('click', (e) => {
         e.stopPropagation();
         toggleSheet();
+      });
+    }
+
+    // Gesto táctil swipe vertical en el panel (deslizar hacia abajo contrae a 44px)
+    if (infoPanel) {
+      let swipeStartY = 0;
+      let swipeStartTime = 0;
+
+      infoPanel.addEventListener('touchstart', (e) => {
+        if (!isMobilePortrait()) return;
+        swipeStartY = e.touches[0].clientY;
+        swipeStartTime = Date.now();
+      }, { passive: true });
+
+      infoPanel.addEventListener('touchend', (e) => {
+        if (!isMobilePortrait()) return;
+        const dy = e.changedTouches[0].clientY - swipeStartY;
+        const dt = Date.now() - swipeStartTime;
+        // Deslizar hacia abajo: contraer para ver el velero
+        if (dy > 30 && dt < 400) {
+          setSheetExpanded(false);
+        } else if (dy < -30 && dt < 400) {
+          setSheetExpanded(true);
+        }
+      }, { passive: true });
+    }
+
+    // Toque en el lienzo 3D: si el panel está abierto en móvil, cerrarlo para apreciar el barco
+    if (renderer && renderer.domElement) {
+      let canvasTapStart = 0;
+      let canvasTapPos = { x: 0, y: 0 };
+      renderer.domElement.addEventListener('pointerdown', (e) => {
+        canvasTapStart = Date.now();
+        canvasTapPos = { x: e.clientX, y: e.clientY };
+      });
+      renderer.domElement.addEventListener('pointerup', (e) => {
+        const dist = Math.hypot(e.clientX - canvasTapPos.x, e.clientY - canvasTapPos.y);
+        const duration = Date.now() - canvasTapStart;
+        if (duration < 300 && dist < 12) {
+          if (isMobilePortrait() && infoPanel && !infoPanel.classList.contains('collapsed')) {
+            setSheetExpanded(false);
+          }
+        }
       });
     }
     if (btnPanelMinimize) {
