@@ -127,7 +127,10 @@ export class WindSystem {
    * A mayor viento → mayor escora; a mayor filado de escota → menor escora.
    */
   _calculateHeeling() {
-    const side = this.tackSide === 'estribor' ? 1 : -1;
+    // Escora hacia sotavento (banda contraria por donde entra el viento):
+    // Viento por estribor -> escora a babor (negativo / inclinación hacia +X)
+    // Viento por babor    -> escora a estribor (positivo / inclinación hacia -X)
+    const side = this.tackSide === 'estribor' ? -1 : 1;
     let baseHeel = 0;
 
     if (this.relativeWindAngle >= NO_GO_ZONE_DEG) {
@@ -140,7 +143,7 @@ export class WindSystem {
 
     // Rizado: menos paño → menos escora
     baseHeel *= this.reefingFactor;
-    this.heelingAngle = baseHeel * side; // Positivo = escora a estribor
+    this.heelingAngle = baseHeel * side; // Positivo = escora a estribor, Negativo = escora a babor
   }
 
   /**

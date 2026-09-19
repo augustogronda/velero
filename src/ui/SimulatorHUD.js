@@ -250,9 +250,19 @@ export class SimulatorHUD {
     this.header = document.createElement('header');
     this.header.className = 'sim-header';
     this.header.innerHTML = `
-      <div class="sim-brand">
-        <div class="sim-badge">⚓ CURSO DE TIMONEL PNA</div>
-        <h1>Simulador Náutico 3D</h1>
+      <div class="sim-header-top-row">
+        <div class="sim-brand">
+          <div class="sim-badge">⚓ CURSO DE TIMONEL PNA</div>
+          <h1>Simulador Náutico 3D</h1>
+        </div>
+
+        <div class="sim-header-actions">
+          <button id="btn-env-settings" class="sim-btn" title="Ajustar brillo del sol, agua y viento 3D">☀️ <span class="btn-text">Luz</span></button>
+          <button id="btn-night-toggle" class="sim-btn sim-btn-night" title="Alternar modo noche y luces reglamentarias de navegación">🌙 <span class="btn-text">Noche</span></button>
+          <button id="btn-notes-toggle" class="sim-btn" title="Ver apuntes y glosario del curso">📖 <span class="btn-text">Apuntes</span></button>
+          <button id="btn-toggle-hud" class="sim-btn" title="Ocultar interfaz para vista panorámica 3D" aria-label="Ocultar interfaz visual">👁️ <span class="btn-text">HUD</span></button>
+          <a href="index.html" class="sim-btn sim-btn-link" title="Volver a la vista de partes y despiece 3D">⛵ <span class="btn-text">Partes</span></a>
+        </div>
       </div>
 
       <div class="sim-mode-selector" role="tablist" aria-label="Ejes temáticos del simulador">
@@ -261,16 +271,34 @@ export class SimulatorHUD {
         <button class="mode-tab" role="tab" id="tab-iala" aria-selected="false" data-mode="iala" title="Sistema de Boyado Marítimo IALA Región B">📍 Balizamiento IALA B</button>
         <button class="mode-tab" role="tab" id="tab-anchor" aria-selected="false" data-mode="anchor" title="Reglas y física de fondeo, filado y círculo de borneo">⚓ Fondeo & Borneo</button>
       </div>
-
-      <div class="sim-header-actions">
-        <button id="btn-env-settings" class="sim-btn" title="Ajustar brillo del sol, agua y viento 3D">☀️ <span class="btn-text">Luz</span></button>
-        <button id="btn-night-toggle" class="sim-btn sim-btn-night" title="Alternar modo noche y luces reglamentarias de navegación">🌙 <span class="btn-text">Noche</span></button>
-        <button id="btn-notes-toggle" class="sim-btn" title="Ver apuntes y glosario del curso">📖 <span class="btn-text">Apuntes</span></button>
-        <button id="btn-toggle-hud" class="sim-btn" title="Ocultar interfaz para vista panorámica 3D" aria-label="Ocultar interfaz visual">👁️ <span class="btn-text">HUD</span></button>
-        <a href="index.html" class="sim-btn sim-btn-link" title="Volver a la vista de partes y despiece 3D">⛵ <span class="btn-text">Partes</span></a>
-      </div>
     `;
     document.body.appendChild(this.header);
+
+    // 1c. Backdrop para cerrar telemetría móvil al tocar fondo
+    this.mobBackdrop = document.createElement('div');
+    this.mobBackdrop.className = 'mob-telemetry-backdrop';
+    this.mobBackdrop.id = 'mob-telemetry-backdrop';
+    this.mobBackdrop.setAttribute('aria-label', 'Cerrar detalle de telemetría');
+    document.body.appendChild(this.mobBackdrop);
+
+    // 1d. Pastilla Náutica Móvil Unificada (Smartphones < 768px)
+    this.mobilePill = document.createElement('div');
+    this.mobilePill.className = 'sim-mobile-pill';
+    this.mobilePill.id = 'sim-mobile-pill';
+    this.mobilePill.setAttribute('role', 'button');
+    this.mobilePill.setAttribute('tabindex', '0');
+    this.mobilePill.setAttribute('aria-label', 'Toca para ver o cerrar detalle de telemetría y rosa náutica');
+    this.mobilePill.innerHTML = `
+      <div class="mob-pill-content">
+        <span class="mob-pill-item"><span class="mob-pill-icon">🧭</span> <strong id="mob-hdg">0°</strong></span>
+        <span class="mob-pill-sep">·</span>
+        <span class="mob-pill-item"><span class="mob-pill-icon">⛵</span> <strong id="mob-speed">0.0</strong> <small>kts</small></span>
+        <span class="mob-pill-sep">·</span>
+        <span class="mob-pill-badge" id="mob-point">Ceñida</span>
+        <span class="mob-pill-expand-icon">ℹ️</span>
+      </div>
+    `;
+    document.body.appendChild(this.mobilePill);
 
     // 1b. Panel de Ajustes de Luz y Agua (Brillo solar, posición y transparencia de oleaje)
     this.envCard = document.createElement('div');
@@ -728,13 +756,52 @@ export class SimulatorHUD {
 
     // Botón para ocultar/mostrar toda la interfaz (HUD)
     const btnToggleHud = document.getElementById('btn-toggle-hud');
-    if (btnToggleHud) {
-      btnToggleHud.addEventListener('click', () => {
-        const isHidden = document.body.classList.toggle('hud-hidden');
+    const updateHudButtonUI = (isHidden) => {
+      if (btnToggleHud) {
         btnToggleHud.classList.toggle('hud-off', isHidden);
         btnToggleHud.innerHTML = isHidden
           ? '👁️ <span class="btn-text">Ver HUD</span>'
           : '👁️ <span class="btn-text">HUD</span>';
+      }
+    };
+
+    if (btnToggleHud) {
+      btnToggleHud.addEventListener('click', () => {
+        const isHidden = document.body.classList.toggle('hud-hidden');
+        updateHudButtonUI(isHidden);
+      });
+    }
+
+    // Toggle de telemetría y rosa náutica completa en smartphones
+    const mobPill = document.getElementById('sim-mobile-pill');
+    if (mobPill) {
+      mobPill.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.body.classList.toggle('mobile-telemetry-active');
+      });
+    }
+
+    // Cerrar telemetría móvil al tocar el fondo desenfocado
+    const mobBackdrop = document.getElementById('mob-telemetry-backdrop');
+    if (mobBackdrop) {
+      mobBackdrop.addEventListener('click', () => {
+        document.body.classList.remove('mobile-telemetry-active');
+      });
+    }
+
+    // Doble-tap en el lienzo 3D para alternar HUD limpio
+    const webglContainer = document.getElementById('webgl-container');
+    if (webglContainer) {
+      let lastTapTime = 0;
+      webglContainer.addEventListener('pointerup', (e) => {
+        // Solo actuar si el tap fue directo sobre el lienzo canvas
+        if (e.target.tagName !== 'CANVAS') return;
+        const now = Date.now();
+        if (now - lastTapTime < 320) {
+          const isHidden = document.body.classList.toggle('hud-hidden');
+          updateHudButtonUI(isHidden);
+        }
+        lastTapTime = now;
       });
     }
 
@@ -1389,6 +1456,17 @@ export class SimulatorHUD {
     const dbiSummary = document.getElementById('dbi-summary');
     if (dbiSummary) {
       dbiSummary.textContent = `${this.wind.boatHeading}° · ${this.wind.trueWindSpeed} kts · ${this.wind.boatSpeed.toFixed(1)} kts`;
+    }
+
+    // Actualizar datos de la Pastilla Náutica Móvil
+    const mobHdg = document.getElementById('mob-hdg');
+    const mobSpeed = document.getElementById('mob-speed');
+    const mobPoint = document.getElementById('mob-point');
+    if (mobHdg) mobHdg.textContent = `${this.wind.boatHeading}°`;
+    if (mobSpeed) mobSpeed.textContent = this.wind.boatSpeed.toFixed(1);
+    if (mobPoint) {
+      mobPoint.textContent = this.wind.pointOfSail;
+      mobPoint.className = `mob-pill-badge ${this.wind.pointOfSail.includes('Zona Muerta') ? 'danger' : 'active'}`;
     }
   }
 }

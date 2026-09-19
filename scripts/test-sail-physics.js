@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { SailManager } from '../src/models/Sail.js';
+import { WindSystem } from '../src/simulation/WindSystem.js';
+import { Boat } from '../src/models/Boat.js';
 
 console.log('=== TEST DE FÍSICA Y CINEMÁTICA DE VELAS ===\n');
 
@@ -90,4 +92,50 @@ if (deltaX > 0.001) {
   process.exit(1);
 }
 
-console.log('\n🎉 TODOS LOS TESTS DE FÍSICA Y CINEMÁTICA DE VELAS PASARON CON ÉXITO!');
+// TEST 5: Dirección de escora con viento por Estribor
+console.log('\n--- Test 5: Dirección de Escora (Viento por Estribor -> Escora a Babor) ---');
+const wind = new WindSystem();
+const testScene = new THREE.Scene();
+const boat = new Boat(testScene);
+
+// Viento desde el Norte (0°), Rumbo 315° (Noroeste) -> Viento entra por Estribor (+45°)
+wind.setTrueWind(0, 18);
+wind.setBoatHeading(315);
+console.log(`Amura: ${wind.tackSide} (esperado: estribor)`);
+console.log(`Escora calculada: ${(wind.heelingAngle * 180 / Math.PI).toFixed(1)}°`);
+
+boat.setHeel(wind.heelingAngle);
+// Verifiquemos hacia qué banda se inclina el mástil (+Y).
+// El mástil apunta hacia arriba (0, 10, 0) en tiltGroup.
+const mastWorldPos = new THREE.Vector3(0, 10, 0);
+boat.tiltGroup.localToWorld(mastWorldPos);
+console.log(`Posición X de la perilla del mástil: ${mastWorldPos.x.toFixed(3)} (debe ser POSITIVA: inclinación hacia Babor/+X)`);
+
+if (wind.tackSide === 'estribor' && mastWorldPos.x > 0.01) {
+  console.log('✅ TEST 5 PASÓ: Con viento por Estribor, el barco escora hacia Sotavento (Babor)!');
+} else {
+  console.error('❌ TEST 5 FALLÓ: Con viento por Estribor, el barco escoró a Barlovento o hacia el lado incorrecto!');
+  process.exit(1);
+}
+
+// TEST 6: Dirección de escora con viento por Babor
+console.log('\n--- Test 6: Dirección de Escora (Viento por Babor -> Escora a Estribor) ---');
+// Viento desde el Norte (0°), Rumbo 45° (Noreste) -> Viento entra por Babor (-45°)
+wind.setBoatHeading(45);
+console.log(`Amura: ${wind.tackSide} (esperado: babor)`);
+console.log(`Escora calculada: ${(wind.heelingAngle * 180 / Math.PI).toFixed(1)}°`);
+
+boat.setHeel(wind.heelingAngle);
+const mastWorldPos2 = new THREE.Vector3(0, 10, 0);
+boat.tiltGroup.localToWorld(mastWorldPos2);
+console.log(`Posición X de la perilla del mástil: ${mastWorldPos2.x.toFixed(3)} (debe ser NEGATIVA: inclinación hacia Estribor/-X)`);
+
+if (wind.tackSide === 'babor' && mastWorldPos2.x < -0.01) {
+  console.log('✅ TEST 6 PASÓ: Con viento por Babor, el barco escora hacia Sotavento (Estribor)!');
+} else {
+  console.error('❌ TEST 6 FALLÓ: Con viento por Babor, el barco escoró a Barlovento o hacia el lado incorrecto!');
+  process.exit(1);
+}
+
+console.log('\n🎉 TODOS LOS TESTS DE FÍSICA, CINEMÁTICA Y ESCORA PASARON CON ÉXITO!');
+

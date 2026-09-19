@@ -181,16 +181,8 @@ export class SceneEnvironment {
   applyWeatherCondition(preset) {
     if (!preset) return;
 
-    if (preset.waterColor) {
-      this.activeWaterColor = preset.waterColor;
-      this.waterMat.color.setHex(preset.waterColor);
-    }
-    if (preset.skyColor) {
-      this.activeSkyColor = preset.skyColor;
-      if (!this.isNight) {
-        this.updateSunPosition();
-      }
-    }
+    // Los tipos de clima no modifican la luz, brillo ni coloración de cielo/agua
+    // para preservar la visibilidad, luminosidad y ajustes elegidos por el usuario.
     if (preset.waveFreq) this.waveFreq = preset.waveFreq;
     if (preset.waveAmp) this.waveAmp = preset.waveAmp;
 

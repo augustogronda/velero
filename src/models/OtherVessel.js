@@ -334,7 +334,9 @@ export class OtherVessel {
 
     // Orientar velas si es velero
     if (this.type === 'sailboat' && this.otherBoom) {
-      const boomSign = this.tackSide === 'estribor' ? 1 : -1;
+      // Viento por estribor -> botavara y escora hacia babor (+X, rotation.y < 0, rotation.z < 0)
+      // Viento por babor -> botavara y escora hacia estribor (-X, rotation.y > 0, rotation.z > 0)
+      const boomSign = this.tackSide === 'estribor' ? -1 : 1;
       this.otherBoom.rotation.y = boomSign * 0.45;
       this.heeling = boomSign * 0.22;
       this.sailorGroup.rotation.z = this.heeling;

@@ -124,6 +124,18 @@
       gap: 12px;
     }
 
+    .sim-header-top-row {
+      display: contents;
+    }
+
+    /* Pastilla de telemetría móvil (oculta en desktop) */
+    .sim-mobile-pill {
+      display: none;
+    }
+    .mob-telemetry-backdrop {
+      display: none;
+    }
+
     .sim-brand {
       pointer-events: auto;
       background: var(--panel-bg);
@@ -1413,6 +1425,7 @@
     body.hud-hidden .sim-controls-panel,
     body.hud-hidden .sim-ripa-card,
     body.hud-hidden .sim-anchor-card,
+    body.hud-hidden .sim-mobile-pill,
     body.hud-hidden .sim-iala-card {
       display: none !important;
     }
@@ -1488,34 +1501,41 @@
       .sim-header {
         flex-direction: column;
         align-items: stretch;
-        gap: 6px;
+        gap: 5px;
         top: max(6px, env(safe-area-inset-top, 6px));
         left: 8px;
         right: 8px;
+        pointer-events: none;
       }
       .sim-header-top-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
         width: 100%;
+        pointer-events: none;
       }
       .sim-brand {
-        padding: 5px 10px;
-        border-radius: 10px;
+        padding: 4px 8px;
+        border-radius: 9px;
+        pointer-events: auto;
       }
       .sim-badge {
-        font-size: 0.52rem;
+        font-size: 0.50rem;
+        letter-spacing: 0.05em;
       }
       .sim-brand h1 {
-        font-size: 0.86rem;
+        font-size: 0.82rem;
+        line-height: 1.1;
       }
       .sim-header-actions {
-        gap: 4px;
+        gap: 3px;
+        pointer-events: auto;
       }
       .sim-btn {
-        padding: 5px 8px;
-        font-size: 0.70rem;
+        padding: 4px 7px;
+        font-size: 0.68rem;
         border-radius: 8px;
+        min-height: 28px;
       }
       .sim-btn .btn-text {
         display: none;
@@ -1526,131 +1546,248 @@
         flex-wrap: nowrap;
         scrollbar-width: none;
         -webkit-overflow-scrolling: touch;
-        gap: 4px;
-        padding: 3px;
-        border-radius: 10px;
+        gap: 3px;
+        padding: 2px;
+        border-radius: 9px;
+        pointer-events: auto;
       }
       .sim-mode-selector::-webkit-scrollbar { display: none; }
       .mode-tab {
-        padding: 5px 9px;
-        font-size: 0.68rem;
+        padding: 4px 8px;
+        font-size: 0.64rem;
         white-space: nowrap;
         flex-shrink: 0;
+        border-radius: 6px;
       }
 
-      /* Widgets de rosa y telemetría compactos en esquinas superiores */
-      .sim-compass-card {
-        top: max(105px, calc(env(safe-area-inset-top, 0px) + 98px));
-        bottom: auto;
-        left: 8px;
-        width: 105px;
-        padding: 6px;
-        border-radius: 12px;
+      /* Pastilla Náutica Móvil Unificada (Sustituye widgets laterales fijos) */
+      .sim-mobile-pill {
+        display: flex;
+        position: fixed;
+        top: max(72px, calc(env(safe-area-inset-top, 0px) + 68px));
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 45;
+        background: rgba(10, 23, 44, 0.88);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border: 1px solid rgba(56, 189, 248, 0.4);
+        border-radius: 9999px;
+        padding: 5px 13px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.55), 0 0 12px rgba(56, 189, 248, 0.2);
+        cursor: pointer;
+        pointer-events: auto;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        max-width: calc(100vw - 24px);
       }
-      .compass-header {
+      .sim-mobile-pill:active {
+        transform: translateX(-50%) scale(0.96);
+        background: rgba(15, 30, 58, 0.96);
+        border-color: var(--accent-cyan);
+      }
+      .mob-pill-content {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.72rem;
+        color: #f8fafc;
+      }
+      .mob-pill-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-weight: 600;
+      }
+      .mob-pill-item strong {
+        font-family: 'Space Grotesk', sans-serif;
+        color: #ffffff;
+      }
+      .mob-pill-item small {
         font-size: 0.58rem;
-        margin-bottom: 2px;
+        color: var(--text-muted);
       }
-      .compass-legend-tws {
-        padding: 1px 4px;
-        font-size: 0.58rem;
+      .mob-pill-sep {
+        color: rgba(255, 255, 255, 0.25);
+        font-weight: 700;
       }
-      .compass-svg {
-        width: 80px;
-        height: 80px;
+      .mob-pill-badge {
+        font-size: 0.62rem;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 9999px;
+        background: rgba(56, 189, 248, 0.18);
+        color: var(--accent-cyan);
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
       }
-      .compass-footer, .compass-subtext {
+      .mob-pill-badge.danger {
+        background: rgba(239, 68, 68, 0.2);
+        color: #f87171;
+        border-color: rgba(239, 68, 68, 0.4);
+      }
+      .mob-pill-expand-icon {
+        font-size: 0.68rem;
+        opacity: 0.8;
+        margin-left: 2px;
+      }
+
+      /* En móvil, las tarjetas laterales grandes se ocultan para dejar el 3D libre */
+      .sim-compass-card,
+      .sim-telemetry-card {
         display: none !important;
       }
 
-      .sim-telemetry-card {
-        top: max(105px, calc(env(safe-area-inset-top, 0px) + 98px));
+      /* Modal de Telemetría Completa al tocar la pastilla */
+      .mob-telemetry-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(4, 9, 20, 0.65);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 80;
+        cursor: pointer;
+      }
+      body.mobile-telemetry-active .mob-telemetry-backdrop {
+        display: block;
+      }
+      body.mobile-telemetry-active .sim-compass-card,
+      body.mobile-telemetry-active .sim-telemetry-card {
+        display: flex !important;
+        position: fixed;
+        z-index: 85;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+        border-radius: 16px;
+        animation: fadeInDown 0.25s ease-out;
+      }
+      body.mobile-telemetry-active .sim-compass-card {
+        top: max(70px, calc(env(safe-area-inset-top, 0px) + 65px));
+        bottom: auto;
+        left: 8px;
+        width: 135px;
+        padding: 6px;
+      }
+      body.mobile-telemetry-active .sim-compass-card .compass-svg {
+        width: 85px;
+        height: 85px;
+      }
+      body.mobile-telemetry-active .sim-telemetry-card {
+        top: max(70px, calc(env(safe-area-inset-top, 0px) + 65px));
         bottom: auto;
         right: 8px;
-        width: 140px;
-        padding: 6px 8px;
-        border-radius: 12px;
+        left: auto;
+        width: calc(100% - 158px);
+        padding: 7px 9px;
         gap: 4px;
       }
-      .tel-row-point {
-        padding-bottom: 3px;
-      }
-      .tel-label {
-        font-size: 0.56rem;
-      }
-      .tel-point-badge {
-        font-size: 0.60rem;
-        padding: 2px 4px;
-      }
-      .tel-metrics-grid {
+      body.mobile-telemetry-active .sim-telemetry-card .tel-metrics-grid {
         grid-template-columns: 1fr 1fr;
         gap: 3px;
       }
-      .metric-box {
+      body.mobile-telemetry-active .sim-telemetry-card .metric-box {
         padding: 3px;
         border-radius: 6px;
       }
-      .m-val {
-        font-size: 0.82rem;
+      body.mobile-telemetry-active .sim-telemetry-card .m-val {
+        font-size: 0.80rem;
       }
-      .m-unit {
-        font-size: 0.50rem;
-      }
-      .tel-eval-box {
-        display: none !important;
+      body.mobile-telemetry-active .sim-telemetry-card .m-unit {
+        font-size: 0.48rem;
       }
 
-      /* Panel de control inferior: Bottom Sheet colapsable que deja libre el 3D */
+      /* Panel de control inferior: Bottom Sheet ergonómico (máx 42vh para no tapar el 3D) */
       .ctrl-drawer-handle {
         display: flex;
+        padding: 2px 0 4px 0;
       }
       .sim-controls-panel {
         left: 8px;
         right: 8px;
-        bottom: max(8px, env(safe-area-inset-bottom, 8px));
-        padding: 6px 12px;
+        bottom: max(6px, env(safe-area-inset-bottom, 6px));
+        padding: 5px 10px;
         border-radius: 16px;
-        max-height: 48px;
+        max-height: 38px;
         overflow: hidden;
         transition: max-height 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease;
       }
       .sim-controls-panel.drawer-open {
-        max-height: 60vh;
+        max-height: 42vh;
+        max-height: 42dvh;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        box-shadow: 0 -12px 45px rgba(0,0,0,0.85);
+        box-shadow: 0 -10px 40px rgba(0,0,0,0.85);
       }
       .sim-controls-panel.drawer-open #dbi-arrow {
         transform: rotate(180deg);
       }
 
-      .ctrl-row-sliders {
-        grid-template-columns: 1fr 1fr;
-        gap: 6px;
+      .ctrl-row-presets,
+      .ctrl-row-weather {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 2px;
+        gap: 4px;
       }
-      .slider-card {
-        padding: 5px 8px;
+      .ctrl-row-presets::-webkit-scrollbar,
+      .ctrl-row-weather::-webkit-scrollbar { display: none; }
+      .ctrl-preset-btns,
+      .ctrl-weather-btns,
+      .ctrl-reef-btns {
+        flex-wrap: nowrap;
+        flex-shrink: 0;
+        gap: 3px;
       }
-      .slider-card label {
+      .btn-preset,
+      .btn-weather-quick,
+      .btn-reef-quick {
         font-size: 0.62rem;
+        padding: 4px 7px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        border-radius: 6px;
       }
 
-      /* Tarjetas de modos y configuración dentro del viewport */
+      .ctrl-row-sliders {
+        grid-template-columns: 1fr 1fr;
+        gap: 5px;
+      }
+      .slider-card {
+        padding: 4px 7px;
+        border-radius: 8px;
+      }
+      .slider-card label {
+        font-size: 0.60rem;
+      }
+      .slider-card input[type="range"] {
+        height: 18px;
+      }
+
+      /* Tarjetas de modos RIPA, IALA, Fondeo y Entorno adaptadas a Bottom Sheet (48vh) */
       .sim-ripa-card,
       .sim-anchor-card,
       .sim-iala-card,
       .sim-env-card {
         position: fixed;
-        top: max(80px, calc(env(safe-area-inset-top, 0px) + 76px));
-        left: 8px;
-        right: 8px;
-        width: calc(100% - 16px);
-        max-height: calc(100dvh - 145px);
+        bottom: 0;
+        top: auto;
+        left: 6px;
+        right: 6px;
+        width: calc(100% - 12px);
+        max-height: 48vh;
+        max-height: 48dvh;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        padding: 12px 14px;
-        border-radius: 16px;
+        padding: 10px 12px max(14px, env(safe-area-inset-bottom, 14px)) 12px;
+        border-radius: 18px 18px 0 0;
+        border-bottom: none;
         z-index: 55;
+        box-shadow: 0 -12px 40px rgba(0,0,0,0.85);
       }
     }
 

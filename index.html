@@ -1365,68 +1365,66 @@
       }
       .badge-bar {
         gap: 4px;
-        margin-bottom: 3px;
-      }
-      .badge, .badge-sub, .badge-water {
-        font-size: 0.65rem;
-        padding: 2px 8px;
-      }
-      h1 {
-        font-size: 1.22rem;
-        line-height: 1.15;
         margin-bottom: 2px;
       }
+      .badge {
+        font-size: 0.62rem;
+        padding: 2px 7px;
+      }
+      .badge-sub, .badge-water {
+        display: none !important;
+      }
+      h1 {
+        font-size: 1.10rem;
+        line-height: 1.1;
+        margin-bottom: 0px;
+      }
       .subtitle {
-        font-size: 0.72rem;
-        line-height: 1.3;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+        display: none !important;
       }
 
       /* Pestañas con scroll táctil fluido */
       .tabs-nav {
-        margin-top: 6px;
+        margin-top: 5px;
         overflow-x: auto;
         flex-wrap: nowrap;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
-        padding-bottom: 4px;
-        gap: 5px;
+        padding-bottom: 2px;
+        gap: 4px;
         max-width: 100%;
       }
       .tabs-nav::-webkit-scrollbar { display: none; }
       .tab-btn {
-        font-size: 0.72rem;
-        padding: 6px 11px;
+        font-size: 0.68rem;
+        padding: 5px 9px;
         white-space: nowrap;
         flex-shrink: 0;
-        border-radius: 8px;
-        min-height: 34px;
+        border-radius: 7px;
+        min-height: 28px;
       }
 
       /* Selector de aparejos en móvil */
       .rig-selector-bar {
-        margin-top: 6px;
+        margin-top: 4px;
         overflow-x: auto;
         flex-wrap: nowrap;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
-        padding: 4px 8px;
-        gap: 5px;
+        padding: 3px 6px;
+        gap: 4px;
         max-width: 100%;
       }
       .rig-selector-bar::-webkit-scrollbar { display: none; }
       .rig-btn {
-        font-size: 0.68rem;
-        padding: 4px 9px;
+        font-size: 0.65rem;
+        padding: 3px 8px;
         white-space: nowrap;
         flex-shrink: 0;
-        min-height: 30px;
+        min-height: 26px;
       }
 
-      /* Panel Flotante transformado en Bottom Sheet ergonómico */
+      /* Panel Flotante transformado en Bottom Sheet ergonómico (50vh máx para dejar 50% al 3D) */
       .info-panel {
         position: fixed;
         top: auto;
@@ -1435,10 +1433,10 @@
         right: 0;
         width: 100%;
         max-width: 100%;
-        max-height: 65vh;
-        max-height: 65dvh;
+        max-height: 50vh;
+        max-height: 50dvh;
         border-radius: 20px 20px 0 0;
-        padding: 8px 16px max(18px, env(safe-area-inset-bottom, 18px)) 16px;
+        padding: 6px 14px max(16px, env(safe-area-inset-bottom, 16px)) 14px;
         border: 1px solid rgba(56, 189, 248, 0.35);
         border-bottom: none;
         background: rgba(8, 14, 28, 0.95);
@@ -1450,12 +1448,12 @@
         transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
         touch-action: pan-y;
         animation: none;
-        gap: 12px;
+        gap: 10px;
       }
 
-      /* Estado contraído: pastilla interactiva compacta (48px) */
+      /* Estado contraído: pastilla interactiva compacta (44px) */
       .info-panel.collapsed {
-        transform: translateY(calc(100% - 48px - env(safe-area-inset-bottom, 0px)));
+        transform: translateY(calc(100% - 44px - env(safe-area-inset-bottom, 0px)));
       }
 
       /* Barra de agarre / despliegue en móviles */
@@ -1528,21 +1526,27 @@
         display: flex;
         flex-direction: column;
         position: fixed;
-        bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+        bottom: calc(50px + env(safe-area-inset-bottom, 0px));
         left: 8px;
         right: 8px;
         width: calc(100vw - 16px);
         max-width: calc(100vw - 16px);
         z-index: 50;
-        padding: 5px 8px;
-        gap: 5px;
-        border-radius: 14px;
-        background: rgba(10, 17, 32, 0.92);
-        backdrop-filter: blur(18px);
-        -webkit-backdrop-filter: blur(18px);
+        padding: 4px 6px;
+        gap: 3px;
+        border-radius: 12px;
+        background: rgba(10, 17, 32, 0.90);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
         border: 1px solid rgba(255, 255, 255, 0.12);
         animation: none;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+        transition: opacity 0.25s ease, transform 0.25s ease;
+      }
+      body.sheet-expanded .bottom-bar {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(20px);
       }
       .bottom-bar-row {
         display: flex;
@@ -4155,6 +4159,7 @@
 
     function setSheetExpanded(expanded) {
       if (!infoPanel) return;
+      document.body.classList.toggle('sheet-expanded', expanded);
       if (expanded) {
         infoPanel.classList.remove('collapsed');
         if (handleTag) handleTag.textContent = 'Toca para contraer ▾';
@@ -5285,6 +5290,9 @@
     // Iniciar con aparejo Sloop y seleccionar Casco por defecto
     buildRig("sloop");
     selectPart("Casco");
+    if (isMobilePortrait()) {
+      setSheetExpanded(false);
+    }
 
     // ── Aviso de experiencia móvil ────────────────────────────────────────
     (function initMobileNotice() {
@@ -5312,6 +5320,13 @@
 
       btnOk   && btnOk.addEventListener('click',    dismiss);
       btnClose && btnClose.addEventListener('click', dismiss);
+
+      // Auto-descartar aviso al primer toque en el 3D o en cualquier control
+      window.addEventListener('pointerdown', (e) => {
+        if (!e.target.closest('#mobile-notice')) {
+          dismiss();
+        }
+      }, { once: true, passive: true });
 
       maybeShow();
     })();
