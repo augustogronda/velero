@@ -1424,7 +1424,7 @@
         min-height: 26px;
       }
 
-      /* Panel Flotante transformado en Bottom Sheet ergonómico (36vh máx para dejar 64% libre al 3D) */
+      /* Panel Flotante transformado en Bottom Sheet táctil tipo iOS con Snap Points */
       .info-panel {
         position: fixed;
         top: auto;
@@ -1433,28 +1433,43 @@
         right: 0;
         width: 100%;
         max-width: 100%;
-        max-height: 36vh;
-        max-height: 36dvh;
-        border-radius: 20px 20px 0 0;
+        height: 78vh;
+        height: 78dvh;
+        max-height: 78vh;
+        max-height: 78dvh;
+        border-radius: 22px 22px 0 0;
         padding: 6px 14px max(14px, env(safe-area-inset-bottom, 14px)) 14px;
         border: 1px solid rgba(56, 189, 248, 0.35);
         border-bottom: none;
-        background: rgba(8, 14, 28, 0.95);
+        background: rgba(8, 14, 28, 0.96);
         backdrop-filter: blur(28px);
         -webkit-backdrop-filter: blur(28px);
-        box-shadow: 0 -10px 35px rgba(0, 0, 0, 0.75), 0 0 20px rgba(56, 189, 248, 0.15);
+        box-shadow: 0 -10px 35px rgba(0, 0, 0, 0.8), 0 0 20px rgba(56, 189, 248, 0.15);
         z-index: 70;
-        transform: translateY(0);
-        transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transform: translateY(calc(100% - 44px - env(safe-area-inset-bottom, 0px)));
+        transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
         touch-action: pan-y;
         animation: none;
         gap: 8px;
         overflow-y: auto;
+        will-change: transform;
       }
 
-      /* Estado contraído: pastilla interactiva compacta (44px) */
+      /* Snap point 1: Contraído (Pastilla compacta 44px) */
+      .info-panel.sheet-collapsed,
       .info-panel.collapsed {
         transform: translateY(calc(100% - 44px - env(safe-area-inset-bottom, 0px)));
+      }
+
+      /* Snap point 2: Intermedio (~36vh visible, deja 64% libre al 3D) */
+      .info-panel.sheet-mid {
+        transform: translateY(calc(100% - 36vh));
+        transform: translateY(calc(100% - 36dvh));
+      }
+
+      /* Snap point 3: Completo (~78vh visible para ver textos largos y tablas) */
+      .info-panel.sheet-full {
+        transform: translateY(0);
       }
 
       /* Barra de agarre / despliegue en móviles */
@@ -1463,29 +1478,42 @@
         align-items: center;
         justify-content: space-between;
         width: 100%;
-        padding: 4px 2px 8px 2px;
-        cursor: pointer;
+        padding: 6px 2px 8px 2px;
+        cursor: grab;
         position: relative;
         border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         flex-shrink: 0;
         -webkit-tap-highlight-color: transparent;
-        min-height: 40px;
-        border-radius: 12px 12px 0 0;
+        min-height: 42px;
+        border-radius: 14px 14px 0 0;
+        touch-action: none;
+        user-select: none;
+      }
+      .panel-handle-bar:active {
+        cursor: grabbing;
       }
       .panel-handle-pill {
         position: absolute;
-        top: -3px;
+        top: -1px;
         left: 50%;
         transform: translateX(-50%);
-        width: 36px;
-        height: 4px;
-        background: rgba(255, 255, 255, 0.35);
+        width: 40px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.38);
         border-radius: 9999px;
+        transition: width 0.2s ease, background 0.2s ease;
+      }
+      .panel-handle-bar:active .panel-handle-pill,
+      .info-panel.is-dragging .panel-handle-pill {
+        width: 54px;
+        background: var(--accent-cyan);
+        box-shadow: 0 0 12px rgba(56, 189, 248, 0.8);
       }
       .panel-handle-info {
         display: flex;
         flex-direction: column;
         gap: 1px;
+        pointer-events: none;
       }
       .handle-title {
         font-family: 'Space Grotesk', sans-serif;
@@ -1505,20 +1533,22 @@
         background: rgba(255, 255, 255, 0.08);
         border: 1px solid rgba(255, 255, 255, 0.15);
         border-radius: 50%;
-        width: 28px;
-        height: 28px;
+        width: 30px;
+        height: 30px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: #ffffff;
         cursor: pointer;
+        flex-shrink: 0;
       }
       .btn-sheet-toggle svg {
-        transition: transform 0.3s ease;
-        /* Abierto: apunta hacia abajo para contraer */
+        transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+        /* Abierto (mid o full): apunta hacia abajo */
         transform: rotate(180deg);
       }
-      /* Colapsado: apunta hacia arriba para desplegar */
+      /* Colapsado: apunta hacia arriba */
+      .info-panel.sheet-collapsed .btn-sheet-toggle svg,
       .info-panel.collapsed .btn-sheet-toggle svg {
         transform: rotate(0deg);
       }
@@ -4181,23 +4211,68 @@
       camera.updateProjectionMatrix();
     }
 
-    function setSheetExpanded(expanded) {
-      if (!infoPanel) return;
-      document.body.classList.toggle('sheet-expanded', expanded);
-      if (expanded) {
-        infoPanel.classList.remove('collapsed');
-        if (handleTag) handleTag.textContent = 'Toca para contraer ▾';
+    let currentSheetState = 'collapsed'; // 'collapsed' | 'mid' | 'full'
+
+    function getSheetSnapTranslate(state) {
+      if (!infoPanel) return 0;
+      const panelH = infoPanel.offsetHeight || Math.round(window.innerHeight * 0.78);
+      if (state === 'full') {
+        return 0;
+      } else if (state === 'mid') {
+        const visibleH = Math.round(window.innerHeight * 0.36);
+        return Math.max(0, panelH - visibleH);
       } else {
-        infoPanel.classList.add('collapsed');
-        if (handleTag) handleTag.textContent = 'Toca para ver detalles ▴';
+        // 'collapsed'
+        const visibleH = 44;
+        return Math.max(0, panelH - visibleH);
       }
-      updateMobileCameraOffset(expanded);
+    }
+
+    function setSheetSnap(state, animate = true) {
+      if (!infoPanel) return;
+      currentSheetState = state;
+
+      infoPanel.classList.remove('sheet-collapsed', 'sheet-mid', 'sheet-full', 'collapsed', 'is-dragging');
+
+      if (state === 'collapsed') {
+        infoPanel.classList.add('sheet-collapsed', 'collapsed');
+        document.body.classList.remove('sheet-expanded');
+        if (handleTag) handleTag.textContent = 'Desliza hacia arriba ▴';
+        updateMobileCameraOffset(false);
+      } else if (state === 'mid') {
+        infoPanel.classList.add('sheet-mid');
+        document.body.classList.add('sheet-expanded');
+        if (handleTag) handleTag.textContent = 'Desliza para ampliar o cerrar ↕';
+        updateMobileCameraOffset(true);
+      } else if (state === 'full') {
+        infoPanel.classList.add('sheet-full');
+        document.body.classList.add('sheet-expanded');
+        if (handleTag) handleTag.textContent = 'Desliza hacia abajo para cerrar ▾';
+        updateMobileCameraOffset(true);
+      }
+
+      // Limpiar transform en línea residual de gestos táctiles
+      infoPanel.style.transform = '';
+      if (!animate) {
+        infoPanel.style.transition = 'none';
+      } else {
+        infoPanel.style.transition = 'transform 0.32s cubic-bezier(0.32, 0.72, 0, 1)';
+      }
+    }
+
+    function setSheetExpanded(expanded) {
+      setSheetSnap(expanded ? 'mid' : 'collapsed');
     }
 
     function toggleSheet() {
       if (!infoPanel) return;
-      const isCollapsed = infoPanel.classList.contains('collapsed');
-      setSheetExpanded(isCollapsed);
+      if (currentSheetState === 'collapsed') {
+        setSheetSnap('mid');
+      } else if (currentSheetState === 'mid') {
+        setSheetSnap('full');
+      } else {
+        setSheetSnap('collapsed');
+      }
     }
 
     function setDesktopPanelOpen(open) {
@@ -4212,37 +4287,157 @@
     }
 
     if (panelHandleBar) {
-      panelHandleBar.addEventListener('click', toggleSheet);
-    }
-    if (btnSheetToggle) {
-      btnSheetToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
+      panelHandleBar.addEventListener('click', (e) => {
+        if (isTouchDragging) return;
         toggleSheet();
       });
     }
 
-    // Gesto táctil swipe vertical en el panel (deslizar hacia abajo contrae a 44px)
-    if (infoPanel) {
-      let swipeStartY = 0;
-      let swipeStartTime = 0;
-
-      infoPanel.addEventListener('touchstart', (e) => {
-        if (!isMobilePortrait()) return;
-        swipeStartY = e.touches[0].clientY;
-        swipeStartTime = Date.now();
-      }, { passive: true });
-
-      infoPanel.addEventListener('touchend', (e) => {
-        if (!isMobilePortrait()) return;
-        const dy = e.changedTouches[0].clientY - swipeStartY;
-        const dt = Date.now() - swipeStartTime;
-        // Deslizar hacia abajo: contraer para ver el velero
-        if (dy > 30 && dt < 400) {
-          setSheetExpanded(false);
-        } else if (dy < -30 && dt < 400) {
-          setSheetExpanded(true);
+    if (btnSheetToggle) {
+      btnSheetToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (currentSheetState === 'collapsed') {
+          setSheetSnap('mid');
+        } else {
+          setSheetSnap('collapsed');
         }
-      }, { passive: true });
+      });
+    }
+
+    // ──────────────────────────────────────────────────────────────────
+    // MOTOR DE GESTOS TÁCTILES 1:1 CON SNAP POINTS (ESTILO CUPERTINO/VAUL)
+    // ──────────────────────────────────────────────────────────────────
+    let isTouchDragging = false;
+    let dragStartY = 0;
+    let dragStartTime = 0;
+    let dragInitialTranslateY = 0;
+    let dragLastY = 0;
+    let dragLastTime = 0;
+    let dragVelocityY = 0;
+
+    function onTouchStart(e) {
+      if (!isMobilePortrait()) return;
+      if (e.touches.length !== 1) return;
+
+      const touch = e.touches[0];
+      const target = e.target;
+
+      const isHandle = target.closest('.panel-handle-bar');
+      const isContent = target.closest('.info-panel');
+
+      if (!isHandle && !isContent) return;
+
+      // Si se toca dentro del cuerpo y está en modo 'full', permitir scroll vertical normal a menos que esté en el tope
+      if (currentSheetState === 'full' && !isHandle && infoPanel.scrollTop > 4) {
+        return;
+      }
+
+      isTouchDragging = true;
+      dragStartY = touch.clientY;
+      dragLastY = touch.clientY;
+      dragStartTime = performance.now();
+      dragLastTime = dragStartTime;
+      dragVelocityY = 0;
+
+      dragInitialTranslateY = getSheetSnapTranslate(currentSheetState);
+
+      infoPanel.classList.add('is-dragging');
+      infoPanel.style.transition = 'none';
+      infoPanel.style.transform = `translateY(${dragInitialTranslateY}px)`;
+    }
+
+    function onTouchMove(e) {
+      if (!isTouchDragging) return;
+      if (e.touches.length !== 1) return;
+
+      const touch = e.touches[0];
+      const now = performance.now();
+      const dy = touch.clientY - dragStartY;
+
+      const dt = now - dragLastTime;
+      if (dt > 8) {
+        dragVelocityY = (touch.clientY - dragLastY) / dt;
+        dragLastY = touch.clientY;
+        dragLastTime = now;
+      }
+
+      // Si está en 'full' y el usuario desliza hacia arriba dentro del contenido para scrollear, permitirlo
+      if (currentSheetState === 'full' && dy < 0 && infoPanel.scrollTop > 0) {
+        return;
+      }
+
+      let targetTranslateY = dragInitialTranslateY + dy;
+      const minTranslateY = 0;
+      const maxTranslateY = getSheetSnapTranslate('collapsed');
+
+      // Resistencia elástica amortiguada (Rubber-band)
+      if (targetTranslateY < minTranslateY) {
+        targetTranslateY = minTranslateY + (targetTranslateY - minTranslateY) * 0.35;
+      } else if (targetTranslateY > maxTranslateY) {
+        targetTranslateY = maxTranslateY + (targetTranslateY - maxTranslateY) * 0.35;
+      }
+
+      infoPanel.style.transform = `translateY(${targetTranslateY}px)`;
+
+      // Evitar recarga o comportamiento elástico del navegador en la manija
+      if (e.cancelable && (e.target.closest('.panel-handle-bar') || dy > 0)) {
+        e.preventDefault();
+      }
+    }
+
+    function onTouchEnd(e) {
+      if (!isTouchDragging) return;
+      isTouchDragging = false;
+
+      infoPanel.classList.remove('is-dragging');
+
+      const touch = e.changedTouches[0];
+      const totalDy = touch.clientY - dragStartY;
+      const totalDt = performance.now() - dragStartTime;
+
+      const midTranslateY = getSheetSnapTranslate('mid');
+      const collapsedTranslateY = getSheetSnapTranslate('collapsed');
+      const currentY = dragInitialTranslateY + totalDy;
+
+      // 1. Inercia rápida (Flick / Swipe)
+      if (Math.abs(dragVelocityY) > 0.4 || (Math.abs(totalDy) > 45 && totalDt < 320)) {
+        if (totalDy < 0) {
+          // Deslizado rápido hacia arriba
+          if (dragInitialTranslateY >= collapsedTranslateY - 15) {
+            setSheetSnap('mid');
+          } else {
+            setSheetSnap('full');
+          }
+        } else {
+          // Deslizado rápido hacia abajo
+          if (dragInitialTranslateY <= 20) {
+            setSheetSnap('mid');
+          } else {
+            setSheetSnap('collapsed');
+          }
+        }
+        return;
+      }
+
+      // 2. Acople magnético por distancia al punto más cercano
+      const distToFull = Math.abs(currentY - 0);
+      const distToMid = Math.abs(currentY - midTranslateY);
+      const distToCollapsed = Math.abs(currentY - collapsedTranslateY);
+
+      if (distToFull <= distToMid && distToFull <= distToCollapsed) {
+        setSheetSnap('full');
+      } else if (distToMid <= distToFull && distToMid <= distToCollapsed) {
+        setSheetSnap('mid');
+      } else {
+        setSheetSnap('collapsed');
+      }
+    }
+
+    if (infoPanel) {
+      infoPanel.addEventListener('touchstart', onTouchStart, { passive: false });
+      window.addEventListener('touchmove', onTouchMove, { passive: false });
+      window.addEventListener('touchend', onTouchEnd, { passive: true });
+      window.addEventListener('touchcancel', onTouchEnd, { passive: true });
     }
 
     // Toque en el lienzo 3D: si el panel está abierto en móvil, cerrarlo para apreciar el barco
@@ -4257,8 +4452,8 @@
         const dist = Math.hypot(e.clientX - canvasTapPos.x, e.clientY - canvasTapPos.y);
         const duration = Date.now() - canvasTapStart;
         if (duration < 300 && dist < 12) {
-          if (isMobilePortrait() && infoPanel && !infoPanel.classList.contains('collapsed')) {
-            setSheetExpanded(false);
+          if (isMobilePortrait() && infoPanel && currentSheetState !== 'collapsed') {
+            setSheetSnap('collapsed');
           }
         }
       });
@@ -4617,8 +4812,10 @@
             const clickedMesh = intersects[0].object;
             const partName = clickedMesh.userData.partName;
             selectPart(partName);
-            // Feedback táctil visual: en smartphones animar la pastilla inferior; si ya estaba abierto el panel, se actualiza
-            if (window.innerWidth <= 767) {
+            if (isMobilePortrait()) {
+              if (currentSheetState === 'collapsed') {
+                setSheetSnap('mid');
+              }
               if (panelHandleBar) {
                 panelHandleBar.classList.remove('pill-flash');
                 void panelHandleBar.offsetWidth; // Forzar reflow
@@ -4653,7 +4850,11 @@
         const clickedMesh = intersects[0].object;
         const partName = clickedMesh.userData.partName;
         selectPart(partName);
-        if (window.innerWidth <= 860) {
+        if (isMobilePortrait()) {
+          if (currentSheetState === 'collapsed') {
+            setSheetSnap('mid');
+          }
+        } else if (window.innerWidth <= 860) {
           setSheetExpanded(true);
         }
       }
@@ -4776,11 +4977,28 @@
         handleTitle.innerHTML = `${info.icon} ${info.title}`;
       }
       if (handleTag) {
-        const isCollapsed = infoPanel && infoPanel.classList.contains('collapsed');
-        handleTag.textContent = `${info.tag} · ${isCollapsed ? 'Toca para ver detalles ▴' : 'Toca para contraer ▾'}`;
+        if (currentSheetState === 'collapsed') {
+          handleTag.textContent = `${info.tag} · Desliza hacia arriba ▴`;
+        } else if (currentSheetState === 'mid') {
+          handleTag.textContent = `${info.tag} · Desliza para ampliar o cerrar ↕`;
+        } else {
+          handleTag.textContent = `${info.tag} · Desliza hacia abajo para cerrar ▾`;
+        }
       }
       if (floatingPanelBtnText) {
         floatingPanelBtnText.innerHTML = `${info.icon} ${info.title}`;
+      }
+
+      // En smartphones, descartar aviso inicial y abrir automáticamente la ficha a altura media
+      if (typeof window.dismissMobileNotice === 'function') {
+        window.dismissMobileNotice();
+      }
+      if (isMobilePortrait()) {
+        if (currentSheetState === 'collapsed') {
+          setSheetSnap('mid');
+        } else {
+          updateMobileCameraOffset(true);
+        }
       }
 
       // Actualizar botones chips
@@ -5385,6 +5603,8 @@
           setTimeout(() => { notice.style.display = 'block'; }, 1500);
         }
       }
+
+      window.dismissMobileNotice = dismiss;
 
       btnOk   && btnOk.addEventListener('click',    dismiss);
       btnClose && btnClose.addEventListener('click', dismiss);
