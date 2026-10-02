@@ -161,6 +161,48 @@
       line-height: 1.15;
     }
 
+    /* ── Menú Global de 3 Secciones ────────────────────────── */
+    .app-global-nav {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      padding: 3px 5px;
+      border-radius: 9999px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    .app-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      text-decoration: none;
+      color: #94a3b8;
+      border: 1px solid transparent;
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+      white-space: nowrap;
+    }
+    .app-nav-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .app-nav-btn.active {
+      color: #ffffff;
+      background: rgba(34, 211, 238, 0.18);
+      border-color: rgba(34, 211, 238, 0.5);
+      box-shadow: 0 0 12px rgba(34, 211, 238, 0.25);
+    }
+    .app-nav-btn .nav-btn-icon {
+      font-size: 0.9rem;
+    }
+
     .sim-mode-selector {
       display: flex;
       gap: 4px;

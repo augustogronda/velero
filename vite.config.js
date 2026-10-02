@@ -12,7 +12,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         simulador: resolve(__dirname, 'simulador.html'),
-        nomenclatura: resolve(__dirname, 'index.html')
+        nomenclatura: resolve(__dirname, 'index.html'),
+        apuntes: resolve(__dirname, 'apuntes.html')
       }
     }
   },

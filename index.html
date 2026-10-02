@@ -159,6 +159,47 @@
       gap: 5px;
     }
 
+    /* ── Menú de 3 Secciones Global ── */
+    .app-global-nav {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 3px 4px;
+      border-radius: 9999px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+    .app-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      text-decoration: none;
+      color: #94a3b8;
+      border: 1px solid transparent;
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+      white-space: nowrap;
+    }
+    .app-nav-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .app-nav-btn.active {
+      color: #ffffff;
+      background: rgba(34, 211, 238, 0.18);
+      border-color: rgba(34, 211, 238, 0.5);
+      box-shadow: 0 0 12px rgba(34, 211, 238, 0.25);
+    }
+    .app-nav-btn .nav-btn-icon {
+      font-size: 0.9rem;
+    }
+
     h1 {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 2.1rem;
@@ -1824,9 +1865,17 @@
         <div class="badge-water">
           <span>🌊</span> Órbita Submarina Activa
         </div>
-        <a href="simulador.html" class="badge" style="text-decoration:none; background:rgba(245, 158, 11, 0.15); color:var(--accent-gold); border-color:rgba(245, 158, 11, 0.4); cursor:pointer;" title="Abrir Simulador Náutico de Viento y Maniobras">
-          <span>🧭</span> Simulador de Maniobras (PNA) ➔
-        </a>
+        <nav class="app-global-nav" aria-label="Secciones principales de la plataforma">
+          <a href="index.html" class="app-nav-btn active" title="Exploración 3D de piezas, casco, jarcias y aparejos">
+            <span class="nav-btn-icon">⛵</span> <span class="nav-btn-text">Partes 3D</span>
+          </a>
+          <a href="simulador.html" class="app-nav-btn" title="Simulador interactivo 3D de navegación, viento real/aparente y RIPA">
+            <span class="nav-btn-icon">🧭</span> <span class="nav-btn-text">Simulador 3D</span>
+          </a>
+          <a href="apuntes.html" class="app-nav-btn" title="Manual teórico oficial completo y banco de exámenes PNA">
+            <span class="nav-btn-icon">📖</span> <span class="nav-btn-text">Apuntes & Examen</span>
+          </a>
+        </nav>
       </div>
       <h1>Partes de un Velero</h1>
       <p class="subtitle">Inspección 3D completa: navega sobre el agua o sumérgete bajo el casco.</p>

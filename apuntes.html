@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Cuaderno Oficial Timonel Vela y Motor · BairesNavega (PNA)</title>
+  <meta name="description" content="Manual de estudio oficial para Timonel de Yate Vela y Motor (PNA). 34 capítulos teóricos, 37 láminas técnicas interactivas y 60 preguntas de examen oficial." />
+
+  <!-- Favicon e íconos -->
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#030712" />
+
+  <!-- Tipografías -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg-dark: #030712;
+      --bg-surface: #080f24;
+      --bg-surface-elevated: #0f1936;
+      --bg-card: rgba(255, 255, 255, 0.035);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(34, 211, 238, 0.5);
+      
+      --accent-cyan: #22d3ee;
+      --accent-blue: #38bdf8;
+      --accent-gold: #fbbf24;
+      --accent-green: #22c55e;
+      --accent-red: #ef4444;
+
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+
+      --sidebar-width: 320px;
+      --header-height: 64px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Barra Superior Global (Unificada para las 3 secciones) ────── */
+    .app-top-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: var(--header-height);
+      background: rgba(3, 7, 18, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      gap: 16px;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      color: var(--accent-gold);
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .brand-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+    }
+
+    /* ── Navegación Principal de las 3 Secciones ───────────────────── */
+    .app-global-nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 4px;
+      border-radius: 9999px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .app-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-decoration: none;
+      color: #94a3b8;
+      border: 1px solid transparent;
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+      white-space: nowrap;
+    }
+
+    .app-nav-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .app-nav-btn.active {
+      color: #ffffff;
+      background: rgba(34, 211, 238, 0.16);
+      border-color: rgba(34, 211, 238, 0.5);
+      box-shadow: 0 0 12px rgba(34, 211, 238, 0.25);
+    }
+
+    .app-nav-btn .nav-btn-icon {
+      font-size: 0.95rem;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-exam-progress {
+      font-size: 0.74rem;
+      color: var(--accent-gold);
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      padding: 5px 12px;
+      border-radius: 9999px;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+
+    /* ── Barra Móvil de Píldoras ─────────────────────────────────── */
+    .mobile-pills-bar {
+      display: none;
+      overflow-x: auto;
+      padding: 10px 16px;
+      gap: 6px;
+      background: rgba(8, 15, 36, 0.95);
+      border-bottom: 1px solid var(--border-subtle);
+      scrollbar-width: none;
+    }
+    .mobile-pills-bar::-webkit-scrollbar {
+      display: none;
+    }
+    .mobile-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #cbd5e1;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      font-size: 0.74rem;
+      font-weight: 500;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .mobile-pill.active {
+      background: rgba(34, 211, 238, 0.2);
+      border-color: var(--accent-cyan);
+      color: #ffffff;
+      font-weight: 700;
+    }
+    .mobile-pill.pill-quiz.active {
+      background: rgba(245, 158, 11, 0.25);
+      border-color: var(--accent-gold);
+      color: var(--accent-gold);
+    }
+
+    /* ── Contenedor Principal (Layout de 2 Columnas) ───────────────── */
+    .app-layout {
+      flex: 1;
+      display: flex;
+      max-width: 1540px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* ── Sidebar Izquierdo ───────────────────────────────────────── */
+    .app-sidebar {
+      width: var(--sidebar-width);
+      flex-shrink: 0;
+      position: sticky;
+      top: var(--header-height);
+      height: calc(100vh - var(--header-height));
+      overflow-y: auto;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      border-right: 1px solid var(--border-subtle);
+      background: rgba(8, 15, 36, 0.5);
+    }
+
+    .sidebar-search-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .sidebar-search-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 9px 32px 9px 12px;
+      font-size: 0.8rem;
+      color: #ffffff;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .sidebar-search-input:focus {
+      border-color: var(--accent-cyan);
+      background: rgba(34, 211, 238, 0.06);
+      box-shadow: 0 0 14px rgba(34, 211, 238, 0.2);
+    }
+
+    .sidebar-search-clear {
+      position: absolute;
+      right: 10px;
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .sidebar-nav-divider {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      padding: 10px 10px 4px 10px;
+      font-weight: 700;
+    }
+
+    .sidebar-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      background: none;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.18s ease;
+    }
+
+    .sidebar-nav-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+    }
+
+    .sidebar-nav-item.active {
+      background: rgba(34, 211, 238, 0.12);
+      border-color: rgba(34, 211, 238, 0.35);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .sidebar-nav-item.highlight-exam {
+      color: var(--accent-gold);
+    }
+    .sidebar-nav-item.highlight-exam.active {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+
+    .nav-item-icon {
+      font-size: 1.05rem;
+      flex-shrink: 0;
+    }
+
+    .nav-item-text {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav-pill-badge {
+      font-size: 0.68rem;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .nav-pill-badge.ok {
+      background: rgba(34, 197, 94, 0.18);
+      color: #86efac;
+    }
+    .nav-pill-badge.warn {
+      background: rgba(239, 68, 68, 0.18);
+      color: #fca5a5;
+    }
+    .nav-pill-badge.in-progress {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+    }
+    .nav-pill-badge.exam-badge {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+    }
+
+    /* ── Contenido Principal (Lectura & Láminas) ─────────────────── */
+    .app-main {
+      flex: 1;
+      padding: 32px 48px;
+      max-width: 1100px;
+      min-width: 0;
+    }
+
+    .module-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 36px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .module-card-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+    }
+
+    .module-icon-large {
+      font-size: 2.4rem;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .module-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      color: var(--accent-cyan);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .module-card-header h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.25;
+    }
+
+    .module-sections-list {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .chapter-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 22px 24px;
+    }
+
+    .chapter-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--accent-gold);
+      margin-bottom: 14px;
+      border-left: 3px solid var(--accent-cyan);
+      padding-left: 10px;
+    }
+
+    .chapter-body {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 0.92rem;
+      color: #cbd5e1;
+      line-height: 1.7;
+    }
+
+    .chapter-body p {
+      white-space: pre-line;
+    }
+
+    mark.highlight {
+      background: rgba(245, 158, 11, 0.35);
+      color: #ffffff;
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+
+    /* ── Láminas Técnicas ────────────────────────────────────────── */
+    .chapter-figures-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .technical-figure {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .technical-figure:hover {
+      border-color: var(--accent-cyan);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+    }
+
+    .figure-img-wrapper {
+      position: relative;
+      background: #02050e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 180px;
+    }
+
+    .figure-img-wrapper img {
+      width: 100%;
+      height: auto;
+      max-height: 280px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .figure-zoom-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(4, 10, 26, 0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      color: #ffffff;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .technical-figure:hover .figure-zoom-overlay {
+      opacity: 1;
+    }
+
+    .figure-caption {
+      padding: 10px 14px;
+      font-size: 0.78rem;
+      color: #94a3b8;
+      background: rgba(0, 0, 0, 0.5);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      line-height: 1.45;
+    }
+    .figure-caption strong {
+      color: var(--accent-cyan);
+    }
+
+    /* ── Autoevaluación en cada módulo ───────────────────────────── */
+    .module-quiz-box {
+      margin-top: 28px;
+      background: rgba(245, 158, 11, 0.04);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      border-radius: 14px;
+      padding: 24px;
+    }
+
+    .module-quiz-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid rgba(245, 158, 11, 0.15);
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+    }
+
+    .quiz-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: var(--accent-gold);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .module-quiz-header h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .quiz-desc {
+      font-size: 0.82rem;
+      color: #94a3b8;
+    }
+
+    .module-quiz-stats {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .quiz-score-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .quiz-score-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 9999px;
+    }
+    .quiz-score-tag.tag-approved {
+      background: rgba(34, 197, 94, 0.2);
+      color: #86efac;
+      border: 1px solid #22c55e;
+    }
+    .quiz-score-tag.tag-pending {
+      background: rgba(245, 158, 11, 0.18);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+
+    .btn-reset-module-quiz {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #cbd5e1;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 0.74rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-reset-module-quiz:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+      color: #fca5a5;
+    }
+
+    .module-quiz-questions {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .quiz-card-item {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .quiz-card-prompt {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 12px;
+      line-height: 1.45;
+      display: flex;
+      gap: 8px;
+    }
+    .q-num {
+      color: var(--accent-cyan);
+    }
+
+    .quiz-card-figure {
+      max-width: 360px;
+      margin-bottom: 12px;
+    }
+
+    .quiz-card-options {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .quiz-opt-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 8px 12px;
+      text-align: left;
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .quiz-opt-btn:hover:not(:disabled) {
+      background: rgba(34, 211, 238, 0.1);
+      border-color: rgba(34, 211, 238, 0.4);
+      color: #ffffff;
+    }
+
+    .opt-letter {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.76rem;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 2px 7px;
+      border-radius: 4px;
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .quiz-opt-btn.correct {
+      background: rgba(34, 197, 94, 0.2) !important;
+      border-color: #22c55e !important;
+      color: #86efac !important;
+      font-weight: 600;
+    }
+    .quiz-opt-btn.correct .opt-letter {
+      background: #22c55e;
+      color: #030712;
+    }
+
+    .quiz-opt-btn.wrong {
+      background: rgba(239, 68, 68, 0.2) !important;
+      border-color: #ef4444 !important;
+      color: #fca5a5 !important;
+    }
+    .quiz-opt-btn.wrong .opt-letter {
+      background: #ef4444;
+      color: #ffffff;
+    }
+
+    .quiz-card-expl {
+      margin-top: 10px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+    .quiz-card-expl.expl-correct {
+      background: rgba(34, 197, 94, 0.1);
+      border-left: 3px solid #22c55e;
+      color: #dcfce7;
+    }
+    .quiz-card-expl.expl-wrong {
+      background: rgba(239, 68, 68, 0.1);
+      border-left: 3px solid #ef4444;
+      color: #fee2e2;
+    }
+
+    /* ── Vista de Examen Completo (60 Q) ─────────────────────────── */
+    .exam-full-banner {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(34, 211, 238, 0.08));
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 30px;
+    }
+
+    .exam-banner-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 20px;
+    }
+
+    .exam-banner-top h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.45rem;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    .exam-banner-top p {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      max-width: 600px;
+    }
+
+    .exam-score-box {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .exam-score-big {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--accent-gold);
+      line-height: 1;
+    }
+
+    .exam-score-pct {
+      font-size: 0.88rem;
+      color: #94a3b8;
+      margin: 4px 0 8px 0;
+    }
+
+    .exam-score-status {
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.1);
+      display: inline-block;
+    }
+    .exam-score-status.stat-ok {
+      background: rgba(34, 197, 94, 0.25);
+      color: #86efac;
+    }
+
+    .btn-reset-all-exam {
+      margin-top: 10px;
+      display: block;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      font-size: 0.72rem;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-left: auto;
+    }
+    .btn-reset-all-exam:hover {
+      background: rgba(239, 68, 68, 0.3);
+    }
+
+    .exam-progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+
+    .exam-progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-gold));
+      transition: width 0.3s ease;
+    }
+
+    .exam-modules-container {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .exam-module-section {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 24px;
+    }
+
+    .exam-module-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 14px;
+      margin-bottom: 20px;
+    }
+
+    .exam-module-header h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem;
+      color: #ffffff;
+    }
+
+    .exam-mod-summary {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+
+    /* ── Lightbox Modal ─────────────────────────────────────────── */
+    .sim-lightbox-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease;
+    }
+    .sim-lightbox-modal.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .sim-lightbox-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .sim-lightbox-container {
+      position: relative;
+      z-index: 2;
+      max-width: 94vw;
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .sim-lightbox-img {
+      max-width: 100%;
+      max-height: 80vh;
+      object-fit: contain;
+      border-radius: 10px;
+      box-shadow: 0 16px 50px rgba(0, 0, 0, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: #02050b;
+    }
+    .sim-lightbox-caption {
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 9px 20px;
+      border-radius: 9999px;
+      max-width: 92vw;
+      text-align: center;
+    }
+    .sim-lightbox-close {
+      position: absolute;
+      top: -46px;
+      right: 0;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 1.15rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .sim-lightbox-close:hover {
+      background: rgba(239, 68, 68, 0.35);
+      border-color: #ef4444;
+      color: #fca5a5;
+    }
+
+    /* ── Responsive Mobile / Tablet ──────────────────────────────── */
+    @media (max-width: 900px) {
+      .app-top-header {
+        padding: 0 14px;
+        gap: 8px;
+      }
+      .brand-title {
+        display: none;
+      }
+      .header-exam-progress {
+        display: none;
+      }
+      .mobile-pills-bar {
+        display: flex;
+      }
+      .app-sidebar {
+        display: none;
+      }
+      .app-main {
+        padding: 16px;
+      }
+      .module-card {
+        padding: 18px 16px;
+      }
+      .chapter-card {
+        padding: 16px 14px;
+      }
+      .chapter-figures-grid {
+        grid-template-columns: 1fr;
+      }
+      .exam-banner-top {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .exam-score-box {
+        text-align: left;
+      }
+      .btn-reset-all-exam {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barra Superior Global (3 Secciones) -->
+  <header class="app-top-header">
+    <div class="brand-section">
+      <div class="brand-badge">⚓ BAIRESNAVEGA · PNA</div>
+      <h1 class="brand-title">Manual de Timonel</h1>
+    </div>
+
+    <nav class="app-global-nav" aria-label="Secciones principales de la plataforma">
+      <a href="index.html" class="app-nav-btn" title="Exploración 3D de piezas, casco, jarcias y aparejos">
+        <span class="nav-btn-icon">⛵</span> <span class="nav-btn-text">Partes 3D</span>
+      </a>
+      <a href="simulador.html" class="app-nav-btn" title="Simulador interactivo 3D de navegación, viento real/aparente y RIPA">
+        <span class="nav-btn-icon">🧭</span> <span class="nav-btn-text">Simulador 3D</span>
+      </a>
+      <a href="apuntes.html" class="app-nav-btn active" title="Manual teórico oficial completo y banco de exámenes PNA">
+        <span class="nav-btn-icon">📖</span> <span class="nav-btn-text">Apuntes & Examen</span>
+      </a>
+    </nav>
+
+    <div class="header-actions">
+      <div class="header-exam-progress" id="header-exam-progress">
+        📝 Examen: 0/60
+      </div>
+    </div>
+  </header>
+
+  <!-- Píldoras móviles horizontales para smartphones/tablets -->
+  <nav class="mobile-pills-bar" id="mobile-pills-bar" aria-label="Filtro rápido de módulos"></nav>
+
+  <!-- Layout de 2 Columnas -->
+  <div class="app-layout">
+    
+    <!-- Sidebar Izquierdo -->
+    <aside class="app-sidebar" aria-label="Índice de materias y módulos">
+      <div class="sidebar-search-box">
+        <input type="text" id="notes-global-search" class="sidebar-search-input" placeholder="🔍 Buscar tema, boya, luz..." autocomplete="off" />
+        <button id="notes-search-clear-btn" class="sidebar-search-clear" title="Borrar búsqueda">✕</button>
+      </div>
+
+      <nav class="sidebar-nav" id="sidebar-modules-nav"></nav>
+    </aside>
+
+    <!-- Área de Contenido Principal -->
+    <main class="app-main" id="course-main-content">
+      <!-- El contenido se inyecta dinámicamente con CoursePage.js -->
+    </main>
+
+  </div>
+
+  <script type="module" src="./src/ui/CoursePage.js"></script>
+</body>
+</html>

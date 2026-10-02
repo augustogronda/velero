@@ -477,12 +477,23 @@ export class SimulatorHUD {
           <h1>Simulador Náutico 3D</h1>
         </div>
 
+        <nav class="app-global-nav" aria-label="Secciones principales de la plataforma">
+          <a href="index.html" class="app-nav-btn" title="Exploración 3D de piezas, casco, jarcias y aparejos">
+            <span class="nav-btn-icon">⛵</span> <span class="nav-btn-text">Partes 3D</span>
+          </a>
+          <a href="simulador.html" class="app-nav-btn active" title="Simulador interactivo 3D de navegación, viento real/aparente y RIPA">
+            <span class="nav-btn-icon">🧭</span> <span class="nav-btn-text">Simulador 3D</span>
+          </a>
+          <a href="apuntes.html" class="app-nav-btn" title="Manual teórico oficial completo y banco de exámenes PNA">
+            <span class="nav-btn-icon">📖</span> <span class="nav-btn-text">Apuntes & Examen</span>
+          </a>
+        </nav>
+
         <div class="sim-header-actions">
           <button id="btn-env-settings" class="sim-btn" title="Ajustar brillo del sol, agua y viento 3D">☀️ <span class="btn-text">Luz</span></button>
           <button id="btn-night-toggle" class="sim-btn sim-btn-night" title="Alternar modo noche y luces reglamentarias de navegación">🌙 <span class="btn-text">Noche</span></button>
-          <button id="btn-notes-toggle" class="sim-btn" title="Ver apuntes y glosario del curso">📖 <span class="btn-text">Apuntes</span></button>
+          <button id="btn-notes-toggle" class="sim-btn" title="Abrir apuntes rápidos en panel lateral">📖 <span class="btn-text">Panel</span></button>
           <button id="btn-toggle-hud" class="sim-btn" title="Ocultar interfaz para vista panorámica 3D" aria-label="Ocultar interfaz visual">👁️ <span class="btn-text">HUD</span></button>
-          <a href="index.html" class="sim-btn sim-btn-link" title="Volver a la vista de partes y despiece 3D">⛵ <span class="btn-text">Partes</span></a>
         </div>
       </div>
 
