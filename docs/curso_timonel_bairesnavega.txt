@@ -144,7 +144,7 @@ Esta medida es muy  importante pués determina por donde podemos navegar de acue
 [FIGURA / ILUSTRACIÓN: figure-300.jpg]
 Descripción visual: Ilustración de estudio sobre Medidas y partes del barco
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-300.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-300.jpg
 
 
 --------------------------------------------------------------------------------
@@ -163,7 +163,7 @@ En el curso interesa reconocerlas, pero sobre todo entender qué función cumple
 [FIGURA / ILUSTRACIÓN: figure-301.jpg]
 Descripción visual: Ilustración de estudio sobre Aparejos
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-301.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-301.jpg
 
 
 ================================================================================
@@ -271,13 +271,13 @@ Esta descripción básica no considera la fuerza de las olas ni la presencia de 
 [FIGURA / ILUSTRACIÓN: figure-400.jpg]
 Descripción visual: Ilustración de estudio sobre Estabilidad
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-400.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-400.jpg
 
 
 [FIGURA / ILUSTRACIÓN: figure-401.jpg]
 Descripción visual: Ilustración de estudio sobre Estabilidad
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-401.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-401.jpg
 
 
 --------------------------------------------------------------------------------
@@ -302,7 +302,7 @@ BARLOVENTO es el lugar de donde viene el viento y SOTAVENTO es el lado hacia don
 [FIGURA / ILUSTRACIÓN: figure-402.jpg]
 Descripción visual: Ilustración de estudio sobre El velero y el viento
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-402.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-402.jpg
 
 
 --------------------------------------------------------------------------------
@@ -327,7 +327,7 @@ En el lenguaje habitual se dice que un barco “viene con buenas” o “viene c
 [FIGURA / ILUSTRACIÓN: figure-403.jpg]
 Descripción visual: Ilustración de estudio sobre Viento real, viento aparente y amuras
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-403.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-403.jpg
 
 
 --------------------------------------------------------------------------------
@@ -356,7 +356,7 @@ NO HAY ORZADA SIN CAZADA Y DERIVADA SIN FILADA.
 [FIGURA / ILUSTRACIÓN: figure-404.jpg]
 Descripción visual: Ilustración de estudio sobre Los rumbos y el trimado de las velas
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-404.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-404.jpg
 
 
 --------------------------------------------------------------------------------
@@ -473,13 +473,13 @@ El sistema de grilla permite ubicar una posición con precisión mediante dos co
 [FIGURA / ILUSTRACIÓN: figure-500.jpg]
 Descripción visual: Ilustración de estudio sobre Coordenadas geográficas y proyecciones
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-500.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-500.jpg
 
 
 [FIGURA / ILUSTRACIÓN: figure-501.jpg]
 Descripción visual: Ilustración de estudio sobre Coordenadas geográficas y proyecciones
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-501.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-501.jpg
 
 
 --------------------------------------------------------------------------------
@@ -519,7 +519,7 @@ Los paralelos indican LATITUDES y los meridianos, LONGITUDES. Ambos ángulos se 
 [FIGURA / ILUSTRACIÓN: figure-502.jpg]
 Descripción visual: Ilustración de estudio sobre Longitud, meridianos y círculos máximos
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-502.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-502.jpg
 
 
 --------------------------------------------------------------------------------
@@ -536,7 +536,7 @@ Los SOLSTICIOS y los EQUINOCCIOS están determinados por la posición aparente d
 [FIGURA / ILUSTRACIÓN: figure-503.jpg]
 Descripción visual: Ilustración de estudio sobre Paralelos más significativos
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-503.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-503.jpg
 
 
 --------------------------------------------------------------------------------
@@ -564,7 +564,7 @@ Entre las medidas de uso náutico habitual se encuentran:
 [FIGURA / ILUSTRACIÓN: figure-504.jpg]
 Descripción visual: Ilustración de estudio sobre La milla náutica y otras medidas
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-504.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-504.jpg
 
 
 ================================================================================
@@ -694,13 +694,13 @@ El esquema del material también muestra las BOYAS DE CANAL PREFERIDO, utilizada
 [FIGURA / ILUSTRACIÓN: figure-600.jpg]
 Descripción visual: Ilustración de estudio sobre Señales laterales y canal preferido
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-600.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-600.jpg
 
 
 [FIGURA / ILUSTRACIÓN: figure-601.jpg]
 Descripción visual: Ilustración de estudio sobre Señales laterales y canal preferido
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-601.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-601.jpg
 
 
 --------------------------------------------------------------------------------
@@ -719,7 +719,7 @@ La boya de AGUAS SEGURAS o RECALADA indica aguas navegables. El material señala
 [FIGURA / ILUSTRACIÓN: figure-602.jpg]
 Descripción visual: Ilustración de estudio sobre Peligro aislado y aguas seguras
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-602.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-602.jpg
 
 
 --------------------------------------------------------------------------------
@@ -736,7 +736,7 @@ Para estudiarlas correctamente conviene observar en conjunto la posición de la 
 [FIGURA / ILUSTRACIÓN: figure-603.jpg]
 Descripción visual: Ilustración de estudio sobre Boyas cardinales
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-603.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-603.jpg
 
 
 --------------------------------------------------------------------------------
@@ -753,7 +753,7 @@ Para los NUEVOS PELIGROS, el esquema muestra una señal con franjas verticales A
 [FIGURA / ILUSTRACIÓN: figure-604.jpg]
 Descripción visual: Ilustración de estudio sobre Señales especiales y nuevos peligros
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-604.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-604.jpg
 
 
 --------------------------------------------------------------------------------
@@ -770,13 +770,13 @@ La comparación entre ambos ayuda a relacionar una misma señal con la forma en 
 [FIGURA / ILUSTRACIÓN: figure-605.jpg]
 Descripción visual: Ilustración de estudio sobre Esquema diurno y nocturno de boyado y balizamiento
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-605.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-605.jpg
 
 
 [FIGURA / ILUSTRACIÓN: figure-606.jpg]
 Descripción visual: Ilustración de estudio sobre Esquema diurno y nocturno de boyado y balizamiento
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-606.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-606.jpg
 
 
 ================================================================================
@@ -876,7 +876,7 @@ La LUZ DE TOPE ilumina un sector de 225° y el resto queda ciego. Una LUZ DE TOD
 [FIGURA / ILUSTRACIÓN: figure-700.jpg]
 Descripción visual: Ilustración de estudio sobre Luces de navegación y sectores
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-700.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-700.jpg
 
 
 --------------------------------------------------------------------------------
@@ -899,13 +899,13 @@ En las lanchas, una luz blanca de todo horizonte puede combinarse con una luz bi
 [FIGURA / ILUSTRACIÓN: figure-701.jpg]
 Descripción visual: Ilustración de estudio sobre Luces de embarcaciones deportivas
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-701.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-701.jpg
 
 
 [FIGURA / ILUSTRACIÓN: figure-702.jpg]
 Descripción visual: Ilustración de estudio sobre Luces de embarcaciones deportivas
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-702.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-702.jpg
 
 
 --------------------------------------------------------------------------------
@@ -926,13 +926,13 @@ Los esquemas del material permiten comparar la apariencia de una embarcación de
 [FIGURA / ILUSTRACIÓN: figure-703.jpg]
 Descripción visual: Ilustración de estudio sobre Embarcaciones a motor
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-703.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-703.jpg
 
 
 [FIGURA / ILUSTRACIÓN: figure-704.jpg]
 Descripción visual: Ilustración de estudio sobre Embarcaciones a motor
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-704.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-704.jpg
 
 
 --------------------------------------------------------------------------------
@@ -951,13 +951,13 @@ El esquema de BARCO SIN GOBIERNO lo identifica mediante DOS LUCES ROJAS DE TODO 
 [FIGURA / ILUSTRACIÓN: figure-705.jpg]
 Descripción visual: Ilustración de estudio sobre Fondeo y barco sin gobierno
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-705.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-705.jpg
 
 
 [FIGURA / ILUSTRACIÓN: figure-706.jpg]
 Descripción visual: Ilustración de estudio sobre Fondeo y barco sin gobierno
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-706.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-706.jpg
 
 
 --------------------------------------------------------------------------------
@@ -978,19 +978,19 @@ El BARCO CON MANIOBRA RESTRINGIDA aparece con una disposición vertical ROJA - B
 [FIGURA / ILUSTRACIÓN: figure-707.jpg]
 Descripción visual: Ilustración de estudio sobre Embarcaciones con maniobra restringida
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-707.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-707.jpg
 
 
 [FIGURA / ILUSTRACIÓN: figure-708.jpg]
 Descripción visual: Ilustración de estudio sobre Embarcaciones con maniobra restringida
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-708.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-708.jpg
 
 
 [FIGURA / ILUSTRACIÓN: figure-709.jpg]
 Descripción visual: Ilustración de estudio sobre Embarcaciones con maniobra restringida
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-709.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-709.jpg
 
 
 --------------------------------------------------------------------------------
@@ -1009,13 +1009,13 @@ Estos dibujos deben estudiarse como patrones visuales: durante la navegación no
 [FIGURA / ILUSTRACIÓN: figure-710.jpg]
 Descripción visual: Ilustración de estudio sobre Remolque y barco varado
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-710.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-710.jpg
 
 
 [FIGURA / ILUSTRACIÓN: figure-711.jpg]
 Descripción visual: Ilustración de estudio sobre Remolque y barco varado
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-711.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-711.jpg
 
 
 ================================================================================
@@ -1059,7 +1059,7 @@ Pregunta 5: En una embarcación a motor de más de 50 m, ¿cómo se disponen las
 
 
 Pregunta 6: Observá el esquema. ¿Qué condición de la embarcación representan las dos luces rojas verticales?
-[Imagen de referencia: imagenes/figure-706.jpg]
+[Imagen de referencia: public/imagenes/curso/figure-706.jpg]
   * Barco fondeado
   * Barco sin gobierno
   * Barco de vela
@@ -1067,7 +1067,7 @@ Pregunta 6: Observá el esquema. ¿Qué condición de la embarcación representa
 
 
 Pregunta 7: Observá el esquema. ¿Qué condición representa la columna de tres luces rojas?
-[Imagen de referencia: imagenes/figure-707.jpg]
+[Imagen de referencia: public/imagenes/curso/figure-707.jpg]
   * Barco con maniobra restringida por su calado
   * Barco fondeado
   * Velero navegando
@@ -1075,7 +1075,7 @@ Pregunta 7: Observá el esquema. ¿Qué condición representa la columna de tres
 
 
 Pregunta 8: Observá el esquema. ¿Qué condición representa la disposición vertical roja, blanca y roja?
-[Imagen de referencia: imagenes/figure-708.jpg]
+[Imagen de referencia: public/imagenes/curso/figure-708.jpg]
   * Barco varado
   * Barco con maniobra restringida
   * Barco de menos de 7 m
@@ -1083,7 +1083,7 @@ Pregunta 8: Observá el esquema. ¿Qué condición representa la disposición ve
 
 
 Pregunta 9: Observá el dibujo. ¿Qué operación representa el conjunto de embarcaciones y luces?
-[Imagen de referencia: imagenes/figure-710.jpg]
+[Imagen de referencia: public/imagenes/curso/figure-710.jpg]
   * Remolque
   * Fondeo
   * Virada por avante
@@ -1091,7 +1091,7 @@ Pregunta 9: Observá el dibujo. ¿Qué operación representa el conjunto de emba
 
 
 Pregunta 10: Observá el esquema. ¿Qué condición representa la embarcación?
-[Imagen de referencia: imagenes/figure-711.jpg]
+[Imagen de referencia: public/imagenes/curso/figure-711.jpg]
   * Barco varado
   * Barco sin gobierno
   * Barco fondeado
@@ -1119,7 +1119,7 @@ Estas marcas permiten reconocer la condición de una embarcación durante el dí
 [FIGURA / ILUSTRACIÓN: figure-800.jpg]
 Descripción visual: Ilustración de estudio sobre Señales diurnas
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-800.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-800.jpg
 
 
 --------------------------------------------------------------------------------
@@ -1141,7 +1141,7 @@ El cuadro del módulo resume señales acústicas entre buques a la vista y seña
 [FIGURA / ILUSTRACIÓN: figure-801.jpg]
 Descripción visual: Ilustración de estudio sobre Señales acústicas
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-801.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-801.jpg
 
 
 --------------------------------------------------------------------------------
@@ -1163,7 +1163,7 @@ Cuando el SOL y la LUNA están en conjunción, en LUNA LLENA o LUNA NUEVA, se pr
 [FIGURA / ILUSTRACIÓN: figure-802.jpg]
 Descripción visual: Ilustración de estudio sobre Mareas
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-802.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-802.jpg
 
 
 --------------------------------------------------------------------------------
@@ -1179,7 +1179,7 @@ La lectura de estas tablas permite relacionar la información prevista con los c
 [FIGURA / ILUSTRACIÓN: figure-803.jpg]
 Descripción visual: Ilustración de estudio sobre Tabla de mareas
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-803.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-803.jpg
 
 
 --------------------------------------------------------------------------------
@@ -1199,7 +1199,7 @@ La curva incluida en el material representa pleamares, bajamares, creciente y ba
 [FIGURA / ILUSTRACIÓN: figure-804.jpg]
 Descripción visual: Ilustración de estudio sobre Método para calcular la altura de marea
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-804.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-804.jpg
 
 
 --------------------------------------------------------------------------------
@@ -1218,7 +1218,7 @@ Para un faro, el dibujo toma como dato la altura conocida del faro. Para el barc
 [FIGURA / ILUSTRACIÓN: figure-805.jpg]
 Descripción visual: Ilustración de estudio sobre Visual hacia el horizonte
 Epígrafe: Esquema incluido en el material del módulo
-Archivo de imagen guardado en: imagenes/figure-805.jpg
+Archivo de imagen guardado en: public/imagenes/curso/figure-805.jpg
 
 
 ================================================================================
@@ -1234,7 +1234,7 @@ Pregunta 1: ¿Qué función cumplen las marcas diurnas que izan los barcos?
 
 
 Pregunta 2: Observá el esquema. ¿Qué condición representan dos bolas negras dispuestas verticalmente?
-[Imagen de referencia: imagenes/figure-800.jpg]
+[Imagen de referencia: public/imagenes/curso/figure-800.jpg]
   * Buque fondeado
   * Buque sin gobierno
   * Buque varado
@@ -1242,7 +1242,7 @@ Pregunta 2: Observá el esquema. ¿Qué condición representan dos bolas negras 
 
 
 Pregunta 3: Observá el cuadro de señales acústicas entre buques a la vista. ¿Qué indica una pitada corta?
-[Imagen de referencia: imagenes/figure-801.jpg]
+[Imagen de referencia: public/imagenes/curso/figure-801.jpg]
   * Caigo a estribor
   * Caigo a babor
   * Estoy dando atrás
@@ -1271,7 +1271,7 @@ Pregunta 6: ¿Cómo se denomina el intervalo que se produce durante el cambio de
 
 
 Pregunta 7: Observá el esquema. ¿En qué fases se muestran las mareas vivas o de sicigias?
-[Imagen de referencia: imagenes/figure-802.jpg]
+[Imagen de referencia: public/imagenes/curso/figure-802.jpg]
   * Cuarto creciente y cuarto menguante
   * Luna nueva y luna llena
   * Solo luna nueva
@@ -1293,7 +1293,7 @@ Pregunta 9: ¿Qué régimen de marea indica el material para el Río de la Plata
 
 
 Pregunta 10: Observá el esquema de visual hacia el horizonte. Para calcular el horizonte desde el barco, ¿qué altura se toma?
-[Imagen de referencia: imagenes/figure-805.jpg]
+[Imagen de referencia: public/imagenes/curso/figure-805.jpg]
   * La eslora total del barco
   * La altura del palo
   * La altura de los ojos del observador sobre la carroza

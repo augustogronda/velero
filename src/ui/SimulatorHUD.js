@@ -904,6 +904,10 @@ export class SimulatorHUD {
         <h3>📖 Cuaderno Oficial Timonel Vela y Motor</h3>
         <button id="btn-notes-close" class="btn-notes-close" aria-label="Cerrar cuaderno de apuntes">✕</button>
       </div>
+      <div class="notes-search-container">
+        <input type="text" id="notes-search-input" class="notes-search-input" placeholder="🔍 Buscar temas, maniobras, boyas, luces, mareas..." autocomplete="off" />
+        <button id="btn-notes-search-clear" class="notes-search-clear" title="Borrar búsqueda" style="display:none;">✕</button>
+      </div>
       <div class="notes-filter-bar" id="notes-filter-bar">
         <button class="notes-pill active" data-filter="all">Todos</button>
         <button class="notes-pill" data-filter="modulo1Nomenclatura">⛵ Mód 1</button>
@@ -920,9 +924,46 @@ export class SimulatorHUD {
       <div class="notes-body" id="notes-content"></div>
     `;
     document.body.appendChild(this.notesDrawer);
+    this.createLightbox();
     this.populateNotes();
   }
 
+  createLightbox() {
+    if (document.getElementById('sim-lightbox-modal')) return;
+    const modal = document.createElement('div');
+    modal.id = 'sim-lightbox-modal';
+    modal.className = 'sim-lightbox-modal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.innerHTML = `
+      <div class="sim-lightbox-backdrop"></div>
+      <div class="sim-lightbox-container">
+        <button class="sim-lightbox-close" id="btn-lightbox-close" aria-label="Cerrar imagen">✕</button>
+        <img id="sim-lightbox-img" class="sim-lightbox-img" src="" alt="Lámina técnica en detalle" />
+        <div id="sim-lightbox-caption" class="sim-lightbox-caption"></div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    const close = () => modal.classList.remove('open');
+    modal.querySelector('.sim-lightbox-backdrop').addEventListener('click', close);
+    modal.querySelector('#btn-lightbox-close').addEventListener('click', close);
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('open')) close();
+    });
+  }
+
+  openLightbox(src, caption) {
+    const modal = document.getElementById('sim-lightbox-modal');
+    const img = document.getElementById('sim-lightbox-img');
+    const cap = document.getElementById('sim-lightbox-caption');
+    if (!modal || !img) return;
+
+    img.src = src;
+    img.alt = caption || 'Lámina técnica náutica';
+    if (cap) cap.innerHTML = `<strong>Lámina Oficial:</strong> ${caption || 'Esquema de estudio'}`;
+    modal.classList.add('open');
+  }
 
   populateRipaNavigation() {
     const pillsContainer = document.getElementById('ripa-pills-bar');
@@ -961,18 +1002,25 @@ export class SimulatorHUD {
         <div class="note-card" data-category="${key}">
           <h4>${cat.icon} ${cat.title}</h4>
           <div class="note-items">
-            ${cat.sections.map(s => `
-              <div class="note-item">
-                <strong>${s.heading}</strong>
-                <p>${s.content}</p>
-                ${s.image ? `
-                  <div class="note-figure">
-                    <img src="${s.image}" alt="${s.heading}" loading="lazy" />
-                    ${s.caption ? `<div class="note-figure-caption">📷 ${s.caption}</div>` : ''}
-                  </div>
-                ` : ''}
-              </div>
-            `).join('')}
+            ${cat.sections.map(s => {
+              const figs = s.figures || (s.image ? [{ src: s.image, caption: s.caption }] : []);
+              return `
+                <div class="note-item">
+                  <strong>${s.heading}</strong>
+                  <p>${s.content}</p>
+                  ${figs.length > 0 ? `
+                    <div class="note-figures-grid">
+                      ${figs.map(f => `
+                        <div class="note-figure" data-lightbox="${f.src}" data-caption="${(f.caption || s.heading).replace(/"/g, '&quot;')}">
+                          <img src="${f.src}" alt="${s.heading}" loading="lazy" />
+                          <div class="note-figure-caption">🔍 <strong>Lámina:</strong> ${f.caption || s.heading}</div>
+                        </div>
+                      `).join('')}
+                    </div>
+                  ` : ''}
+                </div>
+              `;
+            }).join('')}
           </div>
         </div>
       `;
@@ -982,9 +1030,9 @@ export class SimulatorHUD {
     if (typeof COURSE_QUIZZES !== 'undefined' && COURSE_QUIZZES.length > 0) {
       html += `
         <div class="note-card note-card-quiz" data-category="quiz">
-          <h4>📝 Banco de Autoevaluación Oficial PNA (60 Preguntas)</h4>
+          <h4>📝 Banco Oficial de Autoevaluación PNA (60 Preguntas)</h4>
           <p style="font-size:0.73rem; color:#94a3b8; margin-bottom:12px; line-height:1.4;">
-            Preguntas oficiales de examen con corrección instantánea y fundamentación náutica oficial. Aprobación oficial: 70% o más.
+            Preguntas oficiales de examen con corrección instantánea y fundamentación reglamentaria. Exigencia de aprobación oficial PNA: 70% o superior.
           </p>
           <div class="quiz-modules-selector" id="quiz-modules-selector">
             ${COURSE_QUIZZES.map((qm, qmIdx) => `
@@ -994,8 +1042,11 @@ export class SimulatorHUD {
             `).join('')}
           </div>
           <div id="quiz-score-banner" class="quiz-score-banner">
-            <span id="quiz-mod-title">Módulo 1: Nomenclatura</span>
-            <span id="quiz-score-text">0 / 10 respondidas</span>
+            <div class="quiz-score-info">
+              <span id="quiz-mod-title">Módulo 1: Nomenclatura</span>
+              <span id="quiz-score-text">0 / 10 respondidas</span>
+            </div>
+            <button id="btn-quiz-reset-mod" class="quiz-reset-btn" title="Borrar respuestas de este módulo para practicar de nuevo">🔄 Reiniciar examen</button>
           </div>
           <div id="quiz-active-questions"></div>
         </div>
@@ -1003,6 +1054,17 @@ export class SimulatorHUD {
     }
 
     container.innerHTML = html;
+
+    // Attach lightbox listeners to figures
+    const figElements = container.querySelectorAll('.note-figure');
+    figElements.forEach(fig => {
+      fig.addEventListener('click', () => {
+        const src = fig.getAttribute('data-lightbox');
+        const cap = fig.getAttribute('data-caption');
+        if (src) this.openLightbox(src, cap);
+      });
+    });
+
     this.initNotesFiltering();
     this.initQuizSystem();
   }
@@ -1010,22 +1072,95 @@ export class SimulatorHUD {
   initNotesFiltering() {
     const pills = this.notesDrawer.querySelectorAll('.notes-pill');
     const cards = this.notesDrawer.querySelectorAll('.note-card');
+    const searchInput = document.getElementById('notes-search-input');
+    const clearSearchBtn = document.getElementById('btn-notes-search-clear');
+
+    let currentFilter = 'all';
+
+    const applyFilter = () => {
+      const query = (searchInput ? searchInput.value.trim().toLowerCase() : '');
+
+      if (clearSearchBtn) {
+        clearSearchBtn.style.display = query ? 'block' : 'none';
+      }
+
+      cards.forEach(card => {
+        const cat = card.getAttribute('data-category');
+        const isQuiz = cat === 'quiz';
+
+        // Filter by category pill first
+        let matchesPill = false;
+        if (currentFilter === 'all') {
+          matchesPill = true;
+        } else if (currentFilter === 'quiz') {
+          matchesPill = isQuiz;
+        } else {
+          matchesPill = (cat === currentFilter);
+        }
+
+        if (!matchesPill) {
+          card.style.display = 'none';
+          return;
+        }
+
+        // Now filter by search query
+        if (!query) {
+          card.style.display = 'block';
+          const items = card.querySelectorAll('.note-item');
+          items.forEach(it => it.style.display = '');
+          return;
+        }
+
+        if (isQuiz) {
+          // If searching text, hide quiz card unless query includes 'examen' or 'quiz'
+          card.style.display = (query.includes('examen') || query.includes('quiz') || query.includes('test')) ? 'block' : 'none';
+          return;
+        }
+
+        const items = card.querySelectorAll('.note-item');
+        let cardHasMatch = false;
+
+        items.forEach(it => {
+          const itemText = it.textContent.toLowerCase();
+          if (itemText.includes(query)) {
+            it.style.display = 'block';
+            cardHasMatch = true;
+          } else {
+            it.style.display = 'none';
+          }
+        });
+
+        // Also check card header
+        const cardHeader = card.querySelector('h4')?.textContent.toLowerCase() || '';
+        if (cardHeader.includes(query)) {
+          cardHasMatch = true;
+          items.forEach(it => it.style.display = 'block');
+        }
+
+        card.style.display = cardHasMatch ? 'block' : 'none';
+      });
+    };
 
     pills.forEach(pill => {
       pill.addEventListener('click', () => {
         pills.forEach(p => p.classList.remove('active'));
         pill.classList.add('active');
-        const filter = pill.getAttribute('data-filter');
-
-        cards.forEach(card => {
-          if (filter === 'all') {
-            card.style.display = 'block';
-          } else {
-            card.style.display = (card.getAttribute('data-category') === filter) ? 'block' : 'none';
-          }
-        });
+        currentFilter = pill.getAttribute('data-filter');
+        applyFilter();
       });
     });
+
+    if (searchInput) {
+      searchInput.addEventListener('input', applyFilter);
+    }
+
+    if (clearSearchBtn && searchInput) {
+      clearSearchBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        applyFilter();
+        searchInput.focus();
+      });
+    }
   }
 
   initQuizSystem() {
@@ -1038,6 +1173,7 @@ export class SimulatorHUD {
     const container = document.getElementById('quiz-active-questions');
     const bannerTitle = document.getElementById('quiz-mod-title');
     const bannerScore = document.getElementById('quiz-score-text');
+    const resetBtn = document.getElementById('btn-quiz-reset-mod');
 
     const updateScore = () => {
       const qm = COURSE_QUIZZES.find(m => m.moduleNumber === activeModNum);
@@ -1060,10 +1196,28 @@ export class SimulatorHUD {
           bannerScore.textContent = '0 / 10 respondidas';
         } else {
           const pct = Math.round((correctCount / qm.questions.length) * 100);
-          const status = pct >= 70 ? '🎉 APROBADO' : '⚠️ En curso';
+          const status = pct >= 70 ? '🎉 APROBADO (≥70%)' : '⚠️ En curso / Desaprobado (<70%)';
           bannerScore.textContent = `${correctCount}/${qm.questions.length} correctas (${pct}%) — ${status}`;
         }
       }
+
+      // Update module button badges
+      modButtons.forEach(btn => {
+        const modId = parseInt(btn.getAttribute('data-mod'), 10);
+        const modObj = COURSE_QUIZZES.find(m => m.moduleNumber === modId);
+        if (modObj) {
+          let modAnswered = 0;
+          let modCorrect = 0;
+          modObj.questions.forEach(q => {
+            if (answeredMap[q.id] !== undefined) {
+              modAnswered++;
+              if (answeredMap[q.id] === q.correctIndex) modCorrect++;
+            }
+          });
+          const badge = modAnswered === 10 ? (modCorrect >= 7 ? ' ✓' : ' ⚠️') : '';
+          btn.textContent = `${modObj.icon} Mód ${modObj.moduleNumber}: ${modObj.moduleTitle}${badge}`;
+        }
+      });
     };
 
     const renderActiveModule = () => {
@@ -1084,8 +1238,9 @@ export class SimulatorHUD {
               <strong>${qIdx + 1}.</strong> ${q.prompt}
             </div>
             ${q.figure ? `
-              <div class="note-figure" style="margin-bottom:8px;">
+              <div class="note-figure" data-lightbox="${q.figure}" data-caption="Pregunta ${qIdx + 1}: ${q.prompt.replace(/"/g, '&quot;')}" style="margin-bottom:8px;">
                 <img src="${q.figure}" alt="Ilustración de la pregunta" loading="lazy" />
+                <div class="note-figure-caption">🔍 <strong>Lámina de examen:</strong> Click para ampliar</div>
               </div>
             ` : ''}
             <div class="quiz-options">
@@ -1113,10 +1268,20 @@ export class SimulatorHUD {
         `;
       }).join('');
 
+      // Add click listeners to question figures for lightbox
+      const quizFigures = container.querySelectorAll('.note-figure');
+      quizFigures.forEach(fig => {
+        fig.addEventListener('click', () => {
+          const src = fig.getAttribute('data-lightbox');
+          const cap = fig.getAttribute('data-caption');
+          if (src) this.openLightbox(src, cap);
+        });
+      });
+
       // Add click listeners to option buttons
       const optBtns = container.querySelectorAll('.quiz-opt-btn:not(:disabled)');
       optBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', () => {
           const qid = btn.getAttribute('data-qid');
           const optIdx = parseInt(btn.getAttribute('data-idx'), 10);
           answeredMap[qid] = optIdx;
@@ -1127,6 +1292,18 @@ export class SimulatorHUD {
 
       updateScore();
     };
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        const qm = COURSE_QUIZZES.find(m => m.moduleNumber === activeModNum);
+        if (!qm) return;
+        qm.questions.forEach(q => {
+          delete answeredMap[q.id];
+        });
+        renderActiveModule();
+        updateScore();
+      });
+    }
 
     modButtons.forEach(btn => {
       btn.addEventListener('click', () => {

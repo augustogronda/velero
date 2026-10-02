@@ -128,7 +128,7 @@ Otra medida a tener en cuenta es la que medimos desde la línea de flotación ha
 Esta medida es muy  importante pués determina por donde podemos navegar de acuerdo a la profundidad del lugar y también, como veremos más adelante, en la estabilidad y navegabilidad.
 
 
-![Ilustración de estudio sobre Medidas y partes del barco](imagenes/figure-300.jpg)
+![Ilustración de estudio sobre Medidas y partes del barco](../public/imagenes/curso/figure-300.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Medidas y partes del barco)
 
 
@@ -144,7 +144,7 @@ Si el estay de proa llega al tope del palo se habla de aparejo al tope; si termi
 En el curso interesa reconocerlas, pero sobre todo entender qué función cumple cada superficie vélica y cómo se reparte el esfuerzo.
 
 
-![Ilustración de estudio sobre Aparejos](imagenes/figure-301.jpg)
+![Ilustración de estudio sobre Aparejos](../public/imagenes/curso/figure-301.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Aparejos)
 
 
@@ -235,11 +235,11 @@ Entre la fuerza lateral del viento aplicada sobre las velas y el centro de caren
 Esta descripción básica no considera la fuerza de las olas ni la presencia de agua en el interior de la embarcación.
 
 
-![Ilustración de estudio sobre Estabilidad](imagenes/figure-400.jpg)
+![Ilustración de estudio sobre Estabilidad](../public/imagenes/curso/figure-400.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Estabilidad)
 
 
-![Ilustración de estudio sobre Estabilidad](imagenes/figure-401.jpg)
+![Ilustración de estudio sobre Estabilidad](../public/imagenes/curso/figure-401.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Estabilidad)
 
 
@@ -261,7 +261,7 @@ Cuando la proa continúa orzando y el viento pasa a la otra banda, realizamos un
 BARLOVENTO es el lugar de donde viene el viento y SOTAVENTO es el lado hacia donde se dirige. Como los barcos tienden a desplazarse hacia sotavento, debemos tener en cuenta el ABATIMIENTO.
 
 
-![Ilustración de estudio sobre El velero y el viento](imagenes/figure-402.jpg)
+![Ilustración de estudio sobre El velero y el viento](../public/imagenes/curso/figure-402.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre El velero y el viento)
 
 
@@ -283,7 +283,7 @@ Si recibimos el viento por la banda de ESTRIBOR, estamos AMURADOS A ESTRIBOR (BU
 En el lenguaje habitual se dice que un barco “viene con buenas” o “viene con malas”.
 
 
-![Ilustración de estudio sobre Viento real, viento aparente y amuras](imagenes/figure-403.jpg)
+![Ilustración de estudio sobre Viento real, viento aparente y amuras](../public/imagenes/curso/figure-403.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Viento real, viento aparente y amuras)
 
 
@@ -309,7 +309,7 @@ A MAYOR VIENTO, MENOS VELA.
 NO HAY ORZADA SIN CAZADA Y DERIVADA SIN FILADA.
 
 
-![Ilustración de estudio sobre Los rumbos y el trimado de las velas](imagenes/figure-404.jpg)
+![Ilustración de estudio sobre Los rumbos y el trimado de las velas](../public/imagenes/curso/figure-404.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Los rumbos y el trimado de las velas)
 
 
@@ -408,11 +408,11 @@ La proyección resulta especialmente útil en latitudes medias. Hacia los polos,
 El sistema de grilla permite ubicar una posición con precisión mediante dos coordenadas: LATITUD y LONGITUD.
 
 
-![Ilustración de estudio sobre Coordenadas geográficas y proyecciones](imagenes/figure-500.jpg)
+![Ilustración de estudio sobre Coordenadas geográficas y proyecciones](../public/imagenes/curso/figure-500.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Coordenadas geográficas y proyecciones)
 
 
-![Ilustración de estudio sobre Coordenadas geográficas y proyecciones](imagenes/figure-501.jpg)
+![Ilustración de estudio sobre Coordenadas geográficas y proyecciones](../public/imagenes/curso/figure-501.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Coordenadas geográficas y proyecciones)
 
 
@@ -448,7 +448,7 @@ El ECUADOR es el único paralelo que constituye un círculo máximo. Todos los M
 Los paralelos indican LATITUDES y los meridianos, LONGITUDES. Ambos ángulos se expresan en GRADOS, MINUTOS y SEGUNDOS.
 
 
-![Ilustración de estudio sobre Longitud, meridianos y círculos máximos](imagenes/figure-502.jpg)
+![Ilustración de estudio sobre Longitud, meridianos y círculos máximos](../public/imagenes/curso/figure-502.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Longitud, meridianos y círculos máximos)
 
 
@@ -462,7 +462,7 @@ Entre los paralelos más significativos se encuentran los TRÓPICOS y los CÍRCU
 Los SOLSTICIOS y los EQUINOCCIOS están determinados por la posición aparente del Sol respecto de la Tierra y se relacionan con estos paralelos de referencia.
 
 
-![Ilustración de estudio sobre Paralelos más significativos](imagenes/figure-503.jpg)
+![Ilustración de estudio sobre Paralelos más significativos](../public/imagenes/curso/figure-503.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Paralelos más significativos)
 
 
@@ -487,7 +487,7 @@ Entre las medidas de uso náutico habitual se encuentran:
 1 MILLA NÁUTICA = 1 minuto de arco = 1.852 m.
 
 
-![Ilustración de estudio sobre La milla náutica y otras medidas](imagenes/figure-504.jpg)
+![Ilustración de estudio sobre La milla náutica y otras medidas](../public/imagenes/curso/figure-504.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre La milla náutica y otras medidas)
 
 
@@ -599,11 +599,11 @@ Las boyas y marcas flotantes suelen estar fondeadas mediante una cadena. Con cam
 El esquema del material también muestra las BOYAS DE CANAL PREFERIDO, utilizadas cuando una vía de navegación se bifurca.
 
 
-![Ilustración de estudio sobre Señales laterales y canal preferido](imagenes/figure-600.jpg)
+![Ilustración de estudio sobre Señales laterales y canal preferido](../public/imagenes/curso/figure-600.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Señales laterales y canal preferido)
 
 
-![Ilustración de estudio sobre Señales laterales y canal preferido](imagenes/figure-601.jpg)
+![Ilustración de estudio sobre Señales laterales y canal preferido](../public/imagenes/curso/figure-601.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Señales laterales y canal preferido)
 
 
@@ -619,7 +619,7 @@ La marca de PELIGRO AISLADO advierte la presencia de un peligro localizado. El e
 La boya de AGUAS SEGURAS o RECALADA indica aguas navegables. El material señala que puede utilizarse frente a puertos o como punto de referencia de llegada, desde el cual se continúa la derrota elegida.
 
 
-![Ilustración de estudio sobre Peligro aislado y aguas seguras](imagenes/figure-602.jpg)
+![Ilustración de estudio sobre Peligro aislado y aguas seguras](../public/imagenes/curso/figure-602.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Peligro aislado y aguas seguras)
 
 
@@ -633,7 +633,7 @@ Las BOYAS CARDINALES se organizan según los puntos cardinales: NORTE, ESTE, SUR
 Para estudiarlas correctamente conviene observar en conjunto la posición de la boya respecto del peligro, su combinación de colores, la disposición de los conos negros superiores y la característica luminosa indicada para cada cuadrante.
 
 
-![Ilustración de estudio sobre Boyas cardinales](imagenes/figure-603.jpg)
+![Ilustración de estudio sobre Boyas cardinales](../public/imagenes/curso/figure-603.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Boyas cardinales)
 
 
@@ -647,7 +647,7 @@ Las SEÑALES ESPECIALES se identifican en el material con casco AMARILLO, luz AM
 Para los NUEVOS PELIGROS, el esquema muestra una señal con franjas verticales AZULES y AMARILLAS y luces AZUL y AMARILLA alternadas. Estas marcas permiten advertir peligros recientes que requieren una señalización específica hasta que la información quede incorporada a la cartografía y a los avisos correspondientes.
 
 
-![Ilustración de estudio sobre Señales especiales y nuevos peligros](imagenes/figure-604.jpg)
+![Ilustración de estudio sobre Señales especiales y nuevos peligros](../public/imagenes/curso/figure-604.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Señales especiales y nuevos peligros)
 
 
@@ -661,11 +661,11 @@ Los dos esquemas finales integran las señales estudiadas en una situación de n
 La comparación entre ambos ayuda a relacionar una misma señal con la forma en que se identifica durante el día y durante la noche dentro del sistema IALA B.
 
 
-![Ilustración de estudio sobre Esquema diurno y nocturno de boyado y balizamiento](imagenes/figure-605.jpg)
+![Ilustración de estudio sobre Esquema diurno y nocturno de boyado y balizamiento](../public/imagenes/curso/figure-605.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Esquema diurno y nocturno de boyado y balizamiento)
 
 
-![Ilustración de estudio sobre Esquema diurno y nocturno de boyado y balizamiento](imagenes/figure-606.jpg)
+![Ilustración de estudio sobre Esquema diurno y nocturno de boyado y balizamiento](../public/imagenes/curso/figure-606.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Esquema diurno y nocturno de boyado y balizamiento)
 
 
@@ -748,7 +748,7 @@ Las LUCES DE NAVEGACIÓN resultan de dividir el horizonte en distintos sectores.
 La LUZ DE TOPE ilumina un sector de 225° y el resto queda ciego. Una LUZ DE TODO HORIZONTE es visible en los 360° y puede utilizar distintos colores según el mensaje que deba transmitir.
 
 
-![Ilustración de estudio sobre Luces de navegación y sectores](imagenes/figure-700.jpg)
+![Ilustración de estudio sobre Luces de navegación y sectores](../public/imagenes/curso/figure-700.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Luces de navegación y sectores)
 
 
@@ -768,11 +768,11 @@ Las embarcaciones de eslora INFERIOR A 7 m, de ser posible, exhibirán luces de 
 En las lanchas, una luz blanca de todo horizonte puede combinarse con una luz bicolor VERDE y ROJA a proa. El material también indica que las embarcaciones de propulsión mecánica de menos de 7 m y que no superen los 7 nudos pueden llevar una luz blanca de todo horizonte permanentemente encendida.
 
 
-![Ilustración de estudio sobre Luces de embarcaciones deportivas](imagenes/figure-701.jpg)
+![Ilustración de estudio sobre Luces de embarcaciones deportivas](../public/imagenes/curso/figure-701.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Luces de embarcaciones deportivas)
 
 
-![Ilustración de estudio sobre Luces de embarcaciones deportivas](imagenes/figure-702.jpg)
+![Ilustración de estudio sobre Luces de embarcaciones deportivas](../public/imagenes/curso/figure-702.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Luces de embarcaciones deportivas)
 
 
@@ -790,11 +790,11 @@ Las embarcaciones de MÁS DE 50 m de eslora llevan DOS LUCES DE TOPE: una a proa
 Los esquemas del material permiten comparar la apariencia de una embarcación de menos de 50 m y otra de más de 50 m vistas desde PROA, POPA, ESTRIBOR y BABOR.
 
 
-![Ilustración de estudio sobre Embarcaciones a motor](imagenes/figure-703.jpg)
+![Ilustración de estudio sobre Embarcaciones a motor](../public/imagenes/curso/figure-703.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Embarcaciones a motor)
 
 
-![Ilustración de estudio sobre Embarcaciones a motor](imagenes/figure-704.jpg)
+![Ilustración de estudio sobre Embarcaciones a motor](../public/imagenes/curso/figure-704.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Embarcaciones a motor)
 
 
@@ -810,11 +810,11 @@ Cuando una embarcación a motor está FONDEADA debe exhibir luz o luces BLANCAS 
 El esquema de BARCO SIN GOBIERNO lo identifica mediante DOS LUCES ROJAS DE TODO HORIZONTE dispuestas verticalmente. La ilustración muestra además cómo se combina esta señal con las luces laterales cuando la embarcación es observada en navegación.
 
 
-![Ilustración de estudio sobre Fondeo y barco sin gobierno](imagenes/figure-705.jpg)
+![Ilustración de estudio sobre Fondeo y barco sin gobierno](../public/imagenes/curso/figure-705.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Fondeo y barco sin gobierno)
 
 
-![Ilustración de estudio sobre Fondeo y barco sin gobierno](imagenes/figure-706.jpg)
+![Ilustración de estudio sobre Fondeo y barco sin gobierno](../public/imagenes/curso/figure-706.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Fondeo y barco sin gobierno)
 
 
@@ -832,15 +832,15 @@ El BARCO CON MANIOBRA RESTRINGIDA POR SU CALADO aparece representado con TRES LU
 El BARCO CON MANIOBRA RESTRINGIDA aparece con una disposición vertical ROJA - BLANCA - ROJA. El esquema también incluye una DRAGA DE PONTÓN para practicar el reconocimiento de sus luces y de la situación que representa.
 
 
-![Ilustración de estudio sobre Embarcaciones con maniobra restringida](imagenes/figure-707.jpg)
+![Ilustración de estudio sobre Embarcaciones con maniobra restringida](../public/imagenes/curso/figure-707.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Embarcaciones con maniobra restringida)
 
 
-![Ilustración de estudio sobre Embarcaciones con maniobra restringida](imagenes/figure-708.jpg)
+![Ilustración de estudio sobre Embarcaciones con maniobra restringida](../public/imagenes/curso/figure-708.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Embarcaciones con maniobra restringida)
 
 
-![Ilustración de estudio sobre Embarcaciones con maniobra restringida](imagenes/figure-709.jpg)
+![Ilustración de estudio sobre Embarcaciones con maniobra restringida](../public/imagenes/curso/figure-709.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Embarcaciones con maniobra restringida)
 
 
@@ -856,11 +856,11 @@ También se representa un BARCO VARADO. En el dibujo se observan DOS LUCES ROJAS
 Estos dibujos deben estudiarse como patrones visuales: durante la navegación nocturna, la disposición y el color de las luces permiten interpretar la condición de una embarcación aun cuando su casco no se vea con claridad.
 
 
-![Ilustración de estudio sobre Remolque y barco varado](imagenes/figure-710.jpg)
+![Ilustración de estudio sobre Remolque y barco varado](../public/imagenes/curso/figure-710.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Remolque y barco varado)
 
 
-![Ilustración de estudio sobre Remolque y barco varado](imagenes/figure-711.jpg)
+![Ilustración de estudio sobre Remolque y barco varado](../public/imagenes/curso/figure-711.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Remolque y barco varado)
 
 
@@ -897,7 +897,7 @@ Estos dibujos deben estudiarse como patrones visuales: durante la navegación no
 - [ ] Una a cada banda
 
 #### Pregunta 6: Observá el esquema. ¿Qué condición de la embarcación representan las dos luces rojas verticales?
-![Imagen de referencia para la pregunta](imagenes/figure-706.jpg)
+![Imagen de referencia para la pregunta](../public/imagenes/curso/figure-706.jpg)
 
 - [ ] Barco fondeado
 - [ ] Barco sin gobierno
@@ -905,7 +905,7 @@ Estos dibujos deben estudiarse como patrones visuales: durante la navegación no
 - [ ] Barco remolcando
 
 #### Pregunta 7: Observá el esquema. ¿Qué condición representa la columna de tres luces rojas?
-![Imagen de referencia para la pregunta](imagenes/figure-707.jpg)
+![Imagen de referencia para la pregunta](../public/imagenes/curso/figure-707.jpg)
 
 - [ ] Barco con maniobra restringida por su calado
 - [ ] Barco fondeado
@@ -913,7 +913,7 @@ Estos dibujos deben estudiarse como patrones visuales: durante la navegación no
 - [ ] Remolque corto
 
 #### Pregunta 8: Observá el esquema. ¿Qué condición representa la disposición vertical roja, blanca y roja?
-![Imagen de referencia para la pregunta](imagenes/figure-708.jpg)
+![Imagen de referencia para la pregunta](../public/imagenes/curso/figure-708.jpg)
 
 - [ ] Barco varado
 - [ ] Barco con maniobra restringida
@@ -921,7 +921,7 @@ Estos dibujos deben estudiarse como patrones visuales: durante la navegación no
 - [ ] Barco fondeado
 
 #### Pregunta 9: Observá el dibujo. ¿Qué operación representa el conjunto de embarcaciones y luces?
-![Imagen de referencia para la pregunta](imagenes/figure-710.jpg)
+![Imagen de referencia para la pregunta](../public/imagenes/curso/figure-710.jpg)
 
 - [ ] Remolque
 - [ ] Fondeo
@@ -929,7 +929,7 @@ Estos dibujos deben estudiarse como patrones visuales: durante la navegación no
 - [ ] Navegación a vela
 
 #### Pregunta 10: Observá el esquema. ¿Qué condición representa la embarcación?
-![Imagen de referencia para la pregunta](imagenes/figure-711.jpg)
+![Imagen de referencia para la pregunta](../public/imagenes/curso/figure-711.jpg)
 
 - [ ] Barco varado
 - [ ] Barco sin gobierno
@@ -951,7 +951,7 @@ El esquema del material reúne distintas marcas diurnas utilizadas para reconoce
 Estas marcas permiten reconocer la condición de una embarcación durante el día aun cuando no se utilicen las señales luminosas nocturnas.
 
 
-![Ilustración de estudio sobre Señales diurnas](imagenes/figure-800.jpg)
+![Ilustración de estudio sobre Señales diurnas](../public/imagenes/curso/figure-800.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Señales diurnas)
 
 
@@ -969,7 +969,7 @@ Una PITADA CORTA dura aproximadamente 1 segundo. Una PITADA LARGA dura aproximad
 El cuadro del módulo resume señales acústicas entre buques a la vista y señales utilizadas en condiciones de visibilidad reducida.
 
 
-![Ilustración de estudio sobre Señales acústicas](imagenes/figure-801.jpg)
+![Ilustración de estudio sobre Señales acústicas](../public/imagenes/curso/figure-801.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Señales acústicas)
 
 
@@ -987,7 +987,7 @@ En el Río de la Plata, el material señala un régimen de marea MIXTA SEMIDIURN
 Cuando el SOL y la LUNA están en conjunción, en LUNA LLENA o LUNA NUEVA, se producen las mareas de SICIGIAS o VIVAS. Cuando forman un ángulo entre sí respecto de la Tierra se producen las mareas de CUADRATURA o MUERTAS. En sicigias, los valores son más extremos tanto en pleamar como en bajamar.
 
 
-![Ilustración de estudio sobre Mareas](imagenes/figure-802.jpg)
+![Ilustración de estudio sobre Mareas](../public/imagenes/curso/figure-802.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Mareas)
 
 
@@ -999,7 +999,7 @@ El material incorpora una TABLA DE MAREAS como herramienta de consulta. En ella 
 La lectura de estas tablas permite relacionar la información prevista con los conceptos de pleamar, bajamar, duración y amplitud estudiados en el capítulo anterior.
 
 
-![Ilustración de estudio sobre Tabla de mareas](imagenes/figure-803.jpg)
+![Ilustración de estudio sobre Tabla de mareas](../public/imagenes/curso/figure-803.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Tabla de mareas)
 
 
@@ -1015,7 +1015,7 @@ El método distribuye la variación total de la marea en seis partes iguales de 
 La curva incluida en el material representa pleamares, bajamares, creciente y bajante, y compara gráficamente la onda de marea de cuadratura con la de sicigias.
 
 
-![Ilustración de estudio sobre Método para calcular la altura de marea](imagenes/figure-804.jpg)
+![Ilustración de estudio sobre Método para calcular la altura de marea](../public/imagenes/curso/figure-804.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Método para calcular la altura de marea)
 
 
@@ -1031,7 +1031,7 @@ El esquema del material muestra un cálculo de VISUAL HACIA EL HORIZONTE. La dis
 Para un faro, el dibujo toma como dato la altura conocida del faro. Para el barco, la altura considerada es la de los ojos del observador sobre la carroza. El ejemplo suma la distancia al horizonte desde el faro y la distancia al horizonte desde el barco para obtener la visual total entre ambos.
 
 
-![Ilustración de estudio sobre Visual hacia el horizonte](imagenes/figure-805.jpg)
+![Ilustración de estudio sobre Visual hacia el horizonte](../public/imagenes/curso/figure-805.jpg)
 **Figura: Esquema incluido en el material del módulo** (Ilustración de estudio sobre Visual hacia el horizonte)
 
 
@@ -1044,7 +1044,7 @@ Para un faro, el dibujo toma como dato la altura conocida del faro. Para el barc
 - [ ] Medir la profundidad
 
 #### Pregunta 2: Observá el esquema. ¿Qué condición representan dos bolas negras dispuestas verticalmente?
-![Imagen de referencia para la pregunta](imagenes/figure-800.jpg)
+![Imagen de referencia para la pregunta](../public/imagenes/curso/figure-800.jpg)
 
 - [ ] Buque fondeado
 - [ ] Buque sin gobierno
@@ -1052,7 +1052,7 @@ Para un faro, el dibujo toma como dato la altura conocida del faro. Para el barc
 - [ ] Buque dedicado a la pesca
 
 #### Pregunta 3: Observá el cuadro de señales acústicas entre buques a la vista. ¿Qué indica una pitada corta?
-![Imagen de referencia para la pregunta](imagenes/figure-801.jpg)
+![Imagen de referencia para la pregunta](../public/imagenes/curso/figure-801.jpg)
 
 - [ ] Caigo a estribor
 - [ ] Caigo a babor
@@ -1078,7 +1078,7 @@ Para un faro, el dibujo toma como dato la altura conocida del faro. Para el barc
 - [ ] Cuadratura
 
 #### Pregunta 7: Observá el esquema. ¿En qué fases se muestran las mareas vivas o de sicigias?
-![Imagen de referencia para la pregunta](imagenes/figure-802.jpg)
+![Imagen de referencia para la pregunta](../public/imagenes/curso/figure-802.jpg)
 
 - [ ] Cuarto creciente y cuarto menguante
 - [ ] Luna nueva y luna llena
@@ -1098,7 +1098,7 @@ Para un faro, el dibujo toma como dato la altura conocida del faro. Para el barc
 - [ ] Sin variaciones de marea
 
 #### Pregunta 10: Observá el esquema de visual hacia el horizonte. Para calcular el horizonte desde el barco, ¿qué altura se toma?
-![Imagen de referencia para la pregunta](imagenes/figure-805.jpg)
+![Imagen de referencia para la pregunta](../public/imagenes/curso/figure-805.jpg)
 
 - [ ] La eslora total del barco
 - [ ] La altura del palo
