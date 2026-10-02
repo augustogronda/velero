@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { COURSE_NOTES } from './CourseNotes.js';
+import { COURSE_NOTES, COURSE_QUIZZES } from './CourseNotes.js';
 import { RIPA_SCENARIOS } from '../simulation/RipaEngine.js';
 import { WEATHER_PRESETS } from '../simulation/WeatherSystem.js';
 
@@ -901,8 +901,21 @@ export class SimulatorHUD {
     this.notesDrawer.setAttribute('aria-label', 'Cuaderno de Estudio Náutico PNA');
     this.notesDrawer.innerHTML = `
       <div class="notes-header">
-        <h3>📖 Cuaderno de Estudio Náutico (PNA)</h3>
+        <h3>📖 Cuaderno Oficial Timonel Vela y Motor</h3>
         <button id="btn-notes-close" class="btn-notes-close" aria-label="Cerrar cuaderno de apuntes">✕</button>
+      </div>
+      <div class="notes-filter-bar" id="notes-filter-bar">
+        <button class="notes-pill active" data-filter="all">Todos</button>
+        <button class="notes-pill" data-filter="modulo1Nomenclatura">⛵ Mód 1</button>
+        <button class="notes-pill" data-filter="modulo2EstabilidadViento">💨 Mód 2</button>
+        <button class="notes-pill" data-filter="modulo3Coordenadas">🧭 Mód 3</button>
+        <button class="notes-pill" data-filter="modulo4BoyadoIala">🔴 Mód 4</button>
+        <button class="notes-pill" data-filter="modulo5LucesMarcasRipa">💡 Mód 5</button>
+        <button class="notes-pill" data-filter="modulo6SenalesMareas">🌊 Mód 6</button>
+        <button class="notes-pill" data-filter="fondeoBorneo">⚓ Fondeo</button>
+        <button class="notes-pill" data-filter="meteorologia">🌩️ Meteo</button>
+        <button class="notes-pill pill-quiz" data-filter="quiz">📝 Exámenes (60 Q)</button>
+        <button class="notes-pill" data-filter="glosario">📖 Glosario</button>
       </div>
       <div class="notes-body" id="notes-content"></div>
     `;
@@ -938,24 +951,193 @@ export class SimulatorHUD {
   populateNotes() {
     const container = document.getElementById('notes-content');
     if (!container) return;
+
     let html = '';
+
+    // Render course notes cards
     for (const key in COURSE_NOTES) {
       const cat = COURSE_NOTES[key];
       html += `
-        <div class="note-card">
+        <div class="note-card" data-category="${key}">
           <h4>${cat.icon} ${cat.title}</h4>
           <div class="note-items">
             ${cat.sections.map(s => `
               <div class="note-item">
                 <strong>${s.heading}</strong>
                 <p>${s.content}</p>
+                ${s.image ? `
+                  <div class="note-figure">
+                    <img src="${s.image}" alt="${s.heading}" loading="lazy" />
+                    ${s.caption ? `<div class="note-figure-caption">📷 ${s.caption}</div>` : ''}
+                  </div>
+                ` : ''}
               </div>
             `).join('')}
           </div>
         </div>
       `;
     }
+
+    // Render interactive Quiz card
+    if (typeof COURSE_QUIZZES !== 'undefined' && COURSE_QUIZZES.length > 0) {
+      html += `
+        <div class="note-card note-card-quiz" data-category="quiz">
+          <h4>📝 Banco de Autoevaluación Oficial PNA (60 Preguntas)</h4>
+          <p style="font-size:0.73rem; color:#94a3b8; margin-bottom:12px; line-height:1.4;">
+            Preguntas oficiales de examen con corrección instantánea y fundamentación náutica oficial. Aprobación oficial: 70% o más.
+          </p>
+          <div class="quiz-modules-selector" id="quiz-modules-selector">
+            ${COURSE_QUIZZES.map((qm, qmIdx) => `
+              <button class="quiz-mod-btn ${qmIdx === 0 ? 'active' : ''}" data-mod="${qm.moduleNumber}">
+                ${qm.icon} Mód ${qm.moduleNumber}: ${qm.moduleTitle}
+              </button>
+            `).join('')}
+          </div>
+          <div id="quiz-score-banner" class="quiz-score-banner">
+            <span id="quiz-mod-title">Módulo 1: Nomenclatura</span>
+            <span id="quiz-score-text">0 / 10 respondidas</span>
+          </div>
+          <div id="quiz-active-questions"></div>
+        </div>
+      `;
+    }
+
     container.innerHTML = html;
+    this.initNotesFiltering();
+    this.initQuizSystem();
+  }
+
+  initNotesFiltering() {
+    const pills = this.notesDrawer.querySelectorAll('.notes-pill');
+    const cards = this.notesDrawer.querySelectorAll('.note-card');
+
+    pills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        pills.forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        const filter = pill.getAttribute('data-filter');
+
+        cards.forEach(card => {
+          if (filter === 'all') {
+            card.style.display = 'block';
+          } else {
+            card.style.display = (card.getAttribute('data-category') === filter) ? 'block' : 'none';
+          }
+        });
+      });
+    });
+  }
+
+  initQuizSystem() {
+    if (typeof COURSE_QUIZZES === 'undefined' || COURSE_QUIZZES.length === 0) return;
+
+    let activeModNum = 1;
+    const answeredMap = {}; // questionId -> selectedIndex
+
+    const modButtons = this.notesDrawer.querySelectorAll('.quiz-mod-btn');
+    const container = document.getElementById('quiz-active-questions');
+    const bannerTitle = document.getElementById('quiz-mod-title');
+    const bannerScore = document.getElementById('quiz-score-text');
+
+    const updateScore = () => {
+      const qm = COURSE_QUIZZES.find(m => m.moduleNumber === activeModNum);
+      if (!qm) return;
+
+      let answeredCount = 0;
+      let correctCount = 0;
+
+      qm.questions.forEach(q => {
+        if (answeredMap[q.id] !== undefined) {
+          answeredCount++;
+          if (answeredMap[q.id] === q.correctIndex) {
+            correctCount++;
+          }
+        }
+      });
+
+      if (bannerScore) {
+        if (answeredCount === 0) {
+          bannerScore.textContent = '0 / 10 respondidas';
+        } else {
+          const pct = Math.round((correctCount / qm.questions.length) * 100);
+          const status = pct >= 70 ? '🎉 APROBADO' : '⚠️ En curso';
+          bannerScore.textContent = `${correctCount}/${qm.questions.length} correctas (${pct}%) — ${status}`;
+        }
+      }
+    };
+
+    const renderActiveModule = () => {
+      const qm = COURSE_QUIZZES.find(m => m.moduleNumber === activeModNum);
+      if (!qm || !container) return;
+
+      if (bannerTitle) {
+        bannerTitle.textContent = `${qm.icon} Módulo ${qm.moduleNumber}: ${qm.moduleTitle}`;
+      }
+
+      container.innerHTML = qm.questions.map((q, qIdx) => {
+        const userSel = answeredMap[q.id];
+        const isAnswered = userSel !== undefined;
+
+        return `
+          <div class="quiz-q-card" id="q-card-${q.id}">
+            <div class="quiz-q-header">
+              <strong>${qIdx + 1}.</strong> ${q.prompt}
+            </div>
+            ${q.figure ? `
+              <div class="note-figure" style="margin-bottom:8px;">
+                <img src="${q.figure}" alt="Ilustración de la pregunta" loading="lazy" />
+              </div>
+            ` : ''}
+            <div class="quiz-options">
+              ${q.options.map((opt, optIdx) => {
+                let btnClass = 'quiz-opt-btn';
+                if (isAnswered) {
+                  if (optIdx === q.correctIndex) btnClass += ' correct';
+                  else if (optIdx === userSel) btnClass += ' wrong';
+                }
+                const disabled = isAnswered ? 'disabled' : '';
+                return `
+                  <button class="${btnClass}" data-qid="${q.id}" data-idx="${optIdx}" ${disabled}>
+                    ${String.fromCharCode(65 + optIdx)}) ${opt}
+                  </button>
+                `;
+              }).join('')}
+            </div>
+            ${isAnswered ? `
+              <div class="quiz-expl">
+                ${userSel === q.correctIndex ? '<strong>✓ ¡Correcto!</strong> ' : '<strong>✗ Incorrecto.</strong> '}
+                ${q.explanation}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+
+      // Add click listeners to option buttons
+      const optBtns = container.querySelectorAll('.quiz-opt-btn:not(:disabled)');
+      optBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const qid = btn.getAttribute('data-qid');
+          const optIdx = parseInt(btn.getAttribute('data-idx'), 10);
+          answeredMap[qid] = optIdx;
+          renderActiveModule();
+          updateScore();
+        });
+      });
+
+      updateScore();
+    };
+
+    modButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        modButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeModNum = parseInt(btn.getAttribute('data-mod'), 10);
+        renderActiveModule();
+      });
+    });
+
+    renderActiveModule();
   }
 
   bindEvents() {
