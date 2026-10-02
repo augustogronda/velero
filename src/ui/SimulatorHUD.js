@@ -953,14 +953,38 @@ export class SimulatorHUD {
     });
   }
 
+  resolveAssetUrl(url) {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:') || url.startsWith('blob:')) {
+      return url;
+    }
+    const cleanPath = url.replace(/^(\.\/|\/)+/, '');
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    const repoName = (pathParts.length > 0 && pathParts[0] !== 'simulador.html' && pathParts[0] !== 'index.html') ? pathParts[0] : '';
+
+    if (repoName && !window.location.origin.includes('localhost') && !window.location.origin.includes('127.0.0.1')) {
+      return `/${repoName}/${cleanPath}`;
+    }
+    return `./${cleanPath}`;
+  }
+
   openLightbox(src, caption) {
     const modal = document.getElementById('sim-lightbox-modal');
     const img = document.getElementById('sim-lightbox-img');
     const cap = document.getElementById('sim-lightbox-caption');
     if (!modal || !img) return;
 
-    img.src = src;
+    img.dataset.retried = '';
+    const resolved = this.resolveAssetUrl(src);
+    img.src = resolved;
     img.alt = caption || 'Lámina técnica náutica';
+    img.onerror = () => {
+      if (!img.dataset.retried) {
+        img.dataset.retried = '1';
+        const f = resolved.split('/').pop();
+        img.src = `./imagenes/curso/${f}`;
+      }
+    };
     if (cap) cap.innerHTML = `<strong>Lámina Oficial:</strong> ${caption || 'Esquema de estudio'}`;
     modal.classList.add('open');
   }
@@ -1010,12 +1034,15 @@ export class SimulatorHUD {
                   <p>${s.content}</p>
                   ${figs.length > 0 ? `
                     <div class="note-figures-grid">
-                      ${figs.map(f => `
-                        <div class="note-figure" data-lightbox="${f.src}" data-caption="${(f.caption || s.heading).replace(/"/g, '&quot;')}">
-                          <img src="${f.src}" alt="${s.heading}" loading="lazy" />
-                          <div class="note-figure-caption">🔍 <strong>Lámina:</strong> ${f.caption || s.heading}</div>
-                        </div>
-                      `).join('')}
+                      ${figs.map(f => {
+                        const resolvedSrc = this.resolveAssetUrl(f.src);
+                        return `
+                          <div class="note-figure" data-lightbox="${f.src}" data-caption="${(f.caption || s.heading).replace(/"/g, '&quot;')}">
+                            <img src="${resolvedSrc}" alt="${s.heading}" loading="lazy" onerror="if(!this.dataset.retried){this.dataset.retried=1; const fname=this.src.split('/').pop(); this.src='./imagenes/curso/'+fname;}" />
+                            <div class="note-figure-caption">🔍 <strong>Lámina:</strong> ${f.caption || s.heading}</div>
+                          </div>
+                        `;
+                      }).join('')}
                     </div>
                   ` : ''}
                 </div>
@@ -1239,7 +1266,7 @@ export class SimulatorHUD {
             </div>
             ${q.figure ? `
               <div class="note-figure" data-lightbox="${q.figure}" data-caption="Pregunta ${qIdx + 1}: ${q.prompt.replace(/"/g, '&quot;')}" style="margin-bottom:8px;">
-                <img src="${q.figure}" alt="Ilustración de la pregunta" loading="lazy" />
+                <img src="${this.resolveAssetUrl(q.figure)}" alt="Ilustración de la pregunta" loading="lazy" onerror="if(!this.dataset.retried){this.dataset.retried=1; const fname=this.src.split('/').pop(); this.src='./imagenes/curso/'+fname;}" />
                 <div class="note-figure-caption">🔍 <strong>Lámina de examen:</strong> Click para ampliar</div>
               </div>
             ` : ''}
