@@ -948,20 +948,36 @@ export class SimulatorHUD {
     modal.setAttribute('aria-modal', 'true');
     modal.innerHTML = `
       <div class="sim-lightbox-backdrop"></div>
+      <button class="sim-lightbox-close" id="btn-lightbox-close" aria-label="Cerrar imagen">✕</button>
       <div class="sim-lightbox-container">
-        <button class="sim-lightbox-close" id="btn-lightbox-close" aria-label="Cerrar imagen">✕</button>
         <img id="sim-lightbox-img" class="sim-lightbox-img" src="" alt="Lámina técnica en detalle" />
         <div id="sim-lightbox-caption" class="sim-lightbox-caption"></div>
       </div>
     `;
     document.body.appendChild(modal);
 
-    const close = () => modal.classList.remove('open');
-    modal.querySelector('.sim-lightbox-backdrop').addEventListener('click', close);
-    modal.querySelector('#btn-lightbox-close').addEventListener('click', close);
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && modal.classList.contains('open')) close();
+    modal.addEventListener('click', (e) => {
+      if (!e.target.closest('#sim-lightbox-img') && !e.target.closest('#sim-lightbox-caption')) {
+        this.closeLightbox();
+      }
     });
+
+    const closeBtn = modal.querySelector('#btn-lightbox-close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.closeLightbox();
+      });
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('open')) this.closeLightbox();
+    });
+  }
+
+  closeLightbox() {
+    const modal = document.getElementById('sim-lightbox-modal');
+    if (modal) modal.classList.remove('open');
   }
 
   resolveAssetUrl(url) {

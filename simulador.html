@@ -1555,7 +1555,7 @@
       position: fixed;
       inset: 0;
       z-index: 10000;
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: center;
       opacity: 0;
@@ -1563,13 +1563,14 @@
       transition: opacity 0.22s ease;
     }
     .sim-lightbox-modal.open {
+      display: flex;
       opacity: 1;
       pointer-events: auto;
     }
     .sim-lightbox-backdrop {
       position: absolute;
       inset: 0;
-      background: rgba(4, 8, 20, 0.88);
+      background: rgba(4, 8, 20, 0.94);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
     }
@@ -1577,21 +1578,23 @@
       position: relative;
       z-index: 2;
       max-width: 92vw;
-      max-height: 90vh;
+      max-height: 88vh;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       gap: 10px;
       animation: panelEnter 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
     .sim-lightbox-img {
-      max-width: 100%;
+      max-width: 90vw;
       max-height: 76vh;
       object-fit: contain;
       border-radius: 8px;
       box-shadow: 0 12px 40px rgba(0,0,0,0.9);
       border: 1px solid rgba(255,255,255,0.18);
       background: #02050b;
+      cursor: zoom-out;
     }
     .sim-lightbox-caption {
       font-size: 0.82rem;
@@ -1606,26 +1609,30 @@
       line-height: 1.4;
     }
     .sim-lightbox-close {
-      position: absolute;
-      top: -42px;
-      right: 0;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.25);
+      position: fixed;
+      top: 18px;
+      right: 22px;
+      z-index: 10010;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.3);
       color: #ffffff;
-      width: 34px;
-      height: 34px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
-      font-size: 1.1rem;
+      font-size: 1.35rem;
+      font-weight: 700;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: all 0.2s ease;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.6);
     }
     .sim-lightbox-close:hover {
-      background: rgba(239, 68, 68, 0.3);
+      background: rgba(239, 68, 68, 0.6);
       border-color: #ef4444;
-      color: #fca5a5;
+      color: #ffffff;
+      transform: scale(1.08);
     }
 
     /* ── Autoevaluaciones Interactivas ──────────────────────────── */

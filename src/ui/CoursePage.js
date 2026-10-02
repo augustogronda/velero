@@ -46,10 +46,11 @@ export class CoursePage {
   }
 
   init() {
+    this.createLightbox();
+    this.bindNavigationDelegation();
     this.renderSidebar();
     this.renderMobilePills();
     this.renderContent();
-    this.createLightbox();
     this.bindEvents();
     this.updateGlobalExamBadge();
   }
@@ -63,20 +64,36 @@ export class CoursePage {
     modal.setAttribute('aria-modal', 'true');
     modal.innerHTML = `
       <div class="sim-lightbox-backdrop"></div>
+      <button class="sim-lightbox-close" id="btn-lightbox-close" aria-label="Cerrar imagen">✕</button>
       <div class="sim-lightbox-container">
-        <button class="sim-lightbox-close" id="btn-lightbox-close" aria-label="Cerrar imagen">✕</button>
         <img id="sim-lightbox-img" class="sim-lightbox-img" src="" alt="Lámina técnica en detalle" />
         <div id="sim-lightbox-caption" class="sim-lightbox-caption"></div>
       </div>
     `;
     document.body.appendChild(modal);
 
-    const close = () => modal.classList.remove('open');
-    modal.querySelector('.sim-lightbox-backdrop').addEventListener('click', close);
-    modal.querySelector('#btn-lightbox-close').addEventListener('click', close);
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && modal.classList.contains('open')) close();
+    modal.addEventListener('click', (e) => {
+      if (!e.target.closest('#sim-lightbox-img') && !e.target.closest('#sim-lightbox-caption')) {
+        this.closeLightbox();
+      }
     });
+
+    const closeBtn = modal.querySelector('#btn-lightbox-close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.closeLightbox();
+      });
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') this.closeLightbox();
+    });
+  }
+
+  closeLightbox() {
+    const modal = document.getElementById('sim-lightbox-modal');
+    if (modal) modal.classList.remove('open');
   }
 
   openLightbox(src, caption) {
@@ -98,6 +115,46 @@ export class CoursePage {
     };
     if (cap) cap.innerHTML = `<strong>Lámina Oficial:</strong> ${caption || 'Esquema de estudio'}`;
     modal.classList.add('open');
+  }
+
+  bindNavigationDelegation() {
+    const navContainer = document.getElementById('sidebar-modules-nav');
+    if (navContainer && !navContainer.dataset.bound) {
+      navContainer.dataset.bound = 'true';
+      navContainer.addEventListener('click', (e) => {
+        const btn = e.target.closest('.sidebar-nav-item');
+        if (!btn) return;
+        const filter = btn.getAttribute('data-filter');
+        if (!filter) return;
+
+        this.closeLightbox();
+        this.activeFilter = filter;
+        this.renderSidebar();
+        this.renderMobilePills();
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        this.renderContent();
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      });
+    }
+
+    const pillsContainer = document.getElementById('mobile-pills-bar');
+    if (pillsContainer && !pillsContainer.dataset.bound) {
+      pillsContainer.dataset.bound = 'true';
+      pillsContainer.addEventListener('click', (e) => {
+        const btn = e.target.closest('.mobile-pill');
+        if (!btn) return;
+        const filter = btn.getAttribute('data-filter');
+        if (!filter) return;
+
+        this.closeLightbox();
+        this.activeFilter = filter;
+        this.renderSidebar();
+        this.renderMobilePills();
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        this.renderContent();
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      });
+    }
   }
 
   renderSidebar() {
@@ -154,16 +211,6 @@ export class CoursePage {
     `;
 
     navContainer.innerHTML = html;
-
-    navContainer.querySelectorAll('.sidebar-nav-item').forEach(btn => {
-      btn.addEventListener('click', () => {
-        this.activeFilter = btn.getAttribute('data-filter');
-        this.renderSidebar();
-        this.renderMobilePills();
-        this.renderContent();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-    });
   }
 
   renderMobilePills() {
@@ -192,19 +239,10 @@ export class CoursePage {
     `;
 
     pillsContainer.innerHTML = html;
-
-    pillsContainer.querySelectorAll('.mobile-pill').forEach(btn => {
-      btn.addEventListener('click', () => {
-        this.activeFilter = btn.getAttribute('data-filter');
-        this.renderSidebar();
-        this.renderMobilePills();
-        this.renderContent();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-    });
   }
 
   renderContent() {
+    this.closeLightbox();
     const mainContainer = document.getElementById('course-main-content');
     if (!mainContainer) return;
 
